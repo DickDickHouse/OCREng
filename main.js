@@ -3,7 +3,6 @@
 // 棋盤為 11 x 11 的方形
 const BOARD_ROWS = 11;
 const BOARD_COLS = 11;
-const BOARD_SIZE = BOARD_ROWS * BOARD_COLS;
 
 // 幫助函式：把 row, col 轉成一維 index
 function rcToIndex(r, c) {
@@ -19,7 +18,7 @@ for (let r = 0; r < BOARD_ROWS; r++) {
     boardCells.push({
       row: r,
       col: c,
-      isPath: false, // 是否為主跑道的��格（十字/跑道）
+      isPath: false, // 是否為主跑道的一格（十字/跑道）
       classes: [],   // 額外 CSS class
     });
   }
@@ -42,7 +41,7 @@ for (let r = 0; r < BOARD_ROWS; r++) {
   boardCells[idx].classes.push("cell-path");
 }
 
-// 四個角落附近標記為玩家「家」區域（目前只是背���裝飾）
+// 四個角落附近標記為玩家「家」區域（目前只是背景裝飾）
 boardCells[rcToIndex(0, 0)].classes.push("cell-home-green");
 boardCells[rcToIndex(0, 1)].classes.push("cell-home-green");
 boardCells[rcToIndex(1, 0)].classes.push("cell-home-green");
@@ -166,22 +165,41 @@ function initBoard() {
 function renderPieces() {
   const cells = boardEl.getElementsByClassName("cell");
 
-  // 先清除所有舊棋子
+  // 先清除所有舊棋子容器
   for (let cell of cells) {
-    while (cell.firstChild) {
-      cell.removeChild(cell.firstChild);
+    const oldContainer = cell.querySelector(".pieces-container");
+    if (oldContainer) {
+      cell.removeChild(oldContainer);
     }
   }
 
-  // 在路徑上畫出每位玩家棋子
+  // 對每一格記錄有哪些玩家在這一格
+  const cellPiecesMap = new Map(); // key: cellIndex, value: array of players
+
   players.forEach((player) => {
     const step = Math.min(player.currentStep, PATH_LENGTH - 1);
     const pathIndex = pathIndices[step];
-    const cell = cells[pathIndex];
 
-    const piece = document.createElement("div");
-    piece.className = `piece ${player.colorClass}`;
-    cell.appendChild(piece);
+    if (!cellPiecesMap.has(pathIndex)) {
+      cellPiecesMap.set(pathIndex, []);
+    }
+    cellPiecesMap.get(pathIndex).push(player);
+  });
+
+  // 依照 cellPiecesMap，為每一格建立容器並放入多顆棋
+  cellPiecesMap.forEach((playersInCell, cellIndex) => {
+    const cell = cells[cellIndex];
+
+    const container = document.createElement("div");
+    container.className = "pieces-container";
+
+    playersInCell.forEach((player) => {
+      const piece = document.createElement("div");
+      piece.className = `piece ${player.colorClass}`;
+      container.appendChild(piece);
+    });
+
+    cell.appendChild(container);
   });
 }
 
