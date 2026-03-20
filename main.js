@@ -201,6 +201,18 @@ function renderPieces() {
   });
 }
 
+// 取得某個玩家目前的 DOM 棋子元素（可能有多顆同色，暫時取第一顆）
+function getPlayerPieceElement(player) {
+  const cells = boardEl.getElementsByClassName("cell");
+  const step = Math.min(player.currentStep, PATH_LENGTH - 1);
+  const pathIndex = pathIndices[step];
+  const cell = cells[pathIndex];
+  if (!cell) return null;
+  // 在該格中找到對應顏色的棋子（如果有多顆同色，取第一個）
+  const piece = cell.querySelector(`.piece.${player.colorClass}`);
+  return piece;
+}
+
 // ========== 動畫：逐格移動棋子 ==========
 
 function animateMove(player, targetStep, onComplete) {
@@ -220,6 +232,12 @@ function animateMove(player, targetStep, onComplete) {
     player.currentStep = current;
     renderPieces();
 
+    // 讓剛剛這位玩家的棋子保持閃爍（避免重繪時被移除）
+    const pieceEl = getPlayerPieceElement(player);
+    if (pieceEl) {
+      pieceEl.classList.add("piece-blink");
+    }
+
     if (current < end) {
       setTimeout(moveOneStep, stepTime);
     } else {
@@ -236,13 +254,20 @@ function randomDice() {
   return Math.floor(Math.random() * 6) + 1;
 }
 
-// 執行一次完整的擲骰子流程：先動畫，再真正移動
+// 執行一次完整的擲骰子流程：先動畫 + 棋子閃爍，再骰子閃 1 秒，最後開始走
 function handleTurn() {
   if (gameEnded || isAnimating) return;
 
   const currentPlayer = players[currentPlayerIndex];
   isAnimating = true;
   rollButton.disabled = true;
+
+  // 先讓目前玩家的棋子開始閃爍
+  renderPieces(); // 確保有棋子 DOM
+  const currentPiece = getPlayerPieceElement(currentPlayer);
+  if (currentPiece) {
+    currentPiece.classList.add("piece-blink");
+  }
 
   // 計畫顯示 10 個隨機數字
   const totalFrames = 10;
@@ -268,7 +293,7 @@ function handleTurn() {
     setTimeout(() => {
       diceResultEl.textContent = diceValues[i].toString();
 
-      // 最後一個 frame：用這個點數做真正移動
+      // 最後一個 frame：開始點數閃爍 1 秒，之後再移動棋子
       if (i === totalFrames - 1) {
         const dice = diceValues[i];
         const oldStep = currentPlayer.currentStep;
@@ -280,19 +305,32 @@ function handleTurn() {
 
         statusEl.textContent = `${currentPlayer.name} 將從第 ${oldStep} 步走到第 ${targetStep} 步`;
 
-        animateMove(currentPlayer, targetStep, () => {
-          if (targetStep >= PATH_LENGTH - 1) {
-            gameEnded = true;
-            statusEl.textContent = `${currentPlayer.name} 率先繞完一圈，獲勝！`;
-            rollButton.disabled = true;
-            isAnimating = false;
-          } else {
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-            updateCurrentPlayerDisplay();
-            isAnimating = false;
-            rollButton.disabled = false;
-          }
-        });
+        // 讓骰子數字閃爍約 1 秒（4 次）
+        diceResultEl.classList.add("dice-blink");
+        setTimeout(() => {
+          diceResultEl.classList.remove("dice-blink");
+
+          // 點數閃完後，才開始走棋
+          animateMove(currentPlayer, targetStep, () => {
+            // 移動完成後，停止棋子閃爍
+            const finalPiece = getPlayerPieceElement(currentPlayer);
+            if (finalPiece) {
+              finalPiece.classList.remove("piece-blink");
+            }
+
+            if (targetStep >= PATH_LENGTH - 1) {
+              gameEnded = true;
+              statusEl.textContent = `${currentPlayer.name} 率先繞完一圈，獲勝！`;
+              rollButton.disabled = true;
+              isAnimating = false;
+            } else {
+              currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+              updateCurrentPlayerDisplay();
+              isAnimating = false;
+              rollButton.disabled = false;
+            }
+          });
+        }, 1000); // 1 秒閃爍
       }
     }, time);
   }
