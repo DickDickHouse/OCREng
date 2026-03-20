@@ -182,3 +182,20 @@ h1 {
 .piece.yellow {
   background-color: #faad14;
 }
+
+/* 閃爍動畫：每秒 4 次（0.25s 一循環） */
+@keyframes blink-fast {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* 棋子閃爍用 */
+.piece-blink {
+  animation: blink-fast 0.25s linear infinite;
+}
+
+/* 骰子數字閃爍用（1 秒 4 次，一秒結束前我在 JS 會移除 class） */
+.dice-blink {
+  animation: blink-fast 0.25s linear infinite;
+}
