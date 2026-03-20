@@ -332,5 +332,17 @@ function initGame() {
   gameEnded = false;
   isAnimating = false;
   rollButton.disabled = false;
- *
-
+  diceResultEl.textContent = "-";
+  statusEl.textContent = "";
+
+  initBoard();
+  renderPieces();
+  updateCurrentPlayerDisplay();
+}
+
+// 綁定事件
+rollButton.addEventListener("click", handleTurn);
+resetButton.addEventListener("click", initGame);
+
+// 頁面載入後開始
+window.addEventListener("load", initGame);
