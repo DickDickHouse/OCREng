@@ -64,10 +64,6 @@ boardCells[rcToIndex(10, 10)].classes.push("cell-home-yellow");
 
 // ========== 定義主跑道路徑（簡化版，帶顏色） ==========
 
-/**
- * 我們定義一條繞十字周邊的大圈（簡化，不完全等於真實飛行棋路線，但視覺上會在彩色十字周邊繞一圈）。
- */
-
 const pathIndices = [];
 
 // 幫助工具：把一連串 (r,c) 推進 pathIndices
@@ -146,13 +142,14 @@ const currentPlayerNameEl = document.getElementById("current-player-name");
 const diceResultEl = document.getElementById("dice-result");
 const statusEl = document.getElementById("status");
 const rollButton = document.getElementById("roll-button");
+const resetButton = document.getElementById("reset-button");
 
 // ========== 棋盤渲染 ==========
 
 function initBoard() {
   boardEl.innerHTML = "";
-  boardEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 28px)`;
-  boardEl.style.gridTemplateRows = `repeat(${BOARD_ROWS}, 28px)`;
+  boardEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 32px)`;
+  boardEl.style.gridTemplateRows = `repeat(${BOARD_ROWS}, 32px)`;
 
   boardCells.forEach((cellData) => {
     const cell = document.createElement("div");
@@ -276,6 +273,7 @@ function initGame() {
 
 // 綁定事件
 rollButton.addEventListener("click", handleTurn);
+resetButton.addEventListener("click", initGame);
 
 // 頁面載入後開始
 window.addEventListener("load", initGame);
