@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-<head:
+<head>
   <meta charset="UTF-8" />
   <title>簡易版飛行棋 Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,13 +9,22 @@
 <body>
   <h1>簡易版飛行棋 Demo</h1>
 
-  <div id="game-info">
-    <p>目前玩家：<span id="current-player-name">紅方</span></p>
-    <p>骰子點數：<span id="dice-result">-</span></p>
-    <p id="status"></p>
+  <div id="controls">
+    <div class="info-block">
+      <div>目前玩家：</div>
+      <div><span id="current-player-name">紅方</span></div>
+    </div>
+    <div class="info-block">
+      <div>骰子點數：</div>
+      <div><span id="dice-result">-</span></div>
+    </div>
+    <div class="button-block">
+      <button id="roll-button">擲骰子</button>
+      <button id="reset-button" type="button">重新開始</button>
+    </div>
   </div>
 
-  <button id="roll-button">擲骰子</button>
+  <p id="status"></p>
 
   <div id="board-wrapper">
     <div id="board"></div>
