@@ -192,70 +192,10 @@ function initBoard() {
 
 function renderPieces() {
   const cells = boardEl.getElementsByClassName("cell");
-
-  // 先清除所有舊棋子容器與文字
-  for (let i = 0; i < cells.length; i++) {
-    const cell = cells[i];
-    const oldContainer = cell.querySelector(".pieces-container");
-    if (oldContainer) cell.removeChild(oldContainer);
-
-    const oldLabel = cell.querySelector(".cell-label");
-    if (oldLabel) cell.removeChild(oldLabel);
+  for (let cell of cells) {
+    const old = cell.querySelector(".pieces-container");
+    if (old) cell.removeChild(old);
   }
-
-  // 在每個路徑格上顯示步數 index（方便你看）
-  pathIndices.forEach((cellIndex, step) => {
-    const cell = cells[cellIndex];
-    const label = document.createElement("div");
-    label.className = "cell-label";
-    label.style.position = "absolute";
-    label.style.left = "2px";
-    label.style.top = "2px";
-    label.style.fontSize = "10px";
-    label.style.color = "#999";
-    label.textContent = step.toString();
-    cell.appendChild(label);
-  });
-
-  // 再畫棋子
-  const cellPiecesMap = new Map();
-
-  players.forEach((player) => {
-    const color = player.color;
-    player.pieces.forEach((piece) => {
-      let cellIndex = null;
-
-      if (piece.status === "home") {
-        const list = homePositions[color];
-        if (list && list[piece.homeIndex] !== undefined) {
-          cellIndex = list[piece.homeIndex];
-        }
-      } else if (piece.status === "track") {
-        const step = Math.min(piece.step, PATH_LENGTH - 1);
-        cellIndex = pathIndices[step];
-      }
-
-      if (cellIndex !== null && cellIndex !== undefined) {
-        if (!cellPiecesMap.has(cellIndex)) cellPiecesMap.set(cellIndex, []);
-        cellPiecesMap.get(cellIndex).push(player);
-      }
-    });
-  });
-
-  cellPiecesMap.forEach((list, cellIndex) => {
-    const cell = cells[cellIndex];
-    const container = document.createElement("div");
-    container.className = "pieces-container";
-
-    list.forEach((player) => {
-      const pieceEl = document.createElement("div");
-      pieceEl.className = `piece ${player.colorClass}`;
-      container.appendChild(pieceEl);
-    });
-
-    cell.appendChild(container);
-  });
-}
 
   const cellPiecesMap = new Map();
 
