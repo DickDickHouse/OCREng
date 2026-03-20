@@ -19,18 +19,19 @@ for (let r = 0; r < BOARD_ROWS; r++) {
   }
 }
 
-// 四角家區（改成 4x4）
+// 四角家區（2x2）
+// 你提供的座標 (1,1)-(2,2) 等等，這裡已轉成 0-based
 function paintHomeArea(rStart, cStart, className) {
-  for (let r = rStart; r < rStart + 4; r++) {
-    for (let c = cStart; c < cStart + 4; c++) {
+  for (let r = rStart; r < rStart + 2; r++) {
+    for (let c = cStart; c < cStart + 2; c++) {
       boardCells[rcToIndex(r, c)].classes.push(className);
     }
   }
 }
-paintHomeArea(0, 0, "cell-home-blue");    // 左上藍
-paintHomeArea(0, 11, "cell-home-red");    // 右上紅
-paintHomeArea(11, 0, "cell-home-green");  // 左下綠
-paintHomeArea(11, 11, "cell-home-yellow");// 右下黃
+paintHomeArea(0, 0, "cell-home-blue");     // 左上藍
+paintHomeArea(0, 13, "cell-home-red");     // 右上紅
+paintHomeArea(13, 0, "cell-home-green");   // 左下綠
+paintHomeArea(13, 13, "cell-home-yellow"); // 右下黃
 
 // 中央 3x3 終點區
 const centerCells = [
@@ -124,12 +125,12 @@ const startSteps = {
 };
 
 // ========== 玩家設定 ==========
-// 4x4 家區內的 4 個格子（2x2 擺棋）
+// 2x2 家區內的 4 個格子
 const homePositions = {
-  blue:  [rcToIndex(1,1), rcToIndex(1,2), rcToIndex(2,1), rcToIndex(2,2)],
-  red:   [rcToIndex(1,12), rcToIndex(1,13), rcToIndex(2,12), rcToIndex(2,13)],
-  green: [rcToIndex(12,1), rcToIndex(12,2), rcToIndex(13,1), rcToIndex(13,2)],
-  yellow:[rcToIndex(12,12), rcToIndex(12,13), rcToIndex(13,12), rcToIndex(13,13)],
+  blue:  [rcToIndex(0,0), rcToIndex(0,1), rcToIndex(1,0), rcToIndex(1,1)],
+  red:   [rcToIndex(0,13), rcToIndex(0,14), rcToIndex(1,13), rcToIndex(1,14)],
+  green: [rcToIndex(13,0), rcToIndex(13,1), rcToIndex(14,0), rcToIndex(14,1)],
+  yellow:[rcToIndex(13,13), rcToIndex(13,14), rcToIndex(14,13), rcToIndex(14,14)],
 };
 
 const players = [
