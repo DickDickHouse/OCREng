@@ -135,6 +135,7 @@ const players = [
 
 let currentPlayerIndex = 0;
 let gameEnded = false;
+let isAnimating = false; // 是否正在動畫中（擲骰子或移動）
 
 // DOM 元素
 const boardEl = document.getElementById("board");
@@ -200,37 +201,104 @@ function renderPieces() {
   });
 }
 
-// ========== 擲骰子與回合處理 ==========
+// ========== 動畫：逐格移動棋子 ==========
 
-function rollDice() {
+function animateMove(player, targetStep, onComplete) {
+  const start = player.currentStep;
+  const end = targetStep;
+  const stepDiff = end - start;
+  if (stepDiff <= 0) {
+    // 不需要移動
+    if (onComplete) onComplete();
+    return;
+  }
+
+  let current = start;
+  const stepTime = 300; // 每格 0.3 秒
+
+  function moveOneStep() {
+    current += 1;
+    player.currentStep = current;
+    renderPieces();
+
+    if (current < end) {
+      setTimeout(moveOneStep, stepTime);
+    } else {
+      if (onComplete) onComplete();
+    }
+  }
+
+  moveOneStep();
+}
+
+// ========== 擲骰子動畫與回合處理 ==========
+
+function randomDice() {
   return Math.floor(Math.random() * 6) + 1;
 }
 
+// 執行一次完整的擲骰子流程：先動畫，再真正移動
 function handleTurn() {
-  if (gameEnded) return;
+  if (gameEnded || isAnimating) return;
 
   const currentPlayer = players[currentPlayerIndex];
-  const dice = rollDice();
-  diceResultEl.textContent = dice.toString();
+  isAnimating = true;
+  rollButton.disabled = true;
 
-  const oldStep = currentPlayer.currentStep;
-  let newStep = oldStep + dice;
+  // 計畫顯示 10 個隨機數字
+  const totalFrames = 10;
+  const fastFrames = 7; // 前 7 次快一點
+  const slowFrames = totalFrames - fastFrames;
 
-  if (newStep >= PATH_LENGTH) {
-    newStep = PATH_LENGTH - 1;
-    gameEnded = true;
-    statusEl.textContent = `${currentPlayer.name} 率先繞完一圈，獲勝！`;
-    rollButton.disabled = true;
-  } else {
-    statusEl.textContent = `${currentPlayer.name} 從第 ${oldStep} 步移動到第 ${newStep} 步`;
+  const fastInterval = 120; // ms
+  const slowInterval = 400; // ms
+
+  const diceValues = [];
+  for (let i = 0; i < totalFrames; i++) {
+    diceValues.push(randomDice());
   }
 
-  currentPlayer.currentStep = newStep;
-  renderPieces();
+  // 安排每一個 frame 何時顯示
+  let time = 0;
+  for (let i = 0; i < totalFrames; i++) {
+    if (i < fastFrames) {
+      time += fastInterval;
+    } else {
+      time += slowInterval;
+    }
 
-  if (!gameEnded) {
-    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-    updateCurrentPlayerDisplay();
+    setTimeout(() => {
+      diceResultEl.textContent = diceValues[i].toString();
+
+      // 最後一個 frame 時，開始真正移動棋子
+      if (i === totalFrames - 1) {
+        const dice = diceValues[i];
+        const oldStep = currentPlayer.currentStep;
+        let targetStep = oldStep + dice;
+
+        if (targetStep >= PATH_LENGTH) {
+          targetStep = PATH_LENGTH - 1;
+        }
+
+        statusEl.textContent = `${currentPlayer.name} 將從第 ${oldStep} 步走到第 ${targetStep} 步`;
+
+        animateMove(currentPlayer, targetStep, () => {
+          // 動畫結束後檢查是否獲勝
+          if (targetStep >= PATH_LENGTH - 1) {
+            gameEnded = true;
+            statusEl.textContent = `${currentPlayer.name} 率先繞完一圈，獲勝！`;
+            rollButton.disabled = true;
+            isAnimating = false;
+          } else {
+            // 換下一位玩家
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            updateCurrentPlayerDisplay();
+            isAnimating = false;
+            rollButton.disabled = false;
+          }
+        });
+      }
+    }, time);
   }
 }
 
@@ -262,18 +330,7 @@ function initGame() {
   currentPlayerIndex = 0;
   players.forEach((p) => (p.currentStep = 0));
   gameEnded = false;
+  isAnimating = false;
   rollButton.disabled = false;
-  diceResultEl.textContent = "-";
-  statusEl.textContent = "";
-
-  initBoard();
-  renderPieces();
-  updateCurrentPlayerDisplay();
-}
-
-// 綁定事件
-rollButton.addEventListener("click", handleTurn);
-resetButton.addEventListener("click", initGame);
-
-// 頁面載入後開始
-window.addEventListener("load", initGame);
+ *
+
