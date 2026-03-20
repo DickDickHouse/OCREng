@@ -32,18 +32,10 @@ h1 {
 }
 
 /* 玩家名稱顏色 */
-.player-red {
-  color: #ff4d4f;
-}
-.player-blue {
-  color: #1890ff;
-}
-.player-green {
-  color: #52c41a;
-}
-.player-yellow {
-  color: #faad14;
-}
+.player-red { color: #ff4d4f; }
+.player-blue { color: #1890ff; }
+.player-green { color: #52c41a; }
+.player-yellow { color: #faad14; }
 
 /* 控制按鈕區 */
 .button-block {
@@ -64,7 +56,6 @@ h1 {
   background-color: #1890ff;
   color: #fff;
 }
-
 #roll-button:disabled {
   background-color: #d9d9d9;
   color: #888;
@@ -120,9 +111,7 @@ h1 {
 }
 
 /* 主路 */
-.cell-path {
-  background-color: #ffffff;
-}
+.cell-path { background-color: #ffffff; }
 .cell-path-red { background-color: #ffe7e7; }
 .cell-path-blue { background-color: #e6f3ff; }
 .cell-path-green { background-color: #e6ffe7; }
@@ -153,7 +142,6 @@ h1 {
   border: 2px solid #555;
   background-color: #fff;
 }
-
 .start-red::after { border-color: #ff4d4f; }
 .start-blue::after { border-color: #1890ff; }
 .start-green::after { border-color: #52c41a; }
@@ -176,7 +164,6 @@ h1 {
   margin: auto;
   box-shadow: 0 0 2px rgba(0,0,0,0.4);
 }
-
 .piece.red { background-color: #ff4d4f; }
 .piece.blue { background-color: #1890ff; }
 .piece.green { background-color: #52c41a; }
@@ -188,11 +175,5 @@ h1 {
   50% { opacity: 0; }
   100% { opacity: 1; }
 }
-
-.piece-blink {
-  animation: blink-fast 0.25s linear infinite;
-}
-
-.dice-blink {
-  animation: blink-fast 0.25s linear infinite;
-}
+.piece-blink { animation: blink-fast 0.25s linear infinite; }
+.dice-blink { animation: blink-fast 0.25s linear infinite; }
