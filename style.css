@@ -6,11 +6,25 @@ body {
 }
 
 h1 {
+  margin-bottom: 12px;
+}
+
+/* 上方資訊與按鈕區塊 */
+#controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  align-items: center;
   margin-bottom: 8px;
 }
 
-#game-info {
-  margin-bottom: 12px;
+.info-block {
+  background-color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  font-size: 14px;
 }
 
 #current-player-name {
@@ -31,29 +45,75 @@ h1 {
   color: #faad14;
 }
 
+/* 控制按鈕區 */
+.button-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.button-block button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: none;
+}
+
+/* 擲骰子按鈕 */
+#roll-button {
+  background-color: #1890ff;
+  color: #fff;
+}
+
+#roll-button:disabled {
+  background-color: #d9d9d9;
+  color: #888;
+}
+
+/* 重新開始按鈕 */
+#reset-button {
+  background-color: #52c41a;
+  color: #fff;
+}
+
+/* 狀態文字 */
+#status {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  min-height: 20px;
+  color: #333;
+  font-size: 14px;
+}
+
+/* 讓骰子結果更明顯 */
+#dice-result {
+  font-weight: bold;
+  font-size: 18px;
+}
+
 #board-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 /* 棋盤外框，固定大小的方形區域 */
 #board {
   display: grid;
-  grid-template-columns: repeat(11, 28px);
-  grid-template-rows: repeat(11, 28px);
+  grid-template-columns: repeat(11, 32px);
+  grid-template-rows: repeat(11, 32px);
   gap: 2px;
   margin: 0 auto;
-  padding: 8px;
+  padding: 10px;
   background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
 }
 
 /* 單一格子 */
 .cell {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #d9d9d9;
   position: relative;
   background-color: #fafafa;
@@ -64,7 +124,7 @@ h1 {
   background-color: #ffffff;
 }
 
-/* 四個方向的彩色跑道（在 JS 裡我們會為特定路徑格子加上這些 class） */
+/* 四個方向的彩色跑道 */
 .cell-path-red {
   background-color: #ffe7e7;   /* 淡紅 */
 }
@@ -101,10 +161,10 @@ h1 {
   grid-template-rows: repeat(2, 1fr);
 }
 
-/* 小顆棋：適合 2x2 佈局 */
+/* 小顆棋：適合 2x2 佈局，隨棋盤放大稍微加大 */
 .piece {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   margin: auto;
   box-shadow: 0 0 2px rgba(0,0,0,0.4);
@@ -121,30 +181,4 @@ h1 {
 }
 .piece.yellow {
   background-color: #faad14;
-}
-
-#roll-button {
-  padding: 8px 16px;
-  font-size: 16px;
-  border-radius: 4px;
-  border: none;
-  background-color: #1890ff;
-  color: #fff;
-}
-
-#roll-button:disabled {
-  background-color: #d9d9d9;
-  color: #888;
-}
-
-#status {
-  margin-top: 8px;
-  min-height: 20px;
-  color: #333;
-}
-
-/* 讓骰子結果更明顯 */
-#dice-result {
-  font-weight: bold;
-  font-size: 18px;
 }
