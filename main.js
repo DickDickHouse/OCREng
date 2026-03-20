@@ -118,10 +118,10 @@ const PATH_LENGTH = pathIndices.length;
 
 // 定義各顏色玩家的「起點步數」
 const startSteps = {
-  red:   0,                         // 紅方從 bottomPath 起點
-  blue:  bottomPath.length,         // 紅跑完下方接右側
-  green: bottomPath.length + rightPath.length,
-  yellow:bottomPath.length + rightPath.length + topPath.length
+  red:    0,                                         // 紅：下方起點
+  blue:   bottomPath.length,                         // 藍：接右側
+  green:  bottomPath.length + rightPath.length,      // 綠：接上方
+  yellow: bottomPath.length + rightPath.length + topPath.length, // 黃：接左側
 };
 
 // ========== 玩家＆棋子設定 ==========
@@ -278,7 +278,6 @@ function getFirstHomePiece(player) {
 function getAnyTrackPieceElement(player) {
   const cells = boardEl.getElementsByClassName("cell");
 
-  // 找這個玩家的第一顆在路上的棋
   const piece = getFirstTrackPiece(player);
   if (!piece) return null;
 
@@ -332,11 +331,7 @@ function randomDice() {
   return Math.floor(Math.random() * 6) + 1;
 }
 
-// 執行一次完整的擲骰子流程：
-// 1) 目前玩家棋子閃爍
-// 2) 骰子亂數動畫
-// 3) 點數停下後閃 1 秒
-// 4) 根據飛行棋起步規則移動
+// 執行一次完整的擲骰子流程
 function handleTurn() {
   if (gameEnded || isAnimating) return;
 
@@ -344,10 +339,10 @@ function handleTurn() {
   isAnimating = true;
   rollButton.disabled = true;
 
-  // 先更新一次畫面，確保家裡或路上有棋子 DOM
+  // 先更新一次畫面
   renderPieces();
 
-  // 讓「這個玩家」的路上棋（如果有）先閃爍；如果還都在家，暫時不會看到棋閃
+  // 讓這個玩家已有在路上的棋（如有）先閃爍
   let blinkingTargetEl = getAnyTrackPieceElement(player);
   if (blinkingTargetEl) {
     blinkingTargetEl.classList.add("piece-blink");
@@ -380,7 +375,6 @@ function handleTurn() {
           blinkingTargetEl.classList.add("piece-blink");
         }
 
-        // 顯示計畫文字（稍後真正執行）
         statusEl.textContent = `${player.name} 擲出 ${dice} 點`;
 
         // 讓點數閃爍 1 秒
@@ -388,9 +382,9 @@ function handleTurn() {
         setTimeout(() => {
           diceResultEl.classList.remove("dice-blink");
 
-          // 開始依照起步規則實際移動
+          // 按照起步規則實際移動
           performMoveWithLudoRules(player, dice, () => {
-            // 移動完成後，關閉本玩家的棋子閃爍
+            // 移動完成後，關閉本玩家棋子閃爍
             renderPieces();
             const el = getAnyTrackPieceElement(player);
             if (el) {
@@ -400,26 +394,25 @@ function handleTurn() {
             isAnimating = false;
 
             if (!gameEnded) {
-              // 換下一個玩家
               currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
               updateCurrentPlayerDisplay();
               rollButton.disabled = false;
             }
           });
-        }, 1000); // 點數閃 1 秒
+        }, 1000);
       }
     }, time);
   }
 }
 
 /**
- * 依照簡化的飛行棋起步規則，決定這回合怎麼動：
- * - 如果骰子是 6：
- *   - 若家裡還有棋，優先把第一顆在家的棋放到起點
- *   - 否則，如果有在路上的棋，讓第一顆在路上的棋走 6 步
- * - 如果骰子不是 6：
- *   - 若有在路上的棋，讓第一顆在路上的棋往前走骰子步數
- *   - 若全在家，則跳過（這回合無法行動）
+ * 簡化飛行棋起步規則：
+ * - 若 dice = 6：
+ *   - 若家裡有棋：把第一顆在家的棋「起飛」，並用動畫走 6 格到起點
+ *   - 若家裡沒有棋但路上有棋：讓路上的棋走 6 步（動畫）
+ * - 若 dice != 6：
+ *   - 若路上有棋：讓路上的棋走 dice 步（動畫）
+ *   - 若全在家：不能動
  */
 function performMoveWithLudoRules(player, dice, done) {
   const color = player.color;
@@ -430,30 +423,32 @@ function performMoveWithLudoRules(player, dice, done) {
 
   if (dice === 6) {
     if (homePiece) {
-      // 從家起飛到起點
+      // 起飛動畫：從「起點前 6 格」走到起點
+      let initialStep = startStep - 6;
+      if (initialStep < 0) initialStep = 0;
+
       homePiece.status = "track";
-      homePiece.step = startStep;
-      statusEl.textContent = `${player.name} 擲到 6，從家裡起飛！`;
+      homePiece.step = initialStep;
+
+      statusEl.textContent = `${player.name} 擲到 6，從家裡起飛並走到起點！`;
       renderPieces();
-      // 起飛這一步先不動畫走格（直接到起點），之後若你要也可以做格子動畫
-      done();
+
+      animateMovePiece(player, homePiece, startStep, () => {
+        done();
+      });
       return;
     } else if (trackPiece) {
-      // 沒有在家的棋，就讓路上的棋走 6 格
       moveTrackPieceWithDice(player, trackPiece, dice, done);
       return;
     } else {
-      // 理論上不會發生：既沒有家棋也沒有路棋
       done();
       return;
     }
   } else {
-    // 骰子不是 6，只能移動路上的棋（若有）
     if (trackPiece) {
       moveTrackPieceWithDice(player, trackPiece, dice, done);
       return;
     } else {
-      // 全在家且不是 6，不能動
       statusEl.textContent = `${player.name} 全在家且不是 6，無法行動。`;
       done();
       return;
@@ -509,7 +504,6 @@ function updateCurrentPlayerDisplay() {
 // ========== 初始化遊戲 ==========
 
 function initGame() {
-  // 重置玩家棋子
   players.forEach((player) => {
     player.pieces.forEach((p, i) => {
       p.status = "home";
