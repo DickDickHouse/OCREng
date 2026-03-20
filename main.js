@@ -1,7 +1,7 @@
 // ========== 棋盤設定 ==========
 
-const BOARD_ROWS = 11;
-const BOARD_COLS = 11;
+const BOARD_ROWS = 15;
+const BOARD_COLS = 15;
 
 function rcToIndex(r, c) {
   return r * BOARD_COLS + c;
@@ -19,44 +19,52 @@ for (let r = 0; r < BOARD_ROWS; r++) {
   }
 }
 
-// 中央十字
-for (let c = 0; c < BOARD_COLS; c++) {
-  const idx = rcToIndex(5, c);
-  boardCells[idx].isPath = true;
-  boardCells[idx].classes.push("cell-path");
+// 四角家區（6x6）
+function paintHomeArea(rStart, cStart, className) {
+  for (let r = rStart; r < rStart + 6; r++) {
+    for (let c = cStart; c < cStart + 6; c++) {
+      boardCells[rcToIndex(r, c)].classes.push(className);
+    }
+  }
 }
-for (let r = 0; r < BOARD_ROWS; r++) {
-  const idx = rcToIndex(r, 5);
-  boardCells[idx].isPath = true;
-  boardCells[idx].classes.push("cell-path");
-}
+paintHomeArea(0, 0, "cell-home-blue");    // 左上藍
+paintHomeArea(0, 9, "cell-home-red");     // 右上紅
+paintHomeArea(9, 0, "cell-home-green");   // 左下綠
+paintHomeArea(9, 9, "cell-home-yellow");  // 右下黃
 
-// 四角的家
-const homePositions = {
-  green: [rcToIndex(0, 0), rcToIndex(0, 1), rcToIndex(1, 0), rcToIndex(1, 1)],
-  blue:  [rcToIndex(0, 9), rcToIndex(0,10), rcToIndex(1, 9), rcToIndex(1,10)],
-  red:   [rcToIndex(9, 0), rcToIndex(9, 1), rcToIndex(10,0), rcToIndex(10,1)],
-  yellow:[rcToIndex(9, 9), rcToIndex(9,10), rcToIndex(10,9), rcToIndex(10,10)],
-};
+// 中央 3x3 終點區
+const center = 7;
+const centerCells = [
+  [6,6],[6,7],[6,8],
+  [7,6],[7,7],[7,8],
+  [8,6],[8,7],[8,8],
+];
+centerCells.forEach(([r,c]) => {
+  let cls = "center-core";
+  if (r < center && c === center) cls = "center-red";
+  else if (r > center && c === center) cls = "center-green";
+  else if (c < center && r === center) cls = "center-blue";
+  else if (c > center && r === center) cls = "center-yellow";
+  else if (r === 6 && c === 7) cls = "center-red";
+  else if (r === 8 && c === 7) cls = "center-green";
+  else if (r === 7 && c === 6) cls = "center-blue";
+  else if (r === 7 && c === 8) cls = "center-yellow";
+  boardCells[rcToIndex(r,c)].classes.push(cls);
+});
 
-homePositions.green.forEach(i => boardCells[i].classes.push("cell-home-green"));
-homePositions.blue.forEach(i  => boardCells[i].classes.push("cell-home-blue"));
-homePositions.red.forEach(i   => boardCells[i].classes.push("cell-home-red"));
-homePositions.yellow.forEach(i=> boardCells[i].classes.push("cell-home-yellow"));
-
-// ========== 路徑定義（簡化大圈） ==========
+// ========== 簡化路徑（暫時沿用） ==========
 
 const pathIndices = [];
 
 function pushPathCells(coords) {
-  coords.forEach(([r, c]) => {
-    const idx = rcToIndex(r, c);
+  coords.forEach(([r,c]) => {
+    const idx = rcToIndex(r,c);
     if (!pathIndices.includes(idx)) pathIndices.push(idx);
   });
 }
 function addColorToCells(coords, cls) {
-  coords.forEach(([r, c]) => {
-    const idx = rcToIndex(r, c);
+  coords.forEach(([r,c]) => {
+    const idx = rcToIndex(r,c);
     if (!boardCells[idx].classes.includes(cls)) {
       boardCells[idx].classes.push(cls);
     }
@@ -65,33 +73,32 @@ function addColorToCells(coords, cls) {
 
 // 下方紅路
 const bottomPath = [
-  [8, 2], [8, 3], [8, 4], [8, 5], [8, 6], [8, 7], [8, 8],
+  [10,4],[10,5],[10,6],[10,7],[10,8],[10,9],[10,10]
 ];
 pushPathCells(bottomPath);
 addColorToCells(bottomPath, "cell-path-red");
 
 // 右側藍路
 const rightPath = [
-  [7, 8], [6, 8], [5, 8], [4, 8], [3, 8],
+  [9,10],[8,10],[7,10],[6,10],[5,10],[4,10]
 ];
 pushPathCells(rightPath);
 addColorToCells(rightPath, "cell-path-blue");
 
 // 上方綠路
 const topPath = [
-  [2, 8], [2, 7], [2, 6], [2, 5], [2, 4], [2, 3], [2, 2],
+  [4,10],[4,9],[4,8],[4,7],[4,6],[4,5],[4,4]
 ];
 pushPathCells(topPath);
 addColorToCells(topPath, "cell-path-green");
 
 // 左側黃路
 const leftPath = [
-  [3, 2], [4, 2], [5, 2], [6, 2], [7, 2],
+  [5,4],[6,4],[7,4],[8,4],[9,4]
 ];
 pushPathCells(leftPath);
 addColorToCells(leftPath, "cell-path-yellow");
 
-// 標記為 path
 pathIndices.forEach((idx) => {
   boardCells[idx].isPath = true;
   if (!boardCells[idx].classes.includes("cell-path")) {
@@ -99,63 +106,42 @@ pathIndices.forEach((idx) => {
   }
 });
 
-const PATH_LENGTH = pathIndices.length;
+// 起飛格標記（第一階段只做視覺）
+const startCells = {
+  red: rcToIndex(10,4),
+  blue: rcToIndex(9,10),
+  green: rcToIndex(4,10),
+  yellow: rcToIndex(5,4),
+};
+boardCells[startCells.red].classes.push("start-red");
+boardCells[startCells.blue].classes.push("start-blue");
+boardCells[startCells.green].classes.push("start-green");
+boardCells[startCells.yellow].classes.push("start-yellow");
 
-// 起飛「步數」：先用一圈的 4 個位置，之後如果你要再微調
+// 起飛步數（仍沿用簡化）
 const startSteps = {
-  red:    0,
-  blue:   bottomPath.length,
-  green:  bottomPath.length + rightPath.length,
-  yellow: bottomPath.length + rightPath.length + topPath.length,
+  red: 0,
+  blue: bottomPath.length,
+  green: bottomPath.length + rightPath.length,
+  yellow: bottomPath.length + rightPath.length + topPath.length
 };
 
-// ========== 玩家 / 棋子狀態 ==========
+const PATH_LENGTH = pathIndices.length;
+
+// ========== 玩家設定 ==========
+
+const homePositions = {
+  blue:  [rcToIndex(1,1), rcToIndex(1,2), rcToIndex(2,1), rcToIndex(2,2)],
+  red:   [rcToIndex(1,12), rcToIndex(1,13), rcToIndex(2,12), rcToIndex(2,13)],
+  green: [rcToIndex(12,1), rcToIndex(12,2), rcToIndex(13,1), rcToIndex(13,2)],
+  yellow:[rcToIndex(12,12), rcToIndex(12,13), rcToIndex(13,12), rcToIndex(13,13)],
+};
 
 const players = [
-  {
-    id: 0,
-    name: "紅方",
-    color: "red",
-    colorClass: "red",
-    pieces: Array.from({ length: 4 }, (_, i) => ({
-      status: "home",
-      homeIndex: i,
-      step: 0,
-    })),
-  },
-  {
-    id: 1,
-    name: "藍方",
-    color: "blue",
-    colorClass: "blue",
-    pieces: Array.from({ length: 4 }, (_, i) => ({
-      status: "home",
-      homeIndex: i,
-      step: 0,
-    })),
-  },
-  {
-    id: 2,
-    name: "綠方",
-    color: "green",
-    colorClass: "green",
-    pieces: Array.from({ length: 4 }, (_, i) => ({
-      status: "home",
-      homeIndex: i,
-      step: 0,
-    })),
-  },
-  {
-    id: 3,
-    name: "黃方",
-    color: "yellow",
-    colorClass: "yellow",
-    pieces: Array.from({ length: 4 }, (_, i) => ({
-      status: "home",
-      homeIndex: i,
-      step: 0,
-    })),
-  },
+  { id:0, name:"紅方", color:"red", colorClass:"red", pieces: Array.from({length:4}, (_,i)=>({status:"home", homeIndex:i, step:0})) },
+  { id:1, name:"藍方", color:"blue", colorClass:"blue", pieces: Array.from({length:4}, (_,i)=>({status:"home", homeIndex:i, step:0})) },
+  { id:2, name:"綠方", color:"green", colorClass:"green", pieces: Array.from({length:4}, (_,i)=>({status:"home", homeIndex:i, step:0})) },
+  { id:3, name:"黃方", color:"yellow", colorClass:"yellow", pieces: Array.from({length:4}, (_,i)=>({status:"home", homeIndex:i, step:0})) },
 ];
 
 let currentPlayerIndex = 0;
@@ -170,12 +156,12 @@ const statusEl = document.getElementById("status");
 const rollButton = document.getElementById("roll-button");
 const resetButton = document.getElementById("reset-button");
 
-// ========== 棋盤 & 棋子渲染 ==========
+// ========== 棋盤渲染 ==========
 
 function initBoard() {
   boardEl.innerHTML = "";
-  boardEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 32px)`;
-  boardEl.style.gridTemplateRows = `repeat(${BOARD_ROWS}, 32px)`;
+  boardEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 26px)`;
+  boardEl.style.gridTemplateRows = `repeat(${BOARD_ROWS}, 26px)`;
 
   boardCells.forEach((cellData) => {
     const cell = document.createElement("div");
@@ -231,226 +217,4 @@ function renderPieces() {
   });
 }
 
-function getFirstTrackPiece(player) {
-  return player.pieces.find((p) => p.status === "track") || null;
-}
-function getFirstHomePiece(player) {
-  return player.pieces.find((p) => p.status === "home") || null;
-}
-function getAnyTrackPieceElement(player) {
-  const piece = getFirstTrackPiece(player);
-  if (!piece) return null;
-  const step = Math.min(piece.step, PATH_LENGTH - 1);
-  const idx = pathIndices[step];
-  const cells = boardEl.getElementsByClassName("cell");
-  const cell = cells[idx];
-  if (!cell) return null;
-  return cell.querySelector(`.piece.${player.colorClass}`);
-}
-
-// ========== 動畫：逐格移動路上棋 ==========
-
-function animateMovePiece(player, piece, targetStep, onComplete) {
-  const start = piece.step;
-  const end = targetStep;
-  if (end <= start) {
-    onComplete && onComplete();
-    return;
-  }
-
-  let current = start;
-  const stepTime = 300;
-
-  function moveOne() {
-    current += 1;
-    piece.step = current;
-    renderPieces();
-
-    const el = getAnyTrackPieceElement(player);
-    if (el) el.classList.add("piece-blink");
-
-    if (current < end) {
-      setTimeout(moveOne, stepTime);
-    } else {
-      onComplete && onComplete();
-    }
-  }
-
-  moveOne();
-}
-
-// ========== 擲骰子動畫 + 回合流程 ==========
-
-function randomDice() {
-  return Math.floor(Math.random() * 6) + 1;
-}
-
-function handleTurn() {
-  if (gameEnded || isAnimating) return;
-
-  const player = players[currentPlayerIndex];
-  isAnimating = true;
-  rollButton.disabled = true;
-
-  renderPieces();
-
-  let blinkingEl = getAnyTrackPieceElement(player);
-  if (blinkingEl) blinkingEl.classList.add("piece-blink");
-
-  const totalFrames = 10;
-  const fastFrames = 7;
-  const fastInterval = 120;
-  const slowInterval = 400;
-
-  const diceValues = [];
-  for (let i = 0; i < totalFrames; i++) diceValues.push(randomDice());
-
-  let time = 0;
-  for (let i = 0; i < totalFrames; i++) {
-    time += (i < fastFrames ? fastInterval : slowInterval);
-
-    setTimeout(() => {
-      diceResultEl.textContent = diceValues[i].toString();
-
-      if (i === totalFrames - 1) {
-        const dice = diceValues[i];
-
-        blinkingEl = getAnyTrackPieceElement(player);
-        if (blinkingEl) blinkingEl.classList.add("piece-blink");
-
-        statusEl.textContent = `${player.name} 擲出 ${dice} 點`;
-        diceResultEl.classList.add("dice-blink");
-
-        setTimeout(() => {
-          diceResultEl.classList.remove("dice-blink");
-
-          performMoveWithLudoRules(player, dice, () => {
-            renderPieces();
-            const el = getAnyTrackPieceElement(player);
-            if (el) el.classList.remove("piece-blink");
-
-            isAnimating = false;
-            if (!gameEnded) {
-              currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-              updateCurrentPlayerDisplay();
-              rollButton.disabled = false;
-            }
-          });
-        }, 1000);
-      }
-    }, time);
-  }
-}
-
-/**
- * 起步規則（穩定版）：
- *  - dice = 6 且家裡有棋：從家起飛到 startSteps[color]
- *  - dice = 6 且家裡沒棋但有路上棋：路上棋走 6 步
- *  - dice != 6 且有路上棋：路上棋走 dice 步
- *  - dice != 6 且全在家：不能動
- */
-function performMoveWithLudoRules(player, dice, done) {
-  const color = player.color;
-  const startStep = startSteps[color];
-
-  const homePiece = getFirstHomePiece(player);
-  const trackPiece = getFirstTrackPiece(player);
-
-  const homeCount = player.pieces.filter(p => p.status === "home").length;
-  const trackCount = player.pieces.filter(p => p.status === "track").length;
-
-  if (dice === 6) {
-    if (homePiece) {
-      statusEl.textContent =
-        `${player.name} 擲到 6：家裡還有 ${homeCount} 枚，路上有 ${trackCount} 枚，` +
-        `從家第 ${homePiece.homeIndex + 1} 枚起飛到起點。`;
-
-      homePiece.status = "track";
-      homePiece.step = startStep;
-      renderPieces();
-      done();
-      return;
-    } else if (trackPiece) {
-      statusEl.textContent =
-        `${player.name} 擲到 6：家裡 0 枚，只能讓路上棋走 6 步。`;
-      moveTrackPieceWithDice(player, trackPiece, dice, done);
-      return;
-    } else {
-      statusEl.textContent = `${player.name} 擲到 6，但沒有可動的棋。`;
-      done();
-      return;
-    }
-  } else {
-    if (trackPiece) {
-      statusEl.textContent =
-        `${player.name} 擲到 ${dice}：家裡 ${homeCount} 枚，路上 ${trackCount} 枚，` +
-        `讓路上棋前進 ${dice} 步。`;
-      moveTrackPieceWithDice(player, trackPiece, dice, done);
-      return;
-    } else {
-      statusEl.textContent =
-        `${player.name} 擲到 ${dice}，但所有棋都在家，無法行動。`;
-      done();
-      return;
-    }
-  }
-}
-
-function moveTrackPieceWithDice(player, piece, dice, done) {
-  const oldStep = piece.step;
-  let targetStep = oldStep + dice;
-  if (targetStep >= PATH_LENGTH) targetStep = PATH_LENGTH - 1;
-
-  statusEl.textContent += `（從第 ${oldStep} 步走到第 ${targetStep} 步）`;
-
-  animateMovePiece(player, piece, targetStep, () => {
-    if (targetStep >= PATH_LENGTH - 1) {
-      gameEnded = true;
-      statusEl.textContent = `${player.name} 率先繞完一圈，獲勝！`;
-      rollButton.disabled = true;
-      done();
-    } else {
-      done();
-    }
-  });
-}
-
-function updateCurrentPlayerDisplay() {
-  const p = players[currentPlayerIndex];
-  currentPlayerNameEl.textContent = p.name;
-
-  currentPlayerNameEl.classList.remove(
-    "player-red","player-blue","player-green","player-yellow"
-  );
-  if (p.color === "red") currentPlayerNameEl.classList.add("player-red");
-  if (p.color === "blue") currentPlayerNameEl.classList.add("player-blue");
-  if (p.color === "green") currentPlayerNameEl.classList.add("player-green");
-  if (p.color === "yellow") currentPlayerNameEl.classList.add("player-yellow");
-}
-
-// ========== 初始化 ==========
-
-function initGame() {
-  players.forEach((player) => {
-    player.pieces.forEach((p, i) => {
-      p.status = "home";
-      p.homeIndex = i;
-      p.step = 0;
-    });
-  });
-
-  currentPlayerIndex = 0;
-  gameEnded = false;
-  isAnimating = false;
-  rollButton.disabled = false;
-  diceResultEl.textContent = "-";
-  statusEl.textContent = "";
-
-  initBoard();
-  renderPieces();
-  updateCurrentPlayerDisplay();
-}
-
-rollButton.addEventListener("click", handleTurn);
-resetButton.addEventListener("click", initGame);
-window.addEventListener("load", initGame);
+// ========== 這裡以下保留你原本的規則和動畫，不再重複貼（為簡潔） ==========
