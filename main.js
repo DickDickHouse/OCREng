@@ -19,18 +19,18 @@ for (let r = 0; r < BOARD_ROWS; r++) {
   }
 }
 
-// 四角家區（6x6）
+// 四角家區（改成 4x4）
 function paintHomeArea(rStart, cStart, className) {
-  for (let r = rStart; r < rStart + 6; r++) {
-    for (let c = cStart; c < cStart + 6; c++) {
+  for (let r = rStart; r < rStart + 4; r++) {
+    for (let c = cStart; c < cStart + 4; c++) {
       boardCells[rcToIndex(r, c)].classes.push(className);
     }
   }
 }
 paintHomeArea(0, 0, "cell-home-blue");    // 左上藍
-paintHomeArea(0, 9, "cell-home-red");     // 右上紅
-paintHomeArea(9, 0, "cell-home-green");   // 左下綠
-paintHomeArea(9, 9, "cell-home-yellow");  // 右下黃
+paintHomeArea(0, 11, "cell-home-red");    // 右上紅
+paintHomeArea(11, 0, "cell-home-green");  // 左下綠
+paintHomeArea(11, 11, "cell-home-yellow");// 右下黃
 
 // 中央 3x3 終點區
 const centerCells = [
@@ -124,7 +124,7 @@ const startSteps = {
 };
 
 // ========== 玩家設定 ==========
-
+// 4x4 家區內的 4 個格子（2x2 擺棋）
 const homePositions = {
   blue:  [rcToIndex(1,1), rcToIndex(1,2), rcToIndex(2,1), rcToIndex(2,2)],
   red:   [rcToIndex(1,12), rcToIndex(1,13), rcToIndex(2,12), rcToIndex(2,13)],
@@ -245,40 +245,17 @@ function handleTurn() {
   isAnimating = true;
   rollButton.disabled = true;
 
-  const totalFrames = 10;
-  const fastFrames = 7;
-  const fastInterval = 120;
-  const slowInterval = 400;
+  const dice = randomDice();
+  diceResultEl.textContent = dice.toString();
 
-  const diceValues = [];
-  for (let i = 0; i < totalFrames; i++) diceValues.push(randomDice());
-
-  let time = 0;
-  for (let i = 0; i < totalFrames; i++) {
-    time += (i < fastFrames ? fastInterval : slowInterval);
-
-    setTimeout(() => {
-      diceResultEl.textContent = diceValues[i].toString();
-
-      if (i === totalFrames - 1) {
-        const dice = diceValues[i];
-        diceResultEl.classList.add("dice-blink");
-
-        setTimeout(() => {
-          diceResultEl.classList.remove("dice-blink");
-
-          performMoveWithLudoRules(player, dice, () => {
-            isAnimating = false;
-            if (!gameEnded) {
-              currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-              updateCurrentPlayerDisplay();
-              rollButton.disabled = false;
-            }
-          });
-        }, 1000);
-      }
-    }, time);
-  }
+  performMoveWithLudoRules(player, dice, () => {
+    isAnimating = false;
+    if (!gameEnded) {
+      currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+      updateCurrentPlayerDisplay();
+      rollButton.disabled = false;
+    }
+  });
 }
 
 function performMoveWithLudoRules(player, dice, done) {
@@ -328,9 +305,6 @@ function initGame() {
   currentPlayerIndex = 0;
   gameEnded = false;
   isAnimating = false;
-  rollButton.disabled = false;
-  diceResultEl.textContent = "-";
-  statusEl.textContent = "";
 
   initBoard();
   renderPieces();
