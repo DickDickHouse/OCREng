@@ -33,7 +33,6 @@ paintHomeArea(9, 0, "cell-home-green");   // 左下綠
 paintHomeArea(9, 9, "cell-home-yellow");  // 右下黃
 
 // 中央 3x3 終點區
-const center = 7;
 const centerCells = [
   [6,6],[6,7],[6,8],
   [7,6],[7,7],[7,8],
@@ -41,11 +40,7 @@ const centerCells = [
 ];
 centerCells.forEach(([r,c]) => {
   let cls = "center-core";
-  if (r < center && c === center) cls = "center-red";
-  else if (r > center && c === center) cls = "center-green";
-  else if (c < center && r === center) cls = "center-blue";
-  else if (c > center && r === center) cls = "center-yellow";
-  else if (r === 6 && c === 7) cls = "center-red";
+  if (r === 6 && c === 7) cls = "center-red";
   else if (r === 8 && c === 7) cls = "center-green";
   else if (r === 7 && c === 6) cls = "center-blue";
   else if (r === 7 && c === 8) cls = "center-yellow";
@@ -106,7 +101,9 @@ pathIndices.forEach((idx) => {
   }
 });
 
-// 起飛格標記（第一階段只做視覺）
+const PATH_LENGTH = pathIndices.length;
+
+// 起飛格標記
 const startCells = {
   red: rcToIndex(10,4),
   blue: rcToIndex(9,10),
@@ -118,15 +115,13 @@ boardCells[startCells.blue].classes.push("start-blue");
 boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.yellow].classes.push("start-yellow");
 
-// 起飛步數（仍沿用簡化）
+// 起飛步數（簡化）
 const startSteps = {
   red: 0,
   blue: bottomPath.length,
   green: bottomPath.length + rightPath.length,
   yellow: bottomPath.length + rightPath.length + topPath.length
 };
-
-const PATH_LENGTH = pathIndices.length;
 
 // ========== 玩家設定 ==========
 
@@ -217,4 +212,131 @@ function renderPieces() {
   });
 }
 
-// ========== 這裡以下保留你原本的規則和動畫，不再重複貼（為簡潔） ==========
+// ========== 擲骰子與移動（保留簡化規則） ==========
+
+function randomDice() {
+  return Math.floor(Math.random() * 6) + 1;
+}
+
+function animateMovePiece(player, piece, targetStep, onComplete) {
+  const start = piece.step;
+  const end = targetStep;
+  if (end <= start) { onComplete && onComplete(); return; }
+
+  let current = start;
+  const stepTime = 300;
+
+  function moveOne() {
+    current += 1;
+    piece.step = current;
+    renderPieces();
+
+    if (current < end) setTimeout(moveOne, stepTime);
+    else onComplete && onComplete();
+  }
+
+  moveOne();
+}
+
+function handleTurn() {
+  if (gameEnded || isAnimating) return;
+
+  const player = players[currentPlayerIndex];
+  isAnimating = true;
+  rollButton.disabled = true;
+
+  const totalFrames = 10;
+  const fastFrames = 7;
+  const fastInterval = 120;
+  const slowInterval = 400;
+
+  const diceValues = [];
+  for (let i = 0; i < totalFrames; i++) diceValues.push(randomDice());
+
+  let time = 0;
+  for (let i = 0; i < totalFrames; i++) {
+    time += (i < fastFrames ? fastInterval : slowInterval);
+
+    setTimeout(() => {
+      diceResultEl.textContent = diceValues[i].toString();
+
+      if (i === totalFrames - 1) {
+        const dice = diceValues[i];
+        diceResultEl.classList.add("dice-blink");
+
+        setTimeout(() => {
+          diceResultEl.classList.remove("dice-blink");
+
+          performMoveWithLudoRules(player, dice, () => {
+            isAnimating = false;
+            if (!gameEnded) {
+              currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+              updateCurrentPlayerDisplay();
+              rollButton.disabled = false;
+            }
+          });
+        }, 1000);
+      }
+    }, time);
+  }
+}
+
+function performMoveWithLudoRules(player, dice, done) {
+  const homePiece = player.pieces.find(p => p.status === "home");
+  const trackPiece = player.pieces.find(p => p.status === "track");
+
+  if (dice === 6 && homePiece) {
+    homePiece.status = "track";
+    homePiece.step = startSteps[player.color];
+    renderPieces();
+    done();
+    return;
+  }
+
+  if (trackPiece) {
+    let targetStep = trackPiece.step + dice;
+    if (targetStep >= PATH_LENGTH) targetStep = PATH_LENGTH - 1;
+    animateMovePiece(player, trackPiece, targetStep, done);
+    return;
+  }
+
+  done();
+}
+
+function updateCurrentPlayerDisplay() {
+  const p = players[currentPlayerIndex];
+  currentPlayerNameEl.textContent = p.name;
+
+  currentPlayerNameEl.classList.remove(
+    "player-red","player-blue","player-green","player-yellow"
+  );
+  if (p.color === "red") currentPlayerNameEl.classList.add("player-red");
+  if (p.color === "blue") currentPlayerNameEl.classList.add("player-blue");
+  if (p.color === "green") currentPlayerNameEl.classList.add("player-green");
+  if (p.color === "yellow") currentPlayerNameEl.classList.add("player-yellow");
+}
+
+function initGame() {
+  players.forEach((player) => {
+    player.pieces.forEach((p, i) => {
+      p.status = "home";
+      p.homeIndex = i;
+      p.step = 0;
+    });
+  });
+
+  currentPlayerIndex = 0;
+  gameEnded = false;
+  isAnimating = false;
+  rollButton.disabled = false;
+  diceResultEl.textContent = "-";
+  statusEl.textContent = "";
+
+  initBoard();
+  renderPieces();
+  updateCurrentPlayerDisplay();
+}
+
+rollButton.addEventListener("click", handleTurn);
+resetButton.addEventListener("click", initGame);
+window.addEventListener("load", initGame);
