@@ -1,263 +1,146 @@
-// ========== 棋盤設定 ==========
-
-// 棋盤為 11 x 11 的方形
-const BOARD_ROWS = 11;
-const BOARD_COLS = 11;
-const BOARD_SIZE = BOARD_ROWS * BOARD_COLS;
-
-// 幫助函式：把 row, col 轉成一維 index
-function rcToIndex(r, c) {
-  return r * BOARD_COLS + c;
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  margin: 16px;
+  text-align: center;
+  background-color: #f0f2f5;
 }
 
-// 建立一個棋盤，每格有類型：空、主跑道、起點等
-const boardCells = [];
-
-// 先全部填空格
-for (let r = 0; r < BOARD_ROWS; r++) {
-  for (let c = 0; c < BOARD_COLS; c++) {
-    boardCells.push({
-      row: r,
-      col: c,
-      isPath: false, // 是否為主跑道的��格（十字/跑道）
-      classes: [],   // 額外 CSS class
-    });
-  }
+h1 {
+  margin-bottom: 8px;
 }
 
-/**
- * 簡化版十字型主跑道：
- * - 中間行 (row = 5) 的所有格子是水平路
- * - 中間列 (col = 5) 的所有格子是垂直路
- * 這樣會形成一個「十字」。
- */
-for (let c = 0; c < BOARD_COLS; c++) {
-  const idx = rcToIndex(5, c);
-  boardCells[idx].isPath = true;
-  boardCells[idx].classes.push("cell-path");
-}
-for (let r = 0; r < BOARD_ROWS; r++) {
-  const idx = rcToIndex(r, 5);
-  boardCells[idx].isPath = true;
-  boardCells[idx].classes.push("cell-path");
+#game-info {
+  margin-bottom: 12px;
 }
 
-// 四個角落附近標記為玩家「家」區域（目前只是背���裝飾）
-boardCells[rcToIndex(0, 0)].classes.push("cell-home-green");
-boardCells[rcToIndex(0, 1)].classes.push("cell-home-green");
-boardCells[rcToIndex(1, 0)].classes.push("cell-home-green");
-boardCells[rcToIndex(1, 1)].classes.push("cell-home-green");
-
-boardCells[rcToIndex(0, 9)].classes.push("cell-home-blue");
-boardCells[rcToIndex(0, 10)].classes.push("cell-home-blue");
-boardCells[rcToIndex(1, 9)].classes.push("cell-home-blue");
-boardCells[rcToIndex(1, 10)].classes.push("cell-home-blue");
-
-boardCells[rcToIndex(9, 0)].classes.push("cell-home-red");
-boardCells[rcToIndex(9, 1)].classes.push("cell-home-red");
-boardCells[rcToIndex(10, 0)].classes.push("cell-home-red");
-boardCells[rcToIndex(10, 1)].classes.push("cell-home-red");
-
-boardCells[rcToIndex(9, 9)].classes.push("cell-home-yellow");
-boardCells[rcToIndex(9, 10)].classes.push("cell-home-yellow");
-boardCells[rcToIndex(10, 9)].classes.push("cell-home-yellow");
-boardCells[rcToIndex(10, 10)].classes.push("cell-home-yellow");
-
-// ========== 定義主跑道路徑（簡化版，帶顏色） ==========
-
-/**
- * 我們定義一條繞十字周邊的大圈（簡化，不完全等於真實飛行棋路線，但視覺上會在彩色十字周邊繞一圈）。
- */
-
-const pathIndices = [];
-
-// 幫助工具：把一連串 (r,c) 推進 pathIndices
-function pushPathCells(coordsArray) {
-  coordsArray.forEach(([r, c]) => {
-    const idx = rcToIndex(r, c);
-    if (!pathIndices.includes(idx)) {
-      pathIndices.push(idx);
-    }
-  });
+#current-player-name {
+  font-weight: bold;
 }
 
-// 幫助工具：為一段格子加上顏色 class（讓不同方向有不同底色）
-function addColorToCells(coordsArray, className) {
-  coordsArray.forEach(([r, c]) => {
-    const idx = rcToIndex(r, c);
-    if (!boardCells[idx].classes.includes(className)) {
-      boardCells[idx].classes.push(className);
-    }
-  });
+/* 玩家名稱顏色 */
+.player-red {
+  color: #ff4d4f;
+}
+.player-blue {
+  color: #1890ff;
+}
+.player-green {
+  color: #52c41a;
+}
+.player-yellow {
+  color: #faad14;
 }
 
-// 下方水平線 (row = 8, col 2→8) - 紅色路段
-const bottomPath = [
-  [8, 2], [8, 3], [8, 4], [8, 5], [8, 6], [8, 7], [8, 8],
-];
-pushPathCells(bottomPath);
-addColorToCells(bottomPath, "cell-path-red");
-
-// 右側垂直線 (col = 8, row 7→3) - 藍色路段
-const rightPath = [
-  [7, 8], [6, 8], [5, 8], [4, 8], [3, 8],
-];
-pushPathCells(rightPath);
-addColorToCells(rightPath, "cell-path-blue");
-
-// 上方水平線 (row = 2, col 8→2) - 綠色路段
-const topPath = [
-  [2, 8], [2, 7], [2, 6], [2, 5], [2, 4], [2, 3], [2, 2],
-];
-pushPathCells(topPath);
-addColorToCells(topPath, "cell-path-green");
-
-// 左側垂直線 (col = 2, row 3→7) - 黃色路段
-const leftPath = [
-  [3, 2], [4, 2], [5, 2], [6, 2], [7, 2],
-];
-pushPathCells(leftPath);
-addColorToCells(leftPath, "cell-path-yellow");
-
-// 讓這些格子都被標記為 path（主跑道）
-pathIndices.forEach((idx) => {
-  boardCells[idx].isPath = true;
-  if (!boardCells[idx].classes.includes("cell-path")) {
-    boardCells[idx].classes.push("cell-path");
-  }
-});
-
-const PATH_LENGTH = pathIndices.length;
-
-// ========== 玩家設定 ==========
-
-const players = [
-  { id: 0, name: "紅方", colorClass: "red", currentStep: 0 },
-  { id: 1, name: "藍方", colorClass: "blue", currentStep: 0 },
-  { id: 2, name: "綠方", colorClass: "green", currentStep: 0 },
-  { id: 3, name: "黃方", colorClass: "yellow", currentStep: 0 },
-];
-
-let currentPlayerIndex = 0;
-let gameEnded = false;
-
-// DOM 元素
-const boardEl = document.getElementById("board");
-const currentPlayerNameEl = document.getElementById("current-player-name");
-const diceResultEl = document.getElementById("dice-result");
-const statusEl = document.getElementById("status");
-const rollButton = document.getElementById("roll-button");
-
-// ========== 棋盤渲染 ==========
-
-function initBoard() {
-  boardEl.innerHTML = "";
-  boardEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 28px)`;
-  boardEl.style.gridTemplateRows = `repeat(${BOARD_ROWS}, 28px)`;
-
-  boardCells.forEach((cellData) => {
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
-    cellData.classes.forEach((cls) => cell.classList.add(cls));
-    boardEl.appendChild(cell);
-  });
+#board-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
 }
 
-function renderPieces() {
-  const cells = boardEl.getElementsByClassName("cell");
-
-  // 先清除所有舊棋子
-  for (let cell of cells) {
-    while (cell.firstChild) {
-      cell.removeChild(cell.firstChild);
-    }
-  }
-
-  // 在路徑上畫出每位玩家棋子
-  players.forEach((player) => {
-    const step = Math.min(player.currentStep, PATH_LENGTH - 1);
-    const pathIndex = pathIndices[step];
-    const cell = cells[pathIndex];
-
-    const piece = document.createElement("div");
-    piece.className = `piece ${player.colorClass}`;
-    cell.appendChild(piece);
-  });
+/* 棋盤外框，固定大小的方形區域 */
+#board {
+  display: grid;
+  grid-template-columns: repeat(11, 28px);
+  grid-template-rows: repeat(11, 28px);
+  gap: 2px;
+  margin: 0 auto;
+  padding: 8px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-// ========== 擲骰子與回合處理 ==========
-
-function rollDice() {
-  return Math.floor(Math.random() * 6) + 1;
+/* 單一格子 */
+.cell {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d9d9d9;
+  position: relative;
+  background-color: #fafafa;
 }
 
-function handleTurn() {
-  if (gameEnded) return;
-
-  const currentPlayer = players[currentPlayerIndex];
-  const dice = rollDice();
-  diceResultEl.textContent = dice.toString();
-
-  const oldStep = currentPlayer.currentStep;
-  let newStep = oldStep + dice;
-
-  if (newStep >= PATH_LENGTH) {
-    newStep = PATH_LENGTH - 1;
-    gameEnded = true;
-    statusEl.textContent = `${currentPlayer.name} 率先繞完一圈，獲勝！`;
-    rollButton.disabled = true;
-  } else {
-    statusEl.textContent = `${currentPlayer.name} 從第 ${oldStep} 步移動到第 ${newStep} 步`;
-  }
-
-  currentPlayer.currentStep = newStep;
-  renderPieces();
-
-  if (!gameEnded) {
-    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-    updateCurrentPlayerDisplay();
-  }
+/* 中央十字主路：白色路面 */
+.cell-path {
+  background-color: #ffffff;
 }
 
-function updateCurrentPlayerDisplay() {
-  const currentPlayer = players[currentPlayerIndex];
-  currentPlayerNameEl.textContent = currentPlayer.name;
-
-  currentPlayerNameEl.classList.remove(
-    "player-red",
-    "player-blue",
-    "player-green",
-    "player-yellow"
-  );
-
-  if (currentPlayer.colorClass === "red") {
-    currentPlayerNameEl.classList.add("player-red");
-  } else if (currentPlayer.colorClass === "blue") {
-    currentPlayerNameEl.classList.add("player-blue");
-  } else if (currentPlayer.colorClass === "green") {
-    currentPlayerNameEl.classList.add("player-green");
-  } else if (currentPlayer.colorClass === "yellow") {
-    currentPlayerNameEl.classList.add("player-yellow");
-  }
+/* 四個方向的彩色跑道（在 JS 裡我們會為特定路徑格子加上這些 class） */
+.cell-path-red {
+  background-color: #ffe7e7;   /* 淡紅 */
+}
+.cell-path-blue {
+  background-color: #e6f3ff;   /* 淡藍 */
+}
+.cell-path-green {
+  background-color: #e6ffe7;   /* 淡綠 */
+}
+.cell-path-yellow {
+  background-color: #fff7e6;   /* 淡黃 */
 }
 
-// ========== 初始化遊戲 ==========
-
-function initGame() {
-  currentPlayerIndex = 0;
-  players.forEach((p) => (p.currentStep = 0));
-  gameEnded = false;
-  rollButton.disabled = false;
-  diceResultEl.textContent = "-";
-  statusEl.textContent = "";
-
-  initBoard();
-  renderPieces();
-  updateCurrentPlayerDisplay();
+/* 四個角落：玩家「家」區域的背景（暫時只是裝飾） */
+.cell-home-red {
+  background-color: #ffd6d6;
+}
+.cell-home-blue {
+  background-color: #d6e8ff;
+}
+.cell-home-green {
+  background-color: #d7ffd6;
+}
+.cell-home-yellow {
+  background-color: #ffe7ba;
 }
 
-// 綁定事件
-rollButton.addEventListener("click", handleTurn);
+/* 棋子 */
+.piece {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin: auto;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 0;
+  bottom: 0;
+  box-shadow: 0 0 2px rgba(0,0,0,0.4);
+}
 
-// 頁面載入後開始
-window.addEventListener("load", initGame);
+.piece.red {
+  background-color: #ff4d4f;
+}
+.piece.blue {
+  background-color: #1890ff;
+}
+.piece.green {
+  background-color: #52c41a;
+}
+.piece.yellow {
+  background-color: #faad14;
+}
+
+#roll-button {
+  padding: 8px 16px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: none;
+  background-color: #1890ff;
+  color: #fff;
+}
+
+#roll-button:disabled {
+  background-color: #d9d9d9;
+  color: #888;
+}
+
+#status {
+  margin-top: 8px;
+  min-height: 20px;
+  color: #333;
+}
+
+/* 讓骰子結果更明顯 */
+#dice-result {
+  font-weight: bold;
+  font-size: 18px;
+}
