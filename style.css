@@ -97,11 +97,11 @@ h1 {
   margin-top: 8px;
 }
 
-/* 棋盤外框，固定大小的方形區域 */
+/* 棋盤外框 */
 #board {
   display: grid;
-  grid-template-columns: repeat(11, 32px);
-  grid-template-rows: repeat(11, 32px);
+  grid-template-columns: repeat(15, 26px);
+  grid-template-rows: repeat(15, 26px);
   gap: 2px;
   margin: 0 auto;
   padding: 10px;
@@ -112,47 +112,54 @@ h1 {
 
 /* 單一格子 */
 .cell {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border: 1px solid #d9d9d9;
   position: relative;
   background-color: #fafafa;
 }
 
-/* 中央十字主路：白色路面 */
+/* 主路 */
 .cell-path {
   background-color: #ffffff;
 }
+.cell-path-red { background-color: #ffe7e7; }
+.cell-path-blue { background-color: #e6f3ff; }
+.cell-path-green { background-color: #e6ffe7; }
+.cell-path-yellow { background-color: #fff7e6; }
 
-/* 四個方向的彩色跑道 */
-.cell-path-red {
-  background-color: #ffe7e7;   /* 淡紅 */
-}
-.cell-path-blue {
-  background-color: #e6f3ff;   /* 淡藍 */
-}
-.cell-path-green {
-  background-color: #e6ffe7;   /* 淡綠 */
-}
-.cell-path-yellow {
-  background-color: #fff7e6;   /* 淡黃 */
+/* 四角家區 */
+.cell-home-red { background-color: #ffd6d6; }
+.cell-home-blue { background-color: #d6e8ff; }
+.cell-home-green { background-color: #d7ffd6; }
+.cell-home-yellow { background-color: #ffe7ba; }
+
+/* 中央 3x3 終點區 */
+.center-red { background-color: #ffb3b3; }
+.center-green { background-color: #b3ffb3; }
+.center-blue { background-color: #b3d9ff; }
+.center-yellow { background-color: #ffe0a3; }
+.center-core { background-color: #ffffff; }
+
+/* 起步點 */
+.start-red::after,
+.start-blue::after,
+.start-green::after,
+.start-yellow::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  border: 2px solid #555;
+  background-color: #fff;
 }
 
-/* 四個角落：玩家「家」區域的背景（暫時只是裝飾） */
-.cell-home-red {
-  background-color: #ffd6d6;
-}
-.cell-home-blue {
-  background-color: #d6e8ff;
-}
-.cell-home-green {
-  background-color: #d7ffd6;
-}
-.cell-home-yellow {
-  background-color: #ffe7ba;
-}
+.start-red::after { border-color: #ff4d4f; }
+.start-blue::after { border-color: #1890ff; }
+.start-green::after { border-color: #52c41a; }
+.start-yellow::after { border-color: #faad14; }
 
-/* 棋子容器：一格裡可以擺最多 4 粒（2x2） */
+/* 棋子容器 */
 .pieces-container {
   position: absolute;
   inset: 2px;
@@ -161,41 +168,31 @@ h1 {
   grid-template-rows: repeat(2, 1fr);
 }
 
-/* 小顆棋：適合 2x2 佈局，隨棋盤放大稍微加大 */
+/* 棋子 */
 .piece {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   margin: auto;
   box-shadow: 0 0 2px rgba(0,0,0,0.4);
 }
 
-.piece.red {
-  background-color: #ff4d4f;
-}
-.piece.blue {
-  background-color: #1890ff;
-}
-.piece.green {
-  background-color: #52c41a;
-}
-.piece.yellow {
-  background-color: #faad14;
-}
+.piece.red { background-color: #ff4d4f; }
+.piece.blue { background-color: #1890ff; }
+.piece.green { background-color: #52c41a; }
+.piece.yellow { background-color: #faad14; }
 
-/* 閃爍動畫：每秒 4 次（0.25s 一循環） */
+/* 閃爍動畫 */
 @keyframes blink-fast {
   0% { opacity: 1; }
   50% { opacity: 0; }
   100% { opacity: 1; }
 }
 
-/* 棋子閃爍用 */
 .piece-blink {
   animation: blink-fast 0.25s linear infinite;
 }
 
-/* 骰子數字閃爍用 */
 .dice-blink {
   animation: blink-fast 0.25s linear infinite;
 }
