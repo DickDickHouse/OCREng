@@ -101,13 +101,19 @@ pathIndices.forEach((idx) => {
 
 const PATH_LENGTH = pathIndices.length;
 
-// 每色的「路上起點步數」
-const startSteps = {
-  red:    0,
-  blue:   bottomPath.length,
-  green:  bottomPath.length + rightPath.length,
-  yellow: bottomPath.length + rightPath.length + topPath.length,
+// 每色「視覺起飛格」的實際 index（你看到的第一格）
+const startCells = {
+  red:    rcToIndex(8, 2), // 下方紅路左端
+  blue:   rcToIndex(7, 8), // 右側藍路下端
+  green:  rcToIndex(2, 8), // 上方綠路右端
+  yellow: rcToIndex(3, 2), // 左側黃路上端
 };
+
+// 幫助：把某個棋盤 index 找到它在 path 中的 step（0~PATH_LENGTH-1）
+function indexToStep(cellIndex) {
+  const step = pathIndices.indexOf(cellIndex);
+  return step >= 0 ? step : 0;
+}
 
 // ========== 玩家 / 棋子狀態 ==========
 
@@ -118,7 +124,7 @@ const players = [
     color: "red",
     colorClass: "red",
     pieces: Array.from({ length: 4 }, (_, i) => ({
-      status: "home",  // "home" | "track"
+      status: "home",
       homeIndex: i,
       step: 0,
     })),
@@ -176,7 +182,6 @@ function initBoard() {
   boardEl.innerHTML = "";
   boardEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 32px)`;
   boardEl.style.gridTemplateRows = `repeat(${BOARD_ROWS}, 32px)`;
-
   boardCells.forEach((cellData) => {
     const cell = document.createElement("div");
     cell.classList.add("cell");
@@ -234,11 +239,9 @@ function renderPieces() {
 function getFirstTrackPiece(player) {
   return player.pieces.find(p => p.status === "track") || null;
 }
-
 function getFirstHomePiece(player) {
   return player.pieces.find(p => p.status === "home") || null;
 }
-
 function getAnyTrackPieceElement(player) {
   const piece = getFirstTrackPiece(player);
   if (!piece) return null;
@@ -345,18 +348,19 @@ function handleTurn() {
 }
 
 /**
- * 修正版起步規則（關鍵）：
- *  - dice = 6：
- *      若「這個顏色家裡還有棋」：一定從家起飛（家裡第一顆），直接放到起點 step = startSteps[color]
- *      若「這個顏色家裡沒有棋」但路上有棋：才讓路上棋走 6 步（動畫）
- *  - dice != 6：
- *      有路上棋就走 dice 步；全在家就不能動
+ * 修正版起步規則：
+ *  - dice = 6 且家裡有棋：
+ *      直接把「第一顆在家」的棋放到該色起飛格（用 startCells[color]），
+ *      並根據這個格在 path 裡的位置計算 step。
+ *  - dice = 6 且家裡沒棋、有路上棋：路上棋走 6 步。
+ *  - dice != 6 且有路上棋：路上棋走 dice 步。
+ *  - dice != 6 且全在家：不能動。
  */
 function performMoveWithLudoRules(player, dice, done) {
   const color = player.color;
-  const startStep = startSteps[color];
+  const startCellIndex = startCells[color];
+  const startStep = indexToStep(startCellIndex);
 
-  // 這兩個只用「這個 player」自己的陣列，不會互相干擾
   const homePiece = getFirstHomePiece(player);
   const trackPiece = getFirstTrackPiece(player);
 
@@ -365,13 +369,12 @@ function performMoveWithLudoRules(player, dice, done) {
 
   if (dice === 6) {
     if (homePiece) {
-      // 明確顯示目前家裡／路上棋子數，方便你觀察
       statusEl.textContent =
-        `${player.name} 擲到 6：家裡還有 ${homeCount} 枚，` +
-        `路上有 ${trackCount} 枚，從家第 ${homePiece.homeIndex + 1} 枚起飛到起點。`;
+        `${player.name} 擲到 6：家裡還有 ${homeCount} 枚，路上有 ${trackCount} 枚，` +
+        `從家第 ${homePiece.homeIndex + 1} 枚起飛到起點格。`;
 
       homePiece.status = "track";
-      homePiece.step = startStep;
+      homePiece.step = startStep;   // 這裡用「起飛格在 path 中的位置」
       renderPieces();
       done();
       return;
@@ -381,8 +384,7 @@ function performMoveWithLudoRules(player, dice, done) {
       moveTrackPieceWithDice(player, trackPiece, dice, done);
       return;
     } else {
-      // 理論上不會發生：既沒有家棋也沒有路棋
-      statusEl.textContent = `${player.name} 擲到 6，但沒有可以移動的棋。`;
+      statusEl.textContent = `${player.name} 擲到 6，但沒有可動的棋。`;
       done();
       return;
     }
