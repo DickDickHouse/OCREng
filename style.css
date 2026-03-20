@@ -92,17 +92,21 @@ h1 {
   background-color: #ffe7ba;
 }
 
-/* 棋子 */
+/* 棋子容器：一格裡可以擺最多 4 粒（2x2） */
+.pieces-container {
+  position: absolute;
+  inset: 2px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+/* 小顆棋：適合 2x2 佈局 */
 .piece {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   margin: auto;
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  right: 0;
-  bottom: 0;
   box-shadow: 0 0 2px rgba(0,0,0,0.4);
 }
 
