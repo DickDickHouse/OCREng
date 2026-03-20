@@ -4,52 +4,99 @@ body {
   text-align: center;
 }
 
+h1 {
+  margin-bottom: 8px;
+}
+
 #game-info {
   margin-bottom: 12px;
 }
 
-#board {
+#current-player-name {
+  font-weight: bold;
+}
+
+/* 讓玩家名稱顯示對應顏色 */
+.player-red {
+  color: #ff4d4f;
+}
+.player-blue {
+  color: #40a9ff;
+}
+.player-green {
+  color: #52c41a;
+}
+.player-yellow {
+  color: #faad14;
+}
+
+#board-wrapper {
   display: flex;
   justify-content: center;
   margin-top: 16px;
-  flex-wrap: wrap;
-  max-width: 360px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
+/* 棋盤外框，固定大小的方形區域 */
+#board {
+  display: grid;
+  grid-template-columns: repeat(11, 28px);
+  grid-template-rows: repeat(11, 28px);
+  gap: 2px;
+  margin: 0 auto;
+}
+
+/* 單一格子 */
 .cell {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 2px;
-  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ddd;
   position: relative;
+  background-color: #f9f9f9;
 }
 
-.cell-index {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  font-size: 10px;
-  color: #999;
+/* 主跑道格子（十字型的路） */
+.cell-path {
+  background-color: #fff;
 }
 
+/* 起點 / 特殊區（之後可用） */
+.cell-start-red {
+  background-color: #ffe7e7;
+}
+.cell-start-blue {
+  background-color: #e6f3ff;
+}
+.cell-start-green {
+  background-color: #e6ffe7;
+}
+.cell-start-yellow {
+  background-color: #fff7e6;
+}
+
+/* 棋子 */
 .piece {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
+  margin: auto;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 0;
+  bottom: 0;
 }
 
 .piece.red {
   background-color: #ff4d4f;
 }
-
 .piece.blue {
   background-color: #40a9ff;
+}
+.piece.green {
+  background-color: #52c41a;
+}
+.piece.yellow {
+  background-color: #faad14;
 }
 
 #roll-button {
@@ -61,4 +108,9 @@ body {
   margin-top: 8px;
   min-height: 20px;
   color: #333;
+}
+
+/* 讓骰子結果更明顯 */
+#dice-result {
+  font-weight: bold;
 }
