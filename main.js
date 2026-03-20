@@ -37,3 +37,78 @@ function initBoard() {
 function renderPieces() {
   // 清理舊棋子
   const cells = boardEl.getElementsByClassName("cell");
+  for (let cell of cells) {
+    // 移除 index 以外的子元素（也就是棋子）
+    while (cell.childNodes.length > 1) {
+      cell.removeChild(cell.lastChild);
+    }
+  }
+
+  // 將每位玩家的棋子畫上去
+  players.forEach((player) => {
+    const position = player.position;
+    if (position >= 0 && position < BOARD_SIZE) {
+      const cell = cells[position];
+      const piece = document.createElement("div");
+      piece.className = `piece ${player.colorClass}`;
+      cell.appendChild(piece);
+    }
+  });
+}
+
+// 擲骰子（1~6）
+function rollDice() {
+  return Math.floor(Math.random() * 6) + 1;
+}
+
+// 處理一次回合
+function handleTurn() {
+  if (gameEnded) return;
+
+  const currentPlayer = players[currentPlayerIndex];
+  const dice = rollDice();
+  diceResultEl.textContent = dice.toString();
+
+  const oldPos = currentPlayer.position;
+  let newPos = oldPos + dice;
+
+  // 若超出終點，就停在終點
+  if (newPos >= BOARD_SIZE - 1) {
+    newPos = BOARD_SIZE - 1;
+    gameEnded = true;
+    statusEl.textContent = `${currentPlayer.name} 到達終點，獲勝！`;
+    rollButton.disabled = true;
+  } else {
+    statusEl.textContent = `${currentPlayer.name} 從 ${oldPos} 走到 ${newPos}`;
+  }
+
+  currentPlayer.position = newPos;
+  renderPieces();
+
+  // 換下一位玩家
+  if (!gameEnded) {
+    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    currentPlayerNameEl.textContent = players[currentPlayerIndex].name;
+  }
+}
+
+// 綁定按鈕事件
+rollButton.addEventListener("click", handleTurn);
+
+// 初始化狀態
+function initGame() {
+  currentPlayerIndex = 0;
+  players[0].position = 0;
+  players[1].position = 0;
+  gameEnded = false;
+  rollButton.disabled = false;
+  diceResultEl.textContent = "-";
+  statusEl.textContent = "";
+  currentPlayerNameEl.textContent = players[currentPlayerIndex].name;
+
+  initBoard();
+  renderPieces();
+}
+
+// 頁面載入完成後執行初始化
+window.addEventListener("load", initGame);
