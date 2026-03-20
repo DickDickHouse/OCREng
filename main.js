@@ -19,7 +19,7 @@ for (let r = 0; r < BOARD_ROWS; r++) {
     boardCells.push({
       row: r,
       col: c,
-      isPath: false, // 是否為主跑道的一格（十字）
+      isPath: false, // 是否為主跑道的��格（十字/跑道）
       classes: [],   // 額外 CSS class
     });
   }
@@ -42,26 +42,36 @@ for (let r = 0; r < BOARD_ROWS; r++) {
   boardCells[idx].classes.push("cell-path");
 }
 
-// 指定四個「起點格」附近區域（先用顏色背景區分，可之後再加真正起飛邏輯）
-boardCells[rcToIndex(9, 1)].classes.push("cell-start-red");
-boardCells[rcToIndex(1, 9)].classes.push("cell-start-blue");
-boardCells[rcToIndex(1, 1)].classes.push("cell-start-green");
-boardCells[rcToIndex(9, 9)].classes.push("cell-start-yellow");
+// 四個角落附近標記為玩家「家」區域（目前只是背���裝飾）
+boardCells[rcToIndex(0, 0)].classes.push("cell-home-green");
+boardCells[rcToIndex(0, 1)].classes.push("cell-home-green");
+boardCells[rcToIndex(1, 0)].classes.push("cell-home-green");
+boardCells[rcToIndex(1, 1)].classes.push("cell-home-green");
 
-// ========== 定義主跑道路徑（簡化版） ==========
+boardCells[rcToIndex(0, 9)].classes.push("cell-home-blue");
+boardCells[rcToIndex(0, 10)].classes.push("cell-home-blue");
+boardCells[rcToIndex(1, 9)].classes.push("cell-home-blue");
+boardCells[rcToIndex(1, 10)].classes.push("cell-home-blue");
+
+boardCells[rcToIndex(9, 0)].classes.push("cell-home-red");
+boardCells[rcToIndex(9, 1)].classes.push("cell-home-red");
+boardCells[rcToIndex(10, 0)].classes.push("cell-home-red");
+boardCells[rcToIndex(10, 1)].classes.push("cell-home-red");
+
+boardCells[rcToIndex(9, 9)].classes.push("cell-home-yellow");
+boardCells[rcToIndex(9, 10)].classes.push("cell-home-yellow");
+boardCells[rcToIndex(10, 9)].classes.push("cell-home-yellow");
+boardCells[rcToIndex(10, 10)].classes.push("cell-home-yellow");
+
+// ========== 定義主跑道路徑（簡化版，帶顏色） ==========
 
 /**
- * 我們定義一條繞十字外圍的路徑（簡化，不完全等於真實飛行棋路線，但視覺上會在十字周邊繞一圈）。
- * 這裡先做最簡單版本：沿著十字一圈走完，再回到起點。
- *
- * 為方便，我們手動列出一條「不會重複太多格子」的路線。
- * （之後你想更接近真正飛行棋，可以再一起調整。）
+ * 我們定義一條繞十字周邊的大圈（簡化，不完全等於真實飛行棋路線，但視覺上會在彩色十字周邊繞一圈）。
  */
 
-// 這裡我用一個粗略的「大圈」：先從中間偏下往右，繞一圈回來
 const pathIndices = [];
 
-// 一些工具：把一連串 (r,c) 推進 pathIndices
+// 幫助工具：把一連串 (r,c) 推進 pathIndices
 function pushPathCells(coordsArray) {
   coordsArray.forEach(([r, c]) => {
     const idx = rcToIndex(r, c);
@@ -71,22 +81,43 @@ function pushPathCells(coordsArray) {
   });
 }
 
-// 下方水平線 (row = 8, col 2→8)
-pushPathCells([
+// 幫助工具：為一段格子加上顏色 class（讓不同方向有不同底色）
+function addColorToCells(coordsArray, className) {
+  coordsArray.forEach(([r, c]) => {
+    const idx = rcToIndex(r, c);
+    if (!boardCells[idx].classes.includes(className)) {
+      boardCells[idx].classes.push(className);
+    }
+  });
+}
+
+// 下方水平線 (row = 8, col 2→8) - 紅色路段
+const bottomPath = [
   [8, 2], [8, 3], [8, 4], [8, 5], [8, 6], [8, 7], [8, 8],
-]);
-// 右側垂直線 (col = 8, row 7→3)
-pushPathCells([
+];
+pushPathCells(bottomPath);
+addColorToCells(bottomPath, "cell-path-red");
+
+// 右側垂直線 (col = 8, row 7→3) - 藍色路段
+const rightPath = [
   [7, 8], [6, 8], [5, 8], [4, 8], [3, 8],
-]);
-// 上方水平線 (row = 2, col 8→2)
-pushPathCells([
+];
+pushPathCells(rightPath);
+addColorToCells(rightPath, "cell-path-blue");
+
+// 上方水平線 (row = 2, col 8→2) - 綠色路段
+const topPath = [
   [2, 8], [2, 7], [2, 6], [2, 5], [2, 4], [2, 3], [2, 2],
-]);
-// 左側垂直線 (col = 2, row 3→7)
-pushPathCells([
+];
+pushPathCells(topPath);
+addColorToCells(topPath, "cell-path-green");
+
+// 左側垂直線 (col = 2, row 3→7) - 黃色路段
+const leftPath = [
   [3, 2], [4, 2], [5, 2], [6, 2], [7, 2],
-]);
+];
+pushPathCells(leftPath);
+addColorToCells(leftPath, "cell-path-yellow");
 
 // 讓這些格子都被標記為 path（主跑道）
 pathIndices.forEach((idx) => {
@@ -137,7 +168,6 @@ function renderPieces() {
 
   // 先清除所有舊棋子
   for (let cell of cells) {
-    // 移除所有子元素（這一次不顯示 index，小遊戲簡潔就好）
     while (cell.firstChild) {
       cell.removeChild(cell.firstChild);
     }
@@ -145,7 +175,6 @@ function renderPieces() {
 
   // 在路徑上畫出每位玩家棋子
   players.forEach((player) => {
-    // 如果還沒開始走，可以讓他停在路徑的第一格
     const step = Math.min(player.currentStep, PATH_LENGTH - 1);
     const pathIndex = pathIndices[step];
     const cell = cells[pathIndex];
@@ -194,7 +223,6 @@ function updateCurrentPlayerDisplay() {
   const currentPlayer = players[currentPlayerIndex];
   currentPlayerNameEl.textContent = currentPlayer.name;
 
-  // 先移除所有顏色 class
   currentPlayerNameEl.classList.remove(
     "player-red",
     "player-blue",
@@ -202,7 +230,6 @@ function updateCurrentPlayerDisplay() {
     "player-yellow"
   );
 
-  // 再加上對應 class
   if (currentPlayer.colorClass === "red") {
     currentPlayerNameEl.classList.add("player-red");
   } else if (currentPlayer.colorClass === "blue") {
