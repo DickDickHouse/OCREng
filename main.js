@@ -139,9 +139,7 @@ function renderPieces() {
   // 先清除所有舊棋子
   for (let cell of cells) {
     // 移除所有子元素（這一次不顯示 index，小遊戲簡潔就好）
-    while (cell.firstChild) {
-      cell.removeChild(cell.firstChild);
-    }
+    cell.replaceChildren();
   }
 
   // 在路徑上畫出每位玩家棋子
@@ -236,6 +234,9 @@ newGameButton.addEventListener("click", initGame);
 
 window.addEventListener("keydown", (event) => {
   if (event.key === "Enter" || event.key === " ") {
+    if (rollButton.disabled || gameEnded) {
+      return;
+    }
     event.preventDefault();
     handleTurn();
   }
