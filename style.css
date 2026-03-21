@@ -104,6 +104,24 @@ h1 { margin-bottom: 12px; }
   color: #555;
 }
 
+/* ====== 斜切雙色格 ====== */
+/* (5,5): 左上黃 / 右下綠 */
+.cell-split-55 {
+  background: linear-gradient(135deg, #ffe6b8 0 50%, #ccffd7 50% 100%);
+}
+/* (11,5): 左下綠 / 右上藍 */
+.cell-split-115 {
+  background: linear-gradient(45deg, #ccffd7 0 50%, #cce3ff 50% 100%);
+}
+/* (11,11): 左上紅 / 右下藍 */
+.cell-split-1111 {
+  background: linear-gradient(135deg, #ffcccc 0 50%, #cce3ff 50% 100%);
+}
+/* (5,11): 左下黃 / 右上紅 */
+.cell-split-511 {
+  background: linear-gradient(45deg, #ffe6b8 0 50%, #ffcccc 50% 100%);
+}
+
 /* 終點道 */
 .cell-homepath-red { background-color: #ffb3b3; }
 .cell-homepath-blue { background-color: #b3d9ff; }
