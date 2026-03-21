@@ -1,3 +1,6 @@
+window.onerror = function(msg, src, line, col, err) {
+  alert("JS錯誤：" + msg + " (line " + line + ")");
+};
 const VERSION = "v26-ring-debug";
 const versionEl = document.getElementById("version");
 if (versionEl) versionEl.textContent = `版本：${VERSION}`;
