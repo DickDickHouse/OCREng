@@ -1,4 +1,4 @@
-const VERSION = "v31-custom-path";
+const VERSION = "v32-custom-path";
 const versionEl = document.getElementById("version");
 if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 
@@ -32,7 +32,7 @@ paintHomeArea(13, 1, 15, 3, "cell-home-red");
 paintHomeArea(1, 13, 3, 15, "cell-home-green");
 paintHomeArea(13, 13, 15, 15, "cell-home-yellow");
 
-// ====== 中央 3x3（上綠、右紅、下黃、左藍） ======
+// ====== 中央 3x3（終點色修正） ======
 const centerCells = [
   [7,7],[8,7],[9,7],
   [7,8],[8,8],[9,8],
@@ -40,10 +40,10 @@ const centerCells = [
 ];
 centerCells.forEach(([x,y]) => {
   let cls = "center-core";
-  if (x === 8 && y === 7) cls = "center-green";
-  else if (x === 8 && y === 9) cls = "center-yellow";
+  if (x === 8 && y === 7) cls = "center-red";    // 紅隊終點
+  else if (x === 9 && y === 8) cls = "center-yellow"; // 黃隊終點
+  else if (x === 8 && y === 9) cls = "center-green";  // 綠隊終點
   else if (x === 7 && y === 8) cls = "center-blue";
-  else if (x === 9 && y === 8) cls = "center-red";
   boardCells[xyToIndex(x,y)].classes.push(cls);
 });
 
@@ -93,18 +93,18 @@ boardCells[startCells.red].classes.push("start-red");
 boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.yellow].classes.push("start-yellow");
 
-// ====== 每色起點（主路上的第一個該色格） ======
-function findFirstIndexByColor(color) {
-  for (let i = 0; i < basePathWithColor.length; i++) {
-    if (basePathWithColor[i][2] === color) return i;
-  }
-  return 0;
-}
+// ====== 起步點（起飛點後的下一步） ======
+const startStepXY = {
+  blue: [1,5],
+  red: [11,1],
+  green: [5,15],
+  yellow: [11,15],
+};
 const playerStartIndex = {
-  blue: findFirstIndexByColor("blue"),
-  red: findFirstIndexByColor("red"),
-  green: findFirstIndexByColor("green"),
-  yellow: findFirstIndexByColor("yellow"),
+  blue: baseIndexByCell.get(xyToIndex(...startStepXY.blue)),
+  red: baseIndexByCell.get(xyToIndex(...startStepXY.red)),
+  green: baseIndexByCell.get(xyToIndex(...startStepXY.green)),
+  yellow: baseIndexByCell.get(xyToIndex(...startStepXY.yellow)),
 };
 
 // ====== 終點通道 ======
