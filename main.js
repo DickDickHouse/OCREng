@@ -1,10 +1,16 @@
-const VERSION = "v29-full-rules";
+const VERSION = "v30-xy-coords";
 const versionEl = document.getElementById("version");
 if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 
 const BOARD_ROWS = 15;
 const BOARD_COLS = 15;
-function rcToIndex(r, c) { return r * BOARD_COLS + c; }
+
+// (x,y) -> index, x,y are 1-based with (1,1) at top-left
+function xyToIndex(x, y) {
+  const col = x - 1;
+  const row = y - 1;
+  return row * BOARD_COLS + col;
+}
 
 const boardCells = [];
 for (let r = 0; r < BOARD_ROWS; r++) {
@@ -13,64 +19,73 @@ for (let r = 0; r < BOARD_ROWS; r++) {
   }
 }
 
-// 四角家區（2x2）
-function paintHomeArea(rStart, cStart, className) {
-  for (let r = rStart; r < rStart + 2; r++) {
-    for (let c = cStart; c < cStart + 2; c++) {
-      boardCells[rcToIndex(r, c)].classes.push(className);
+// ====== 家區 (3x3) ======
+function paintHomeArea(x1, y1, x2, y2, className) {
+  for (let y = y1; y <= y2; y++) {
+    for (let x = x1; x <= x2; x++) {
+      boardCells[xyToIndex(x, y)].classes.push(className);
     }
   }
 }
-paintHomeArea(0, 0, "cell-home-blue");
-paintHomeArea(0, 13, "cell-home-green");
-paintHomeArea(13, 0, "cell-home-yellow");
-paintHomeArea(13, 13, "cell-home-red");
+paintHomeArea(1, 1, 3, 3, "cell-home-blue");
+paintHomeArea(13, 1, 15, 3, "cell-home-red");
+paintHomeArea(1, 13, 3, 15, "cell-home-green");
+paintHomeArea(13, 13, 15, 15, "cell-home-yellow");
 
-// 中央 3x3（上綠、右紅、下黃、左藍）
+// ====== 中央 3x3（上綠、右紅、下黃、左藍） ======
 const centerCells = [
-  [6,6],[6,7],[6,8],
-  [7,6],[7,7],[7,8],
-  [8,6],[8,7],[8,8],
+  [7,7],[8,7],[9,7],
+  [7,8],[8,8],[9,8],
+  [7,9],[8,9],[9,9],
 ];
-centerCells.forEach(([r,c]) => {
+centerCells.forEach(([x,y]) => {
   let cls = "center-core";
-  if (r === 6 && c === 7) cls = "center-green";
-  else if (r === 8 && c === 7) cls = "center-yellow";
-  else if (r === 7 && c === 6) cls = "center-blue";
-  else if (r === 7 && c === 8) cls = "center-red";
-  boardCells[rcToIndex(r,c)].classes.push(cls);
+  if (x === 8 && y === 7) cls = "center-green";
+  else if (x === 8 && y === 9) cls = "center-yellow";
+  else if (x === 7 && y === 8) cls = "center-blue";
+  else if (x === 9 && y === 8) cls = "center-red";
+  boardCells[xyToIndex(x,y)].classes.push(cls);
 });
 
-// ✅ 外圈 52 格（真正外圍一圈，不含四角）
-const basePathCoords = [];
-for (let c = 1; c <= 13; c++) basePathCoords.push([0, c]);
-for (let r = 1; r <= 13; r++) basePathCoords.push([r, 14]);
-for (let c = 13; c >= 1; c--) basePathCoords.push([14, c]);
-for (let r = 13; r >= 1; r--) basePathCoords.push([r, 0]);
+// ====== 外圈路徑 (依你提供的序列，允許跳格) ======
+const basePathCoordsXY = [
+  [5,1],[6,1],[7,1],[8,1],[9,1],[10,1],[11,1],[11,2],[11,3],[11,4],
+  [12,5],[13,5],[14,5],[15,5],[15,6],[15,7],[15,8],[15,9],[15,11],
+  [14,11],[13,11],[12,11],[11,12],[11,13],[11,14],[11,15],[10,15],
+  [9,15],[8,15],[7,15],[6,15],[5,15],[5,14],[5,13],[5,12],[4,11],
+  [3,11],[2,11],[1,11],[1,10],[1,9],[1,8],[1,7],[1,6],[1,5],
+  [2,5],[3,5],[4,5],[5,4],[5,3],[5,2]
+];
 
 const basePath = [];
 const baseIndexByCell = new Map();
-basePathCoords.forEach(([r,c]) => {
-  const idx = rcToIndex(r,c);
+basePathCoordsXY.forEach(([x,y]) => {
+  const idx = xyToIndex(x,y);
   baseIndexByCell.set(idx, basePath.length);
   basePath.push(idx);
 });
 const PATH_LENGTH = basePath.length;
 
-// 起飛格（四邊中點）
+// ====== 起飛點 ======
+const startCellsXY = {
+  blue: [1,4],
+  red: [12,1],
+  green: [4,15],
+  yellow: [12,15],
+};
 const startCells = {
-  blue: rcToIndex(7,0),
-  green: rcToIndex(0,7),
-  red: rcToIndex(7,14),
-  yellow: rcToIndex(14,7),
+  blue: xyToIndex(...startCellsXY.blue),
+  red: xyToIndex(...startCellsXY.red),
+  green: xyToIndex(...startCellsXY.green),
+  yellow: xyToIndex(...startCellsXY.yellow),
 };
 boardCells[startCells.blue].classes.push("start-blue");
-boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.red].classes.push("start-red");
+boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.yellow].classes.push("start-yellow");
 
-// 主路顏色分段（每色 13 格）
-const colorOrder = ["blue", "green", "red", "yellow"];
+// ====== 主路顏色分段（每色 13 格） ======
+const colorOrder = ["blue", "green", "red", "yellow"]; 
 const colorClassMap = {
   red: "cell-path-red",
   blue: "cell-path-blue",
@@ -91,28 +106,36 @@ basePath.forEach((idx) => {
   }
 });
 
-// 終點道（6 格）
+// ====== 終點通道 ======
+function lineCoords(x1,y1,x2,y2) {
+  const coords = [];
+  if (x1 === x2) {
+    const step = y1 <= y2 ? 1 : -1;
+    for (let y = y1; y !== y2 + step; y += step) coords.push([x1,y]);
+  } else if (y1 === y2) {
+    const step = x1 <= x2 ? 1 : -1;
+    for (let x = x1; x !== x2 + step; x += step) coords.push([x,y1]);
+  }
+  return coords;
+}
+
 const homePaths = {
-  blue:  [rcToIndex(7,1), rcToIndex(7,2), rcToIndex(7,3), rcToIndex(7,4), rcToIndex(7,5), rcToIndex(7,6)],
-  green: [rcToIndex(1,7), rcToIndex(2,7), rcToIndex(3,7), rcToIndex(4,7), rcToIndex(5,7), rcToIndex(6,7)],
-  red:   [rcToIndex(7,13), rcToIndex(7,12), rcToIndex(7,11), rcToIndex(7,10), rcToIndex(7,9), rcToIndex(7,8)],
-  yellow:[rcToIndex(13,7), rcToIndex(12,7), rcToIndex(11,7), rcToIndex(10,7), rcToIndex(9,7), rcToIndex(8,7)],
+  red:   lineCoords(8,1,8,7).map(([x,y]) => xyToIndex(x,y)),
+  yellow:lineCoords(15,8,9,8).map(([x,y]) => xyToIndex(x,y)),
+  green: lineCoords(8,15,8,9).map(([x,y]) => xyToIndex(x,y)),
+  blue:  lineCoords(1,8,7,8).map(([x,y]) => xyToIndex(x,y)),
 };
 homePaths.blue.forEach(i => boardCells[i].classes.push("cell-homepath-blue"));
 homePaths.green.forEach(i => boardCells[i].classes.push("cell-homepath-green"));
 homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));
 homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
 
-// ✅ 飛行格（先放在各色起飛後第 4 格）
-function stepIndex(startCell, step) {
-  const startIndex = baseIndexByCell.get(startCell);
-  return basePath[(startIndex + step) % basePath.length];
-}
+// ====== 飛行隧道 ======
 const flySquares = {
-  blue:  { from: stepIndex(startCells.blue, 4), dir: "fly-right", jump: 4 },
-  green: { from: stepIndex(startCells.green, 4), dir: "fly-down",  jump: 4 },
-  red:   { from: stepIndex(startCells.red, 4), dir: "fly-left",  jump: 4 },
-  yellow:{ from: stepIndex(startCells.yellow, 4), dir: "fly-up",   jump: 4 },
+  yellow: { from: xyToIndex(5,11), to: xyToIndex(4,5), dir: "fly-left" },
+  green:  { from: xyToIndex(5,4),  to: xyToIndex(11,4), dir: "fly-right" },
+  blue:   { from: xyToIndex(12,5), to: xyToIndex(12,11), dir: "fly-down" },
+  red:    { from: xyToIndex(11,12),to: xyToIndex(5,12), dir: "fly-left" },
 };
 Object.values(flySquares).forEach(f => boardCells[f.from].classes.push(f.dir));
 
@@ -135,12 +158,25 @@ function baseIndexToProgress(color, baseIndex) {
   return (baseIndex - playerStartIndex[color] + basePath.length) % basePath.length;
 }
 
-// 玩家
+// ====== 玩家 ======
+function homeList(x1,y1,x2,y2) {
+  const list = [];
+  for (let y = y1; y <= y2; y++) {
+    for (let x = x1; x <= x2; x++) list.push(xyToIndex(x,y));
+  }
+  return list;
+}
+const homePositionsFull = {
+  blue:  homeList(1,1,3,3),
+  red:   homeList(13,1,15,3),
+  green: homeList(1,13,3,15),
+  yellow:homeList(13,13,15,15),
+};
 const homePositions = {
-  blue:  [rcToIndex(0,0), rcToIndex(0,1), rcToIndex(1,0), rcToIndex(1,1)],
-  green: [rcToIndex(0,13), rcToIndex(0,14), rcToIndex(1,13), rcToIndex(1,14)],
-  yellow:[rcToIndex(13,0), rcToIndex(13,1), rcToIndex(14,0), rcToIndex(14,1)],
-  red:   [rcToIndex(13,13), rcToIndex(13,14), rcToIndex(14,13), rcToIndex(14,14)],
+  blue:  homePositionsFull.blue.slice(0,4),
+  red:   homePositionsFull.red.slice(0,4),
+  green: homePositionsFull.green.slice(0,4),
+  yellow:homePositionsFull.yellow.slice(0,4),
 };
 
 const players = [
@@ -242,9 +278,12 @@ function applyFlyAndCapture(player, piece) {
   if (piece.progress < PATH_LENGTH) {
     const cellIndex = path[piece.progress];
     const fly = flySquares[color];
-    if (cellIndex === fly.from) {
-      piece.progress = Math.min(piece.progress + fly.jump, PATH_LENGTH - 1);
-      renderPieces();
+    if (fly && cellIndex === fly.from) {
+      const targetIndex = baseIndexByCell.get(fly.to);
+      if (targetIndex !== undefined) {
+        piece.progress = baseIndexToProgress(color, targetIndex);
+        renderPieces();
+      }
     }
   }
 
