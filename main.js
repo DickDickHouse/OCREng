@@ -47,53 +47,38 @@ centerCells.forEach(([r,c]) => {
   boardCells[rcToIndex(r,c)].classes.push(cls);
 });
 
-// ========== 主路徑（標準 52 格） ==========
+// ========== 主路徑（標準 52 格外圈） ==========
+const basePathCoords = [
+  [7,0],[6,0],[6,1],[6,2],[6,3],[6,4],[6,5],
+  [5,6],[4,6],[3,6],[2,6],[1,6],[0,6],
+  [0,7],[0,8],
+  [1,8],[2,8],[3,8],[4,8],[5,8],
+  [6,9],[6,10],[6,11],[6,12],[6,13],[6,14],
+  [7,14],[8,14],
+  [8,13],[8,12],[8,11],[8,10],[8,9],
+  [9,8],[10,8],[11,8],[12,8],[13,8],[14,8],
+  [14,7],[14,6],
+  [13,6],[12,6],[11,6],[10,6],[9,6],
+  [8,5],[8,4],[8,3],[8,2],[8,1],[8,0],
+];
 
 const basePath = [];
 const baseIndexByCell = new Map();
 
-function pushCell(r, c) {
-  const idx = rcToIndex(r, c);
-  if (!baseIndexByCell.has(idx)) {
-    baseIndexByCell.set(idx, basePath.length);
-    basePath.push(idx);
-  }
-}
+basePathCoords.forEach(([r,c]) => {
+  const idx = rcToIndex(r,c);
+  baseIndexByCell.set(idx, basePath.length);
+  basePath.push(idx);
+});
 
-function addRow(r, cStart, cEnd) {
-  const step = cStart <= cEnd ? 1 : -1;
-  for (let c = cStart; c !== cEnd + step; c += step) {
-    pushCell(r, c);
-  }
-}
+const PATH_LENGTH = basePath.length; // 52
 
-function addCol(rStart, c, rEnd) {
-  const step = rStart <= rEnd ? 1 : -1;
-  for (let r = rStart; r !== rEnd + step; r += step) {
-    pushCell(r, c);
-  }
-}
-
-// 按順時針
-addRow(6, 0, 5);      // 左邊向右
-addCol(5, 6, 0);      // 向上
-addRow(0, 7, 8);      // 向右
-addCol(1, 8, 5);      // 向下
-addRow(6, 9, 14);     // 向右
-addCol(7, 14, 8);     // 向下
-addRow(8, 13, 9);     // 向左
-addCol(9, 8, 14);     // 向下
-addRow(14, 7, 6);     // 向左
-addCol(13, 6, 9);     // 向上
-addRow(8, 5, 0);      // 向左
-addCol(7, 0, 7);      // 只補 (7,0) 不回到起點
-
-// 起飛格（彩圖：藍左、綠上、紅右、黃下）
+// 起飛格（彩圖 START 位置）
 const startCells = {
-  blue: rcToIndex(6,0),
-  green: rcToIndex(0,8),
-  red: rcToIndex(8,14),
-  yellow: rcToIndex(14,6),
+  blue: rcToIndex(7,0),
+  green: rcToIndex(0,7),
+  red: rcToIndex(7,14),
+  yellow: rcToIndex(14,7),
 };
 
 // 起飛格標記
@@ -126,8 +111,6 @@ basePath.forEach((idx) => {
   }
 });
 
-const PATH_LENGTH = basePath.length; // 52
-
 // 終點道（6 格）
 const homePaths = {
   blue:  [rcToIndex(7,1), rcToIndex(7,2), rcToIndex(7,3), rcToIndex(7,4), rcToIndex(7,5), rcToIndex(7,6)],
@@ -136,13 +119,12 @@ const homePaths = {
   yellow:[rcToIndex(13,7), rcToIndex(12,7), rcToIndex(11,7), rcToIndex(10,7), rcToIndex(9,7), rcToIndex(8,7)],
 };
 
-// 終點道上色
 homePaths.blue.forEach(i => boardCells[i].classes.push("cell-homepath-blue"));
 homePaths.green.forEach(i => boardCells[i].classes.push("cell-homepath-green"));
 homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));
 homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
 
-// 飛行格（箭頭）— 依彩圖位置
+// 飛行格（箭頭）
 const flySquares = {
   blue:  { from: rcToIndex(6,5), to: rcToIndex(6,9), dir: "fly-right" },
   green: { from: rcToIndex(5,8), to: rcToIndex(9,8), dir: "fly-down" },
@@ -154,7 +136,7 @@ Object.values(flySquares).forEach(f => {
   boardCells[f.from].classes.push(f.dir);
 });
 
-// 安全格（起飛格 + 飛行格）
+// 安全格
 const safeCells = new Set([
   startCells.blue, startCells.green, startCells.red, startCells.yellow,
   flySquares.blue.from, flySquares.green.from, flySquares.red.from, flySquares.yellow.from,
@@ -171,13 +153,11 @@ Object.keys(startCells).forEach((color) => {
   playerPaths[color] = rotated.concat(homePaths[color]);
 });
 
-// baseIndex -> 該玩家路徑 progress
 function baseIndexToProgress(color, baseIndex) {
   return (baseIndex - playerStartIndex[color] + basePath.length) % basePath.length;
 }
 
 // ========== 玩家設定 ==========
-
 const homePositions = {
   blue:  [rcToIndex(0,0), rcToIndex(0,1), rcToIndex(1,0), rcToIndex(1,1)],
   green: [rcToIndex(0,13), rcToIndex(0,14), rcToIndex(1,13), rcToIndex(1,14)],
@@ -205,7 +185,6 @@ const rollButton = document.getElementById("roll-button");
 const resetButton = document.getElementById("reset-button");
 
 // ========== 棋盤渲染 ==========
-
 function getPieceCellIndex(player, piece) {
   if (piece.status === "home") {
     return homePositions[player.color][piece.homeIndex];
@@ -262,7 +241,6 @@ function renderPieces() {
 }
 
 // ========== 遊戲邏輯 ==========
-
 function randomDice() {
   return Math.floor(Math.random() * 6) + 1;
 }
@@ -273,7 +251,7 @@ function animateMovePiece(player, piece, targetProgress, onComplete) {
   if (end <= start) { onComplete && onComplete(); return; }
 
   let current = start;
-  const stepTime = 300;
+  const stepTime = 250;
 
   function moveOne() {
     current += 1;
@@ -291,14 +269,13 @@ function applyFlyAndCapture(player, piece) {
   const color = player.color;
   const path = playerPaths[color];
 
-  // 只在主路上才有飛行
+  // 飛行
   if (piece.progress < PATH_LENGTH) {
     const cellIndex = path[piece.progress];
     const fly = flySquares[color];
     if (cellIndex === fly.from) {
       const targetBaseIndex = baseIndexByCell.get(fly.to);
-      const newProgress = baseIndexToProgress(color, targetBaseIndex);
-      piece.progress = newProgress;
+      piece.progress = baseIndexToProgress(color, targetBaseIndex);
       renderPieces();
     }
   }
@@ -333,7 +310,7 @@ function performMoveWithRules(player, dice, done) {
 
   if (dice === 6 && homePiece) {
     homePiece.status = "track";
-    homePiece.progress = 0; // 起飛到該色起點
+    homePiece.progress = 0;
     renderPieces();
     applyFlyAndCapture(player, homePiece);
     done();
@@ -342,10 +319,7 @@ function performMoveWithRules(player, dice, done) {
 
   if (trackPiece) {
     const target = trackPiece.progress + dice;
-    if (target > maxIndex) {
-      done(); // 必須剛好走到終點
-      return;
-    }
+    if (target > maxIndex) { done(); return; }
     animateMovePiece(player, trackPiece, target, () => {
       applyFlyAndCapture(player, trackPiece);
       if (trackPiece.progress === maxIndex) {
@@ -396,9 +370,8 @@ function handleTurn() {
 
 function initGame() {
   players.forEach((player) => {
-    player.pieces.forEach((p, i) => {
+    player.pieces.forEach((p) => {
       p.status = "home";
-      p.homeIndex = i;
       p.progress = 0;
     });
   });
