@@ -5,11 +5,8 @@ body {
   background-color: #f0f2f5;
 }
 
-h1 {
-  margin-bottom: 12px;
-}
+h1 { margin-bottom: 12px; }
 
-/* 上方資訊與按鈕區塊 */
 #controls {
   display: flex;
   flex-wrap: wrap;
@@ -27,23 +24,18 @@ h1 {
   font-size: 14px;
 }
 
-#current-player-name {
-  font-weight: bold;
-}
+#current-player-name { font-weight: bold; }
 
-/* 玩家名稱顏色 */
 .player-red { color: #ff4d4f; }
 .player-blue { color: #1890ff; }
 .player-green { color: #52c41a; }
 .player-yellow { color: #faad14; }
 
-/* 控制按鈕區 */
 .button-block {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-
 .button-block button {
   padding: 6px 12px;
   font-size: 14px;
@@ -51,35 +43,18 @@ h1 {
   border: none;
 }
 
-/* 擲骰子按鈕 */
-#roll-button {
-  background-color: #1890ff;
-  color: #fff;
-}
-#roll-button:disabled {
-  background-color: #d9d9d9;
-  color: #888;
-}
+#roll-button { background-color: #1890ff; color: #fff; }
+#roll-button:disabled { background-color: #d9d9d9; color: #888; }
 
-/* 重新開始按鈕 */
-#reset-button {
-  background-color: #52c41a;
-  color: #fff;
-}
+#reset-button { background-color: #52c41a; color: #fff; }
 
-/* 狀態文字 */
-#status {
-  margin-top: 4px;
-  margin-bottom: 4px;
-  min-height: 20px;
-  color: #333;
-  font-size: 14px;
-}
+#status { margin: 4px 0; min-height: 20px; color: #333; font-size: 14px; }
+#dice-result { font-weight: bold; font-size: 18px; }
 
-/* 讓骰子結果更明顯 */
-#dice-result {
+#version {
+  color: #d00;
   font-weight: bold;
-  font-size: 18px;
+  margin-bottom: 6px;
 }
 
 #board-wrapper {
@@ -88,7 +63,7 @@ h1 {
   margin-top: 8px;
 }
 
-/* 棋盤外框 */
+/* 棋盤 */
 #board {
   display: grid;
   grid-template-columns: repeat(15, 26px);
@@ -101,7 +76,6 @@ h1 {
   box-shadow: 0 2px 10px rgba(0,0,0,0.18);
 }
 
-/* 單一格子 */
 .cell {
   width: 26px;
   height: 26px;
@@ -111,25 +85,25 @@ h1 {
 }
 
 /* 主路 */
-.cell-path { background-color: #ffffff; }
-.cell-path-red { background-color: #ffe7e7; }
-.cell-path-blue { background-color: #e6f3ff; }
-.cell-path-green { background-color: #e6ffe7; }
-.cell-path-yellow { background-color: #fff7e6; }
+.cell-path { background-color: #f2f2f2; }
+.cell-path-red { background-color: #ffd6d6; }
+.cell-path-blue { background-color: #d6e8ff; }
+.cell-path-green { background-color: #d7ffd6; }
+.cell-path-yellow { background-color: #ffe7ba; }
 
 /* 終點道 */
-.cell-homepath-red { background-color: #ffd6d6; }
-.cell-homepath-blue { background-color: #d6e8ff; }
-.cell-homepath-green { background-color: #d7ffd6; }
-.cell-homepath-yellow { background-color: #ffe7ba; }
+.cell-homepath-red { background-color: #ffb3b3; }
+.cell-homepath-blue { background-color: #b3d9ff; }
+.cell-homepath-green { background-color: #b3ffb3; }
+.cell-homepath-yellow { background-color: #ffe0a3; }
 
-/* 四角家區（2x2） */
+/* 四角家區 */
 .cell-home-red { background-color: #ffd6d6; }
 .cell-home-blue { background-color: #d6e8ff; }
 .cell-home-green { background-color: #d7ffd6; }
 .cell-home-yellow { background-color: #ffe7ba; }
 
-/* 中央 3x3 終點區（依彩圖：上綠、右紅、下黃、左藍） */
+/* 中央 3x3 */
 .center-blue { background-color: #b3d9ff; }
 .center-green { background-color: #b3ffb3; }
 .center-red { background-color: #ffb3b3; }
@@ -153,7 +127,7 @@ h1 {
 .start-green::after { border-color: #52c41a; }
 .start-yellow::after { border-color: #faad14; }
 
-/* 飛行格（箭頭） */
+/* 飛行格箭頭 */
 .fly-up::after,
 .fly-down::after,
 .fly-left::after,
@@ -172,7 +146,6 @@ h1 {
 .fly-left::after { content: "←"; }
 .fly-right::after { content: "→"; }
 
-/* 棋子容器 */
 .pieces-container {
   position: absolute;
   inset: 2px;
@@ -181,7 +154,6 @@ h1 {
   grid-template-rows: repeat(2, 1fr);
 }
 
-/* 棋子 */
 .piece {
   width: 14px;
   height: 14px;
@@ -193,12 +165,3 @@ h1 {
 .piece.blue { background-color: #1890ff; }
 .piece.green { background-color: #52c41a; }
 .piece.yellow { background-color: #faad14; }
-
-/* 閃爍動畫 */
-@keyframes blink-fast {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
-}
-.piece-blink { animation: blink-fast 0.25s linear infinite; }
-.dice-blink { animation: blink-fast 0.25s linear infinite; }
