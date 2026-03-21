@@ -63,7 +63,6 @@ h1 { margin-bottom: 12px; }
   margin-top: 8px;
 }
 
-/* 棋盤 */
 #board {
   display: grid;
   grid-template-columns: repeat(15, 26px);
@@ -85,11 +84,21 @@ h1 { margin-bottom: 12px; }
 }
 
 /* 主路 */
-.cell-path { background-color: #eaeaea; }
+.cell-path { background-color: #e0e0e0; }
 .cell-path-red { background-color: #ffcccc; }
 .cell-path-blue { background-color: #cce3ff; }
 .cell-path-green { background-color: #ccffd7; }
 .cell-path-yellow { background-color: #ffe6b8; }
+
+/* ✅ 外圈小點（debug） */
+.cell-path-dot::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: #666;
+  opacity: 0.5;
+}
 
 /* 終點道 */
 .cell-homepath-red { background-color: #ffb3b3; }
