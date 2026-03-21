@@ -1,11 +1,9 @@
-const VERSION = "v24-outer-ring";
-
+const VERSION = "v25-outer-ring-fixed";
 const versionEl = document.getElementById("version");
 if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 
 const BOARD_ROWS = 15;
 const BOARD_COLS = 15;
-
 function rcToIndex(r, c) { return r * BOARD_COLS + c; }
 
 const boardCells = [];
@@ -43,9 +41,9 @@ centerCells.forEach(([r,c]) => {
   boardCells[rcToIndex(r,c)].classes.push(cls);
 });
 
-// ✅ 外圈 52 格（真正一圈）
+// ✅ 正確外圈 52 格（標準 15x15）
 const basePathCoords = [
-  [7,0],[6,0],[6,1],[6,2],[6,3],[6,4],[6,5],
+  [6,1],[6,2],[6,3],[6,4],[6,5],
   [5,6],[4,6],[3,6],[2,6],[1,6],[0,6],
   [0,7],[0,8],
   [1,8],[2,8],[3,8],[4,8],[5,8],
@@ -56,6 +54,7 @@ const basePathCoords = [
   [14,7],[14,6],
   [13,6],[12,6],[11,6],[10,6],[9,6],
   [8,5],[8,4],[8,3],[8,2],[8,1],[8,0],
+  [7,0],[6,0],
 ];
 
 const basePath = [];
@@ -65,17 +64,15 @@ basePathCoords.forEach(([r,c]) => {
   baseIndexByCell.set(idx, basePath.length);
   basePath.push(idx);
 });
+const PATH_LENGTH = basePath.length; // 52
 
-const PATH_LENGTH = basePath.length;
-
-// 起飛格（四邊中間）
+// 起飛格（四邊中點）
 const startCells = {
-  blue: rcToIndex(7,0),
-  green: rcToIndex(0,7),
-  red: rcToIndex(7,14),
-  yellow: rcToIndex(14,7),
+  blue: rcToIndex(6,1),
+  green: rcToIndex(1,8),
+  red: rcToIndex(8,13),
+  yellow: rcToIndex(13,6),
 };
-
 boardCells[startCells.blue].classes.push("start-blue");
 boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.red].classes.push("start-red");
@@ -89,7 +86,6 @@ const colorClassMap = {
   green: "cell-path-green",
   yellow: "cell-path-yellow",
 };
-
 colorOrder.forEach((color) => {
   const startIndex = baseIndexByCell.get(startCells[color]);
   for (let i = 0; i < 13; i++) {
@@ -97,7 +93,6 @@ colorOrder.forEach((color) => {
     boardCells[idx].classes.push(colorClassMap[color]);
   }
 });
-
 basePath.forEach((idx) => {
   boardCells[idx].isPath = true;
   if (!boardCells[idx].classes.includes("cell-path")) {
@@ -112,31 +107,25 @@ const homePaths = {
   red:   [rcToIndex(7,13), rcToIndex(7,12), rcToIndex(7,11), rcToIndex(7,10), rcToIndex(7,9), rcToIndex(7,8)],
   yellow:[rcToIndex(13,7), rcToIndex(12,7), rcToIndex(11,7), rcToIndex(10,7), rcToIndex(9,7), rcToIndex(8,7)],
 };
-
 homePaths.blue.forEach(i => boardCells[i].classes.push("cell-homepath-blue"));
 homePaths.green.forEach(i => boardCells[i].classes.push("cell-homepath-green"));
 homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));
 homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
 
-// 飛行格（箭頭）
+// 飛行格（先保留原位置，外圈完成後再微調）
 const flySquares = {
   blue:  { from: rcToIndex(6,5), to: rcToIndex(6,9), dir: "fly-right" },
   green: { from: rcToIndex(5,8), to: rcToIndex(9,8), dir: "fly-down" },
   red:   { from: rcToIndex(8,9), to: rcToIndex(8,5), dir: "fly-left" },
   yellow:{ from: rcToIndex(9,6), to: rcToIndex(5,6), dir: "fly-up" },
 };
+Object.values(flySquares).forEach(f => boardCells[f.from].classes.push(f.dir));
 
-Object.values(flySquares).forEach(f => {
-  boardCells[f.from].classes.push(f.dir);
-});
-
-// 安全格
 const safeCells = new Set([
   startCells.blue, startCells.green, startCells.red, startCells.yellow,
   flySquares.blue.from, flySquares.green.from, flySquares.red.from, flySquares.yellow.from,
 ]);
 
-// 玩家路徑
 const playerPaths = {};
 const playerStartIndex = {};
 Object.keys(startCells).forEach((color) => {
@@ -176,9 +165,7 @@ const rollButton = document.getElementById("roll-button");
 const resetButton = document.getElementById("reset-button");
 
 function getPieceCellIndex(player, piece) {
-  if (piece.status === "home") {
-    return homePositions[player.color][piece.homeIndex];
-  }
+  if (piece.status === "home") return homePositions[player.color][piece.homeIndex];
   return playerPaths[player.color][piece.progress];
 }
 
