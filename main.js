@@ -116,6 +116,7 @@ const currentPlayerNameEl = document.getElementById("current-player-name");
 const diceResultEl = document.getElementById("dice-result");
 const statusEl = document.getElementById("status");
 const rollButton = document.getElementById("roll-button");
+const newGameButton = document.getElementById("new-game-button");
 
 // ========== 棋盤渲染 ==========
 
@@ -178,7 +179,7 @@ function handleTurn() {
     statusEl.textContent = `${currentPlayer.name} 率先繞完一圈，獲勝！`;
     rollButton.disabled = true;
   } else {
-    statusEl.textContent = `${currentPlayer.name} 從第 ${oldStep} 步移動到第 ${newStep} 步`;
+    statusEl.textContent = `${currentPlayer.name} 從第 ${oldStep + 1} 步移動到第 ${newStep + 1} 步`;
   }
 
   currentPlayer.currentStep = newStep;
@@ -231,6 +232,14 @@ function initGame() {
 
 // 綁定事件
 rollButton.addEventListener("click", handleTurn);
+newGameButton.addEventListener("click", initGame);
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    handleTurn();
+  }
+});
 
 // 頁面載入後開始
 window.addEventListener("load", initGame);
