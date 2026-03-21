@@ -85,11 +85,11 @@ h1 { margin-bottom: 12px; }
 }
 
 /* 主路 */
-.cell-path { background-color: #f2f2f2; }
-.cell-path-red { background-color: #ffd6d6; }
-.cell-path-blue { background-color: #d6e8ff; }
-.cell-path-green { background-color: #d7ffd6; }
-.cell-path-yellow { background-color: #ffe7ba; }
+.cell-path { background-color: #eaeaea; }
+.cell-path-red { background-color: #ffcccc; }
+.cell-path-blue { background-color: #cce3ff; }
+.cell-path-green { background-color: #ccffd7; }
+.cell-path-yellow { background-color: #ffe6b8; }
 
 /* 終點道 */
 .cell-homepath-red { background-color: #ffb3b3; }
