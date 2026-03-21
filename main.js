@@ -1,6 +1,6 @@
 const VERSION = "v32-custom-path";
 const versionEl = document.getElementById("version");
-if (versionEl) versionEl.textContent = `版本：${VERSION}`;
+if (versionEl) versionEl.textContent = `版��：${VERSION}`;
 
 const BOARD_ROWS = 15;
 const BOARD_COLS = 15;
@@ -151,6 +151,12 @@ jumpPairs.forEach(([x1,y1,x2,y2]) => {
   boardCells[xyToIndex(x1,y1)].classes.push("cell-jump");
   boardCells[xyToIndex(x2,y2)].classes.push("cell-jump");
 });
+
+// ====== 斜切雙色格 ======
+boardCells[xyToIndex(5,5)].classes.push("cell-split-55");
+boardCells[xyToIndex(11,5)].classes.push("cell-split-115");
+boardCells[xyToIndex(11,11)].classes.push("cell-split-1111");
+boardCells[xyToIndex(5,11)].classes.push("cell-split-511");
 
 // 安全格（起飛格 + 飛行格）
 const safeCells = new Set([
