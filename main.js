@@ -1,21 +1,17 @@
-// ========== 棋盤設定 ==========
+const VERSION = "v24-outer-ring";
+
+const versionEl = document.getElementById("version");
+if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 
 const BOARD_ROWS = 15;
 const BOARD_COLS = 15;
 
-function rcToIndex(r, c) {
-  return r * BOARD_COLS + c;
-}
+function rcToIndex(r, c) { return r * BOARD_COLS + c; }
 
 const boardCells = [];
 for (let r = 0; r < BOARD_ROWS; r++) {
   for (let c = 0; c < BOARD_COLS; c++) {
-    boardCells.push({
-      row: r,
-      col: c,
-      isPath: false,
-      classes: [],
-    });
+    boardCells.push({ row: r, col: c, isPath: false, classes: [] });
   }
 }
 
@@ -27,10 +23,10 @@ function paintHomeArea(rStart, cStart, className) {
     }
   }
 }
-paintHomeArea(0, 0, "cell-home-blue");      // 左上藍
-paintHomeArea(0, 13, "cell-home-green");    // 右上綠
-paintHomeArea(13, 0, "cell-home-yellow");   // 左下黃
-paintHomeArea(13, 13, "cell-home-red");     // 右下紅
+paintHomeArea(0, 0, "cell-home-blue");
+paintHomeArea(0, 13, "cell-home-green");
+paintHomeArea(13, 0, "cell-home-yellow");
+paintHomeArea(13, 13, "cell-home-red");
 
 // 中央 3x3（上綠、右紅、下黃、左藍）
 const centerCells = [
@@ -47,7 +43,7 @@ centerCells.forEach(([r,c]) => {
   boardCells[rcToIndex(r,c)].classes.push(cls);
 });
 
-// ========== 主路徑（標準 52 格外圈） ==========
+// ✅ 外圈 52 格（真正一圈）
 const basePathCoords = [
   [7,0],[6,0],[6,1],[6,2],[6,3],[6,4],[6,5],
   [5,6],[4,6],[3,6],[2,6],[1,6],[0,6],
@@ -64,16 +60,15 @@ const basePathCoords = [
 
 const basePath = [];
 const baseIndexByCell = new Map();
-
 basePathCoords.forEach(([r,c]) => {
   const idx = rcToIndex(r,c);
   baseIndexByCell.set(idx, basePath.length);
   basePath.push(idx);
 });
 
-const PATH_LENGTH = basePath.length; // 52
+const PATH_LENGTH = basePath.length;
 
-// 起飛格（彩圖 START 位置）
+// 起飛格（四邊中間）
 const startCells = {
   blue: rcToIndex(7,0),
   green: rcToIndex(0,7),
@@ -81,7 +76,6 @@ const startCells = {
   yellow: rcToIndex(14,7),
 };
 
-// 起飛格標記
 boardCells[startCells.blue].classes.push("start-blue");
 boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.red].classes.push("start-red");
@@ -142,22 +136,20 @@ const safeCells = new Set([
   flySquares.blue.from, flySquares.green.from, flySquares.red.from, flySquares.yellow.from,
 ]);
 
-// 為每位玩家建立完整路徑（主路 + 終點道）
+// 玩家路徑
 const playerPaths = {};
 const playerStartIndex = {};
-
 Object.keys(startCells).forEach((color) => {
   const startIndex = baseIndexByCell.get(startCells[color]);
   playerStartIndex[color] = startIndex;
   const rotated = basePath.slice(startIndex).concat(basePath.slice(0, startIndex));
   playerPaths[color] = rotated.concat(homePaths[color]);
 });
-
 function baseIndexToProgress(color, baseIndex) {
   return (baseIndex - playerStartIndex[color] + basePath.length) % basePath.length;
 }
 
-// ========== 玩家設定 ==========
+// 玩家
 const homePositions = {
   blue:  [rcToIndex(0,0), rcToIndex(0,1), rcToIndex(1,0), rcToIndex(1,1)],
   green: [rcToIndex(0,13), rcToIndex(0,14), rcToIndex(1,13), rcToIndex(1,14)],
@@ -176,7 +168,6 @@ let currentPlayerIndex = 0;
 let gameEnded = false;
 let isAnimating = false;
 
-// DOM
 const boardEl = document.getElementById("board");
 const currentPlayerNameEl = document.getElementById("current-player-name");
 const diceResultEl = document.getElementById("dice-result");
@@ -184,20 +175,17 @@ const statusEl = document.getElementById("status");
 const rollButton = document.getElementById("roll-button");
 const resetButton = document.getElementById("reset-button");
 
-// ========== 棋盤渲染 ==========
 function getPieceCellIndex(player, piece) {
   if (piece.status === "home") {
     return homePositions[player.color][piece.homeIndex];
   }
-  const path = playerPaths[player.color];
-  return path[piece.progress];
+  return playerPaths[player.color][piece.progress];
 }
 
 function initBoard() {
   boardEl.innerHTML = "";
   boardEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 26px)`;
   boardEl.style.gridTemplateRows = `repeat(${BOARD_ROWS}, 26px)`;
-
   boardCells.forEach((cellData) => {
     const cell = document.createElement("div");
     cell.classList.add("cell");
@@ -212,64 +200,48 @@ function renderPieces() {
     const old = cell.querySelector(".pieces-container");
     if (old) cell.removeChild(old);
   }
-
   const cellPiecesMap = new Map();
-
   players.forEach((player) => {
     player.pieces.forEach((piece) => {
       const cellIndex = getPieceCellIndex(player, piece);
-      if (cellIndex !== null && cellIndex !== undefined) {
-        if (!cellPiecesMap.has(cellIndex)) cellPiecesMap.set(cellIndex, []);
-        cellPiecesMap.get(cellIndex).push(player);
-      }
+      if (!cellPiecesMap.has(cellIndex)) cellPiecesMap.set(cellIndex, []);
+      cellPiecesMap.get(cellIndex).push(player);
     });
   });
-
   cellPiecesMap.forEach((list, cellIndex) => {
     const cell = cells[cellIndex];
     const container = document.createElement("div");
     container.className = "pieces-container";
-
     list.forEach((player) => {
       const pieceEl = document.createElement("div");
       pieceEl.className = `piece ${player.colorClass}`;
       container.appendChild(pieceEl);
     });
-
     cell.appendChild(container);
   });
 }
 
-// ========== 遊戲邏輯 ==========
-function randomDice() {
-  return Math.floor(Math.random() * 6) + 1;
-}
+function randomDice() { return Math.floor(Math.random() * 6) + 1; }
 
 function animateMovePiece(player, piece, targetProgress, onComplete) {
   const start = piece.progress;
   const end = targetProgress;
   if (end <= start) { onComplete && onComplete(); return; }
-
   let current = start;
   const stepTime = 250;
-
   function moveOne() {
     current += 1;
     piece.progress = current;
     renderPieces();
-
     if (current < end) setTimeout(moveOne, stepTime);
     else onComplete && onComplete();
   }
-
   moveOne();
 }
 
 function applyFlyAndCapture(player, piece) {
   const color = player.color;
   const path = playerPaths[color];
-
-  // 飛行
   if (piece.progress < PATH_LENGTH) {
     const cellIndex = path[piece.progress];
     const fly = flySquares[color];
@@ -279,8 +251,6 @@ function applyFlyAndCapture(player, piece) {
       renderPieces();
     }
   }
-
-  // 吃子（主路、非安全格）
   if (piece.progress < PATH_LENGTH) {
     const cellIndex = path[piece.progress];
     if (!safeCells.has(cellIndex)) {
@@ -297,7 +267,6 @@ function applyFlyAndCapture(player, piece) {
       });
     }
   }
-
   renderPieces();
 }
 
@@ -338,10 +307,7 @@ function performMoveWithRules(player, dice, done) {
 function updateCurrentPlayerDisplay() {
   const p = players[currentPlayerIndex];
   currentPlayerNameEl.textContent = p.name;
-
-  currentPlayerNameEl.classList.remove(
-    "player-red","player-blue","player-green","player-yellow"
-  );
+  currentPlayerNameEl.classList.remove("player-red","player-blue","player-green","player-yellow");
   if (p.color === "red") currentPlayerNameEl.classList.add("player-red");
   if (p.color === "blue") currentPlayerNameEl.classList.add("player-blue");
   if (p.color === "green") currentPlayerNameEl.classList.add("player-green");
@@ -350,14 +316,11 @@ function updateCurrentPlayerDisplay() {
 
 function handleTurn() {
   if (gameEnded || isAnimating) return;
-
   const player = players[currentPlayerIndex];
   isAnimating = true;
   rollButton.disabled = true;
-
   const dice = randomDice();
   diceResultEl.textContent = dice.toString();
-
   performMoveWithRules(player, dice, () => {
     isAnimating = false;
     if (!gameEnded) {
@@ -370,16 +333,11 @@ function handleTurn() {
 
 function initGame() {
   players.forEach((player) => {
-    player.pieces.forEach((p) => {
-      p.status = "home";
-      p.progress = 0;
-    });
+    player.pieces.forEach((p) => { p.status = "home"; p.progress = 0; });
   });
-
   currentPlayerIndex = 0;
   gameEnded = false;
   isAnimating = false;
-
   initBoard();
   renderPieces();
   updateCurrentPlayerDisplay();
