@@ -110,8 +110,8 @@ h1 { margin-bottom: 12px; }
   background: linear-gradient(45deg, #ffe6b8 0 50%, #ccffd7 50% 100%);
 }
 /* (11,5) 接觸(11,4)=綠；接觸(12,5)=藍 */
-.cell-split-55 {
-  background: linear-gradient(45deg, #000 0 50%, #fff 50% 100%);
+.cell-split-115 {
+  background: linear-gradient(135deg, #ccffd7 0 50%, #cce3ff 50% 100%);
 }
 /* (11,11) 顏色對調後：接觸(12,11)=紅；接觸(11,12)=藍 */
 .cell-split-1111 {
