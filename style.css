@@ -90,14 +90,18 @@ h1 { margin-bottom: 12px; }
 .cell-path-green { background-color: #ccffd7; }
 .cell-path-yellow { background-color: #ffe6b8; }
 
-/* ✅ 外圈小點（debug） */
-.cell-path-dot::before {
-  content: "";
+/* 跳棋顯示 */
+.cell-jump {
+  outline: 2px dashed #555;
+  outline-offset: -2px;
+}
+.cell-jump::after {
+  content: "跳";
   position: absolute;
-  inset: 9px;
-  border-radius: 50%;
-  background: #666;
-  opacity: 0.5;
+  top: 1px;
+  left: 2px;
+  font-size: 10px;
+  color: #555;
 }
 
 /* 終點道 */
