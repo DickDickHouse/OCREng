@@ -1,4 +1,4 @@
-const VERSION = "v30-xy-coords";
+const VERSION = "v31-custom-path";
 const versionEl = document.getElementById("version");
 if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 
@@ -47,26 +47,35 @@ centerCells.forEach(([x,y]) => {
   boardCells[xyToIndex(x,y)].classes.push(cls);
 });
 
-// ====== 外圈路徑 (依你提供的序列，允許跳格) ======
-const basePathCoordsXY = [
-  [5,1],[6,1],[7,1],[8,1],[9,1],[10,1],[11,1],[11,2],[11,3],[11,4],
-  [12,5],[13,5],[14,5],[15,5],[15,6],[15,7],[15,8],[15,9],[15,11],
-  [14,11],[13,11],[12,11],[11,12],[11,13],[11,14],[11,15],[10,15],
-  [9,15],[8,15],[7,15],[6,15],[5,15],[5,14],[5,13],[5,12],[4,11],
-  [3,11],[2,11],[1,11],[1,10],[1,9],[1,8],[1,7],[1,6],[1,5],
-  [2,5],[3,5],[4,5],[5,4],[5,3],[5,2]
+// ====== 外圈路徑（依你最新序列+顏色） ======
+const basePathWithColor = [
+  [5,1,"yellow"], [6,1,"green"], [7,1,"blue"], [8,1,"red"], [9,1,"yellow"], [10,1,"green"],
+  [11,1,"blue"], [11,2,"red"], [11,3,"yellow"], [11,4,"green"], [12,5,"blue"], [13,5,"red"],
+  [14,5,"yellow"], [15,5,"green"], [15,6,"blue"], [15,7,"red"], [15,8,"yellow"], [15,9,"green"],
+  [15,10,"blue"], [15,11,"red"], [14,11,"yellow"], [13,11,"green"], [12,11,"blue"], [11,12,"red"],
+  [11,13,"yellow"], [11,14,"green"], [11,15,"blue"], [10,15,"red"], [9,15,"yellow"], [8,15,"green"],
+  [7,15,"blue"], [6,15,"red"], [5,15,"yellow"], [5,14,"green"], [5,13,"blue"], [5,12,"red"],
+  [4,11,"yellow"], [3,11,"green"], [2,11,"blue"], [1,11,"red"], [1,10,"yellow"], [1,9,"green"],
+  [1,8,"blue"], [1,7,"red"], [1,6,"yellow"], [1,5,"green"], [2,5,"blue"], [3,5,"red"],
+  [4,5,"yellow"], [5,4,"green"], [5,3,"blue"], [5,2,"red"]
 ];
 
 const basePath = [];
 const baseIndexByCell = new Map();
-basePathCoordsXY.forEach(([x,y]) => {
+
+basePathWithColor.forEach(([x,y,color]) => {
   const idx = xyToIndex(x,y);
   baseIndexByCell.set(idx, basePath.length);
   basePath.push(idx);
+
+  boardCells[idx].isPath = true;
+  boardCells[idx].classes.push("cell-path");
+  boardCells[idx].classes.push(`cell-path-${color}`);
 });
+
 const PATH_LENGTH = basePath.length;
 
-// ====== 起飛點 ======
+// ====== 起飛點（不在主路徑） ======
 const startCellsXY = {
   blue: [1,4],
   red: [12,1],
@@ -84,27 +93,19 @@ boardCells[startCells.red].classes.push("start-red");
 boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.yellow].classes.push("start-yellow");
 
-// ====== 主路顏色分段（每色 13 格） ======
-const colorOrder = ["blue", "green", "red", "yellow"]; 
-const colorClassMap = {
-  red: "cell-path-red",
-  blue: "cell-path-blue",
-  green: "cell-path-green",
-  yellow: "cell-path-yellow",
+// ====== 每色起點（主路上的第一個該色格） ======
+function findFirstIndexByColor(color) {
+  for (let i = 0; i < basePathWithColor.length; i++) {
+    if (basePathWithColor[i][2] === color) return i;
+  }
+  return 0;
+}
+const playerStartIndex = {
+  blue: findFirstIndexByColor("blue"),
+  red: findFirstIndexByColor("red"),
+  green: findFirstIndexByColor("green"),
+  yellow: findFirstIndexByColor("yellow"),
 };
-colorOrder.forEach((color) => {
-  const startIndex = baseIndexByCell.get(startCells[color]);
-  for (let i = 0; i < 13; i++) {
-    const idx = basePath[(startIndex + i) % basePath.length];
-    boardCells[idx].classes.push(colorClassMap[color]);
-  }
-});
-basePath.forEach((idx) => {
-  boardCells[idx].isPath = true;
-  if (!boardCells[idx].classes.includes("cell-path")) {
-    boardCells[idx].classes.push("cell-path");
-  }
-});
 
 // ====== 終點通道 ======
 function lineCoords(x1,y1,x2,y2) {
@@ -139,21 +140,32 @@ const flySquares = {
 };
 Object.values(flySquares).forEach(f => boardCells[f.from].classes.push(f.dir));
 
+// ====== 跳棋顯示（不連續位置） ======
+const jumpPairs = [
+  [4,5,5,4],
+  [11,4,12,5],
+  [12,11,11,12],
+  [5,12,4,11],
+];
+jumpPairs.forEach(([x1,y1,x2,y2]) => {
+  boardCells[xyToIndex(x1,y1)].classes.push("cell-jump");
+  boardCells[xyToIndex(x2,y2)].classes.push("cell-jump");
+});
+
 // 安全格（起飛格 + 飛行格）
 const safeCells = new Set([
   startCells.blue, startCells.green, startCells.red, startCells.yellow,
   flySquares.blue.from, flySquares.green.from, flySquares.red.from, flySquares.yellow.from,
 ]);
 
-// 玩家路徑（主路 + 終點道）
+// ====== 玩家路徑（主路 + 終點道） ======
 const playerPaths = {};
-const playerStartIndex = {};
 Object.keys(startCells).forEach((color) => {
-  const startIndex = baseIndexByCell.get(startCells[color]);
-  playerStartIndex[color] = startIndex;
+  const startIndex = playerStartIndex[color];
   const rotated = basePath.slice(startIndex).concat(basePath.slice(0, startIndex));
   playerPaths[color] = rotated.concat(homePaths[color]);
 });
+
 function baseIndexToProgress(color, baseIndex) {
   return (baseIndex - playerStartIndex[color] + basePath.length) % basePath.length;
 }
@@ -199,7 +211,8 @@ const resetButton = document.getElementById("reset-button");
 
 function getPieceCellIndex(player, piece) {
   if (piece.status === "home") return homePositions[player.color][piece.homeIndex];
-  return playerPaths[player.color][piece.progress];
+  if (piece.progress === 0) return startCells[player.color];
+  return playerPaths[player.color][piece.progress - 1];
 }
 
 function initBoard() {
@@ -272,24 +285,23 @@ function animateMovePiece(player, piece, targetProgress, onComplete) {
 
 function applyFlyAndCapture(player, piece) {
   const color = player.color;
-  const path = playerPaths[color];
 
   // 飛行
-  if (piece.progress < PATH_LENGTH) {
-    const cellIndex = path[piece.progress];
+  if (piece.progress > 0 && piece.progress <= PATH_LENGTH) {
+    const cellIndex = playerPaths[color][piece.progress - 1];
     const fly = flySquares[color];
     if (fly && cellIndex === fly.from) {
       const targetIndex = baseIndexByCell.get(fly.to);
       if (targetIndex !== undefined) {
-        piece.progress = baseIndexToProgress(color, targetIndex);
+        piece.progress = baseIndexToProgress(color, targetIndex) + 1;
         renderPieces();
       }
     }
   }
 
   // 吃子（主路、非安全格）
-  if (piece.progress < PATH_LENGTH) {
-    const cellIndex = path[piece.progress];
+  if (piece.progress > 0 && piece.progress <= PATH_LENGTH) {
+    const cellIndex = playerPaths[color][piece.progress - 1];
     if (!safeCells.has(cellIndex)) {
       players.forEach((op) => {
         if (op.color === color) return;
@@ -309,27 +321,25 @@ function applyFlyAndCapture(player, piece) {
 }
 
 function performMoveWithRules(player, dice, done) {
-  const path = playerPaths[player.color];
-  const maxIndex = path.length - 1;
+  const maxProgress = playerPaths[player.color].length;
 
   const homePiece = player.pieces.find(p => p.status === "home");
   const trackPiece = player.pieces.find(p => p.status !== "home");
 
   if (dice === 6 && homePiece) {
     homePiece.status = "track";
-    homePiece.progress = 0; // 起飛
+    homePiece.progress = 0; // 起飛點
     renderPieces();
-    applyFlyAndCapture(player, homePiece);
     done();
     return;
   }
 
   if (trackPiece) {
     const target = trackPiece.progress + dice;
-    if (target > maxIndex) { done(); return; }
+    if (target > maxProgress) { done(); return; }
     animateMovePiece(player, trackPiece, target, () => {
       applyFlyAndCapture(player, trackPiece);
-      if (trackPiece.progress === maxIndex) {
+      if (trackPiece.progress === maxProgress) {
         gameEnded = true;
         statusEl.textContent = `${player.name} 抵達終點，獲勝！`;
         rollButton.disabled = true;
