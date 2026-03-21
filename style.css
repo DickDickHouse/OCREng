@@ -117,16 +117,22 @@ h1 {
 .cell-path-green { background-color: #e6ffe7; }
 .cell-path-yellow { background-color: #fff7e6; }
 
-/* 四角家區 */
+/* 終點道 */
+.cell-homepath-red { background-color: #ffd6d6; }
+.cell-homepath-blue { background-color: #d6e8ff; }
+.cell-homepath-green { background-color: #d7ffd6; }
+.cell-homepath-yellow { background-color: #ffe7ba; }
+
+/* 四角家區（2x2） */
 .cell-home-red { background-color: #ffd6d6; }
 .cell-home-blue { background-color: #d6e8ff; }
 .cell-home-green { background-color: #d7ffd6; }
 .cell-home-yellow { background-color: #ffe7ba; }
 
-/* 中央 3x3 終點區 */
-.center-red { background-color: #ffb3b3; }
-.center-green { background-color: #b3ffb3; }
+/* 中央 3x3 終點區（依彩圖：上綠、右紅、下黃、左藍） */
 .center-blue { background-color: #b3d9ff; }
+.center-green { background-color: #b3ffb3; }
+.center-red { background-color: #ffb3b3; }
 .center-yellow { background-color: #ffe0a3; }
 .center-core { background-color: #ffffff; }
 
@@ -146,6 +152,25 @@ h1 {
 .start-blue::after { border-color: #1890ff; }
 .start-green::after { border-color: #52c41a; }
 .start-yellow::after { border-color: #faad14; }
+
+/* 飛行格（箭頭） */
+.fly-up::after,
+.fly-down::after,
+.fly-left::after,
+.fly-right::after {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+.fly-up::after { content: "↑"; }
+.fly-down::after { content: "↓"; }
+.fly-left::after { content: "←"; }
+.fly-right::after { content: "→"; }
 
 /* 棋子容器 */
 .pieces-container {
