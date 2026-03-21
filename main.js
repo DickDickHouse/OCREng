@@ -1,4 +1,4 @@
-const VERSION = "v27-ring-check";
+const VERSION = "v28-outer-perimeter";
 const versionEl = document.getElementById("version");
 if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 
@@ -41,21 +41,16 @@ centerCells.forEach(([r,c]) => {
   boardCells[rcToIndex(r,c)].classes.push(cls);
 });
 
-// ✅ 外圈 52 格（應該形成一圈）
-const basePathCoords = [
-  [6,1],[6,2],[6,3],[6,4],[6,5],
-  [5,6],[4,6],[3,6],[2,6],[1,6],[0,6],
-  [0,7],[0,8],
-  [1,8],[2,8],[3,8],[4,8],[5,8],
-  [6,9],[6,10],[6,11],[6,12],[6,13],[6,14],
-  [7,14],[8,14],
-  [8,13],[8,12],[8,11],[8,10],[8,9],
-  [9,8],[10,8],[11,8],[12,8],[13,8],[14,8],
-  [14,7],[14,6],
-  [13,6],[12,6],[11,6],[10,6],[9,6],
-  [8,5],[8,4],[8,3],[8,2],[8,1],[8,0],
-  [7,0],[6,0],
-];
+// ✅ 外圈 52 格（真正外圍一圈，不含四角）
+const basePathCoords = [];
+// 上邊（跳過角落）
+for (let c = 1; c <= 13; c++) basePathCoords.push([0, c]);
+// 右邊
+for (let r = 1; r <= 13; r++) basePathCoords.push([r, 14]);
+// 下邊
+for (let c = 13; c >= 1; c--) basePathCoords.push([14, c]);
+// 左邊
+for (let r = 13; r >= 1; r--) basePathCoords.push([r, 0]);
 
 const basePath = [];
 const baseIndexByCell = new Map();
@@ -66,16 +61,12 @@ basePathCoords.forEach(([r,c]) => {
 });
 const PATH_LENGTH = basePath.length;
 
-// 顯示 PATH 長度（必須是 52）
-const statusEl = document.getElementById("status");
-if (statusEl) statusEl.textContent = `PATH=${PATH_LENGTH}`;
-
 // 起飛格（四邊中點）
 const startCells = {
-  blue: rcToIndex(6,1),
-  green: rcToIndex(1,8),
-  red: rcToIndex(8,13),
-  yellow: rcToIndex(13,6),
+  blue: rcToIndex(7,0),
+  green: rcToIndex(0,7),
+  red: rcToIndex(7,14),
+  yellow: rcToIndex(14,7),
 };
 boardCells[startCells.blue].classes.push("start-blue");
 boardCells[startCells.green].classes.push("start-green");
@@ -117,7 +108,7 @@ homePaths.green.forEach(i => boardCells[i].classes.push("cell-homepath-green"));
 homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));
 homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
 
-// 玩家（簡化顯示仍保留 4 顆）
+// 玩家（保留 4 顆）
 const homePositions = {
   blue:  [rcToIndex(0,0), rcToIndex(0,1), rcToIndex(1,0), rcToIndex(1,1)],
   green: [rcToIndex(0,13), rcToIndex(0,14), rcToIndex(1,13), rcToIndex(1,14)],
@@ -143,10 +134,7 @@ function initBoard() {
     const cell = document.createElement("div");
     cell.classList.add("cell");
     cellData.classes.forEach((cls) => cell.classList.add(cls));
-
-    // ✅ 在外圈格子顯示 •
     if (cellData.isPath) cell.textContent = "•";
-
     boardEl.appendChild(cell);
   });
 }
