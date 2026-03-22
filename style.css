@@ -1,99 +1,7 @@
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  margin: 16px;
-  text-align: center;
-  background-color: #f0f2f5;
-}
-
-h1 { margin-bottom: 12px; }
-
-#controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.info-block {
-  background-color: #ffffff;
-  padding: 6px 10px;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  font-size: 14px;
-}
-
-#current-player-name { font-weight: bold; }
-
-.player-red { color: #ff4d4f; }
-.player-blue { color: #1890ff; }
-.player-green { color: #52c41a; }
-.player-yellow { color: #faad14; }
-
-.button-block {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.button-block button {
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: none;
-}
-
-#roll-button { background-color: #1890ff; color: #fff; }
-#roll-button:disabled { background-color: #d9d9d9; color: #888; }
-
-#reset-button { background-color: #52c41a; color: #fff; }
-
-#status { margin: 4px 0; min-height: 20px; color: #333; font-size: 14px; }
-#dice-result { font-weight: bold; font-size: 18px; }
-
-#version {
-  color: #d00;
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-
-#board-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-}
-
-#board {
-  display: grid;
-  grid-template-columns: repeat(15, 26px);
-  grid-template-rows: repeat(15, 26px);
-  gap: 2px;
-  margin: 0 auto;
-  padding: 10px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
-}
-
-.cell {
-  width: 26px;
-  height: 26px;
-  border: 1px solid #d9d9d9;
-  position: relative;
-  background-color: #fafafa;
-}
-
-/* 主路 */
-.cell-path { background-color: #e0e0e0; }
-.cell-path-red { background-color: #ffcccc; }
-.cell-path-blue { background-color: #cce3ff; }
-.cell-path-green { background-color: #ccffd7; }
-.cell-path-yellow { background-color: #ffe6b8; }
-
-/* 跳棋顯示 */
+/* 跳棋顯示：只保留「跳」字，移除虛線框 */
 .cell-jump {
-  outline: 2px dashed #555;
-  outline-offset: -2px;
+  outline: none;
+  outline-offset: 0;
 }
 .cell-jump::after {
   content: "跳";
@@ -118,7 +26,7 @@ h1 { margin-bottom: 12px; }
   background: linear-gradient(135deg, #ffe6b8 0 50%, #ffcccc 50% 100%);
 }
 
-/* ====== 連貫梯形外框（跨兩格，無對角線） ====== */
+/* ====== 連貫梯形外框（跨兩格，虛線） ====== */
 .cell-extend-45::before,
 .cell-extend-54::before,
 .cell-extend-114::before,
@@ -130,7 +38,7 @@ h1 { margin-bottom: 12px; }
   content: "";
   position: absolute;
   box-sizing: border-box;
-  border: 2px solid #333;
+  border: 2px dashed #333; /* ✅ 虛線梯形 */
   pointer-events: none;
 }
 
@@ -197,78 +105,3 @@ h1 { margin-bottom: 12px; }
   height: calc(200% + 2px);
   clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
 }
-
-/* 終點道 */
-.cell-homepath-red { background-color: #ffb3b3; }
-.cell-homepath-blue { background-color: #b3d9ff; }
-.cell-homepath-green { background-color: #b3ffb3; }
-.cell-homepath-yellow { background-color: #ffe0a3; }
-
-/* 四角家區 */
-.cell-home-red { background-color: #ffd6d6; }
-.cell-home-blue { background-color: #d6e8ff; }
-.cell-home-green { background-color: #d7ffd6; }
-.cell-home-yellow { background-color: #ffe7ba; }
-
-/* 中央 3x3 */
-.center-blue { background-color: #b3d9ff; }
-.center-green { background-color: #b3ffb3; }
-.center-red { background-color: #ffb3b3; }
-.center-yellow { background-color: #ffe0a3; }
-.center-core { background-color: #ffffff; }
-
-/* 起步點 */
-.start-red::after,
-.start-blue::after,
-.start-green::after,
-.start-yellow::after {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 50%;
-  border: 2px solid #555;
-  background-color: #fff;
-}
-.start-red::after { border-color: #ff4d4f; }
-.start-blue::after { border-color: #1890ff; }
-.start-green::after { border-color: #52c41a; }
-.start-yellow::after { border-color: #faad14; }
-
-/* 飛行格箭頭 */
-.fly-up::after,
-.fly-down::after,
-.fly-left::after,
-.fly-right::after {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
-}
-.fly-up::after { content: "↑"; }
-.fly-down::after { content: "↓"; }
-.fly-left::after { content: "←"; }
-.fly-right::after { content: "→"; }
-
-.pieces-container {
-  position: absolute;
-  inset: 2px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-}
-
-.piece {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  margin: auto;
-  box-shadow: 0 0 2px rgba(0,0,0,0.4);
-}
-.piece.red { background-color: #ff4d4f; }
-.piece.blue { background-color: #1890ff; }
-.piece.green { background-color: #52c41a; }
-.piece.yellow { background-color: #faad14; }
