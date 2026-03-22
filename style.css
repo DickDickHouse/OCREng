@@ -1,1 +1,107 @@
+/* 跳棋顯示：只保留「跳」字，移除虛線框 */
+.cell-jump {
+  outline: none;
+  outline-offset: 0;
+}
+.cell-jump::after {
+  content: "跳";
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  font-size: 10px;
+  color: #555;
+}
 
+/* ====== 斜切雙色格（保留顏色，不畫三角框） ====== */
+.cell-split-55 {
+  background: linear-gradient(45deg, #ffe6b8 0 50%, #ccffd7 50% 100%);
+}
+.cell-split-115 {
+  background: linear-gradient(135deg, #ccffd7 0 50%, #cce3ff 50% 100%);
+}
+.cell-split-1111 {
+  background: linear-gradient(45deg, #cce3ff 0 50%, #ffcccc 50% 100%);
+}
+.cell-split-511 {
+  background: linear-gradient(135deg, #ffe6b8 0 50%, #ffcccc 50% 100%);
+}
+
+/* ====== 連貫梯形外框（跨兩格，虛線） ====== */
+.cell-extend-45::before,
+.cell-extend-54::before,
+.cell-extend-114::before,
+.cell-extend-125::before,
+.cell-extend-1211::before,
+.cell-extend-1112::before,
+.cell-extend-411::before,
+.cell-extend-512::before {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px dashed #333; /* ✅ 虛線梯形 */
+  pointer-events: none;
+}
+
+/* (4,5) + (5,5) 黃色梯形：往右延伸 */
+.cell-extend-45::before {
+  left: 0; top: 0;
+  width: calc(200% + 2px);
+  height: 100%;
+  clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%);
+}
+
+/* (5,4) + (5,5) 綠色梯形：往下延伸 */
+.cell-extend-54::before {
+  left: 0; top: 0;
+  width: 100%;
+  height: calc(200% + 2px);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%);
+}
+
+/* (11,4) + (11,5) 綠色梯形：往下延伸 */
+.cell-extend-114::before {
+  left: 0; top: 0;
+  width: 100%;
+  height: calc(200% + 2px);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%);
+}
+
+/* (12,5) + (11,5) 藍色梯形：往左延伸 */
+.cell-extend-125::before {
+  left: calc(-100% - 2px); top: 0;
+  width: calc(200% + 2px);
+  height: 100%;
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* (12,11) + (11,11) 藍色梯形：往左延伸 */
+.cell-extend-1211::before {
+  left: calc(-100% - 2px); top: 0;
+  width: calc(200% + 2px);
+  height: 100%;
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* (11,12) + (11,11) 紅色梯形：往上延伸 */
+.cell-extend-1112::before {
+  left: 0; top: calc(-100% - 2px);
+  width: 100%;
+  height: calc(200% + 2px);
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* (4,11) + (5,11) 黃色梯形：往右延伸 */
+.cell-extend-411::before {
+  left: 0; top: 0;
+  width: calc(200% + 2px);
+  height: 100%;
+  clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%);
+}
+
+/* (5,12) + (5,11) 紅色梯形：往上延伸 */
+.cell-extend-512::before {
+  left: 0; top: calc(-100% - 2px);
+  width: 100%;
+  height: calc(200% + 2px);
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
+}
