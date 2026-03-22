@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>簡易版飛行棋 Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- ✅ 絕對路徑 + 版本號（避免快取與路徑錯） -->
+  <link rel="stylesheet" href="/OCREng/style.css?v=99" />
+</head>
+<body>
+  <h1>簡易版飛行棋 Demo</h1>
 
+  <div id="controls">
+    <div class="info-block">
+      <div>目前玩家：</div>
+      <div><span id="current-player-name">紅方</span></div>
+    </div>
+    <div class="info-block">
+      <div>骰子點數：</div>
+      <div><span id="dice-result">-</span></div>
+    </div>
+    <div class="button-block">
+      <button id="roll-button" type="button">擲骰子</button>
+      <button id="reset-button" type="button">重新開始</button>
+    </div>
+  </div>
+
+  <p id="version">版本：載入中…</p>
+  <p id="status"></p>
+
+  <div id="board-wrapper">
+    <div id="board"></div>
+  </div>
+
+  <!-- ✅ 絕對路徑 + 版本號 -->
+  <script src="/OCREng/main.js?v=99"></script>
+</body>
+</html>
