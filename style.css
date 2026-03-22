@@ -90,7 +90,7 @@ h1 { margin-bottom: 12px; }
 .cell-path-green { background-color: #ccffd7; }
 .cell-path-yellow { background-color: #ffe6b8; }
 
-/* 跳棋顯示：只保留「跳」字，移除虛線框 */
+/* 跳棋顯示：只保留「跳」字 */
 .cell-jump {
   outline: none;
   outline-offset: 0;
@@ -104,7 +104,7 @@ h1 { margin-bottom: 12px; }
   color: #555;
 }
 
-/* ====== 斜切雙色格（保留顏色，不畫三角框） ====== */
+/* ====== 斜切雙色格（保留顏色） ====== */
 .cell-split-55 {
   background: linear-gradient(45deg, #ffe6b8 0 50%, #ccffd7 50% 100%);
 }
@@ -112,11 +112,29 @@ h1 { margin-bottom: 12px; }
   background: linear-gradient(135deg, #ccffd7 0 50%, #cce3ff 50% 100%);
 }
 .cell-split-1111 {
-  background: linear-gradient(45deg, #cce3ff 0 50%, #ffcccc 50% 100%);
+  /* 顏色互換 */
+  background: linear-gradient(45deg, #ffcccc 0 50%, #cce3ff 50% 100%);
 }
 .cell-split-511 {
   background: linear-gradient(135deg, #ffe6b8 0 50%, #ffcccc 50% 100%);
 }
+
+/* ====== 斜切格的虛線分割線 ====== */
+.cell-split-55::after,
+.cell-split-115::after,
+.cell-split-1111::after,
+.cell-split-511::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-top: 2px dashed #333;
+  transform-origin: center;
+  pointer-events: none;
+}
+.cell-split-55::after { transform: rotate(45deg); }
+.cell-split-1111::after { transform: rotate(45deg); }
+.cell-split-115::after { transform: rotate(-45deg); }
+.cell-split-511::after { transform: rotate(-45deg); }
 
 /* ====== 連貫梯形外框（跨兩格，虛線） ====== */
 .cell-extend-45::before,
@@ -130,72 +148,82 @@ h1 { margin-bottom: 12px; }
   content: "";
   position: absolute;
   box-sizing: border-box;
-  border: 2px dashed #333; /* ✅ 虛線梯形 */
+  border: 2px dashed #333;
   pointer-events: none;
 }
-
-/* (4,5) + (5,5) 黃色梯形：往右延伸 */
 .cell-extend-45::before {
   left: 0; top: 0;
   width: calc(200% + 2px);
   height: 100%;
   clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%);
 }
-
-/* (5,4) + (5,5) 綠色梯形：往下延伸 */
 .cell-extend-54::before {
   left: 0; top: 0;
   width: 100%;
   height: calc(200% + 2px);
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%);
 }
-
-/* (11,4) + (11,5) 綠色梯形：往下延伸 */
 .cell-extend-114::before {
   left: 0; top: 0;
   width: 100%;
   height: calc(200% + 2px);
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%);
 }
-
-/* (12,5) + (11,5) 藍色梯形：往左延伸 */
 .cell-extend-125::before {
   left: calc(-100% - 2px); top: 0;
   width: calc(200% + 2px);
   height: 100%;
   clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
 }
-
-/* (12,11) + (11,11) 藍色梯形：往左延伸 */
 .cell-extend-1211::before {
   left: calc(-100% - 2px); top: 0;
   width: calc(200% + 2px);
   height: 100%;
   clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
 }
-
-/* (11,12) + (11,11) 紅色梯形：往上延伸 */
 .cell-extend-1112::before {
   left: 0; top: calc(-100% - 2px);
   width: 100%;
   height: calc(200% + 2px);
   clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
 }
-
-/* (4,11) + (5,11) 黃色梯形：往右延伸 */
 .cell-extend-411::before {
   left: 0; top: 0;
   width: calc(200% + 2px);
   height: 100%;
   clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%);
 }
-
-/* (5,12) + (5,11) 紅色梯形：往上延伸 */
 .cell-extend-512::before {
   left: 0; top: calc(-100% - 2px);
   width: 100%;
   height: calc(200% + 2px);
   clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* ====== 單邊虛線 ====== */
+.edge-dash-right::after,
+.edge-dash-left::after,
+.edge-dash-top::after,
+.edge-dash-bottom::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+.edge-dash-right::after {
+  top: 2px; bottom: 2px; right: -1px; width: 0;
+  border-right: 2px dashed #333;
+}
+.edge-dash-left::after {
+  top: 2px; bottom: 2px; left: -1px; width: 0;
+  border-left: 2px dashed #333;
+}
+.edge-dash-top::after {
+  left: 2px; right: 2px; top: -1px; height: 0;
+  border-top: 2px dashed #333;
+}
+.edge-dash-bottom::after {
+  left: 2px; right: 2px; bottom: -1px; height: 0;
+  border-bottom: 2px dashed #333;
 }
 
 /* 終點道 */
