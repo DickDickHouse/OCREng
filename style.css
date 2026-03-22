@@ -112,7 +112,6 @@ h1 { margin-bottom: 12px; }
   background: linear-gradient(135deg, #ccffd7 0 50%, #cce3ff 50% 100%);
 }
 .cell-split-1111 {
-  /* 顏色互換 */
   background: linear-gradient(45deg, #ffcccc 0 50%, #cce3ff 50% 100%);
 }
 .cell-split-511 {
@@ -151,54 +150,14 @@ h1 { margin-bottom: 12px; }
   border: 2px dashed #333;
   pointer-events: none;
 }
-.cell-extend-45::before {
-  left: 0; top: 0;
-  width: calc(200% + 2px);
-  height: 100%;
-  clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%);
-}
-.cell-extend-54::before {
-  left: 0; top: 0;
-  width: 100%;
-  height: calc(200% + 2px);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%);
-}
-.cell-extend-114::before {
-  left: 0; top: 0;
-  width: 100%;
-  height: calc(200% + 2px);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%);
-}
-.cell-extend-125::before {
-  left: calc(-100% - 2px); top: 0;
-  width: calc(200% + 2px);
-  height: 100%;
-  clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
-}
-.cell-extend-1211::before {
-  left: calc(-100% - 2px); top: 0;
-  width: calc(200% + 2px);
-  height: 100%;
-  clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
-}
-.cell-extend-1112::before {
-  left: 0; top: calc(-100% - 2px);
-  width: 100%;
-  height: calc(200% + 2px);
-  clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
-}
-.cell-extend-411::before {
-  left: 0; top: 0;
-  width: calc(200% + 2px);
-  height: 100%;
-  clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%);
-}
-.cell-extend-512::before {
-  left: 0; top: calc(-100% - 2px);
-  width: 100%;
-  height: calc(200% + 2px);
-  clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%);
-}
+.cell-extend-45::before { left: 0; top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%); }
+.cell-extend-54::before { left: 0; top: 0; width: 100%; height: calc(200% + 2px); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%); }
+.cell-extend-114::before { left: 0; top: 0; width: 100%; height: calc(200% + 2px); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%); }
+.cell-extend-125::before { left: calc(-100% - 2px); top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
+.cell-extend-1211::before { left: calc(-100% - 2px); top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
+.cell-extend-1112::before { left: 0; top: calc(-100% - 2px); width: 100%; height: calc(200% + 2px); clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
+.cell-extend-411::before { left: 0; top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%); }
+.cell-extend-512::before { left: 0; top: calc(-100% - 2px); width: 100%; height: calc(200% + 2px); clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
 
 /* ====== 單邊虛線 ====== */
 .edge-dash-right::after,
