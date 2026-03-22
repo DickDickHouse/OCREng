@@ -104,33 +104,34 @@ h1 { margin-bottom: 12px; }
   color: #555;
 }
 
-/* ====== 斜切雙色格（已按你最後要求調整） ====== */
-/* (5,5) 顏色對調後：接觸(5,4)=黃；接觸(4,5)=綠 */
+/* ====== 斜切雙色格 ====== */
 .cell-split-55 {
   background: linear-gradient(45deg, #ffe6b8 0 50%, #ccffd7 50% 100%);
 }
-/* (11,5) 接觸(11,4)=綠；接觸(12,5)=藍 */
 .cell-split-115 {
   background: linear-gradient(135deg, #ccffd7 0 50%, #cce3ff 50% 100%);
 }
-/* (11,11) 顏色對調後：接觸(12,11)=紅；接觸(11,12)=藍 */
 .cell-split-1111 {
-  background: linear-gradient(45deg, #ffcccc 0 50%, #cce3ff 50% 100%);
+  background: linear-gradient(45deg, #cce3ff 0 50%, #ffcccc 50% 100%);
 }
-/* (5,11) 接觸(4,11)=黃；接觸(5,12)=紅 */
 .cell-split-511 {
   background: linear-gradient(135deg, #ffe6b8 0 50%, #ffcccc 50% 100%);
 }
 
-/* ====== 梯形通道粗框（2px 深灰） ====== */
+/* ====== 梯形通道粗框（連貫） ====== */
+.trap-outline {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #333;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* 斜切格內的兩個三角框 */
 .cell-split-55::before,
-.cell-split-55::after,
 .cell-split-115::before,
-.cell-split-115::after,
 .cell-split-1111::before,
-.cell-split-1111::after,
-.cell-split-511::before,
-.cell-split-511::after {
+.cell-split-511::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -139,16 +140,78 @@ h1 { margin-bottom: 12px; }
   clip-path: polygon(0 0, 100% 0, 0 100%);
   pointer-events: none;
 }
-
-/* 右下半（另一個梯形） */
 .cell-split-55::after,
 .cell-split-115::after,
 .cell-split-1111::after,
 .cell-split-511::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #333;
+  box-sizing: border-box;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+
+/* ====== 對應相鄰格延伸框線 ====== */
+/* (4,5) + (5,5) 黃色梯形 */
+.cell-extend-45::before,
+.cell-extend-54::before,
+.cell-extend-114::before,
+.cell-extend-125::before,
+.cell-extend-1211::before,
+.cell-extend-1112::before,
+.cell-extend-411::before,
+.cell-extend-512::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #333;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* (4,5) 與 (5,5) 的黃半格連結 */
+.cell-extend-45::before {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+/* (5,4) 與 (5,5) 的綠半格連結 */
+.cell-extend-54::before {
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 
-/* 終點道 */
+/* (11,4) + (11,5) 綠半格 */
+.cell-extend-114::before {
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+/* (12,5) + (11,5) 藍半格 */
+.cell-extend-125::before {
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
+/* (12,11) + (11,11) 藍半格 */
+.cell-extend-1211::before {
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
+/* (11,12) + (11,11) 紅半格 */
+.cell-extend-1112::before {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+/* (4,11) + (5,11) 黃半格 */
+.cell-extend-411::before {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+/* (5,12) + (5,11) 紅半�� */
+.cell-extend-512::before {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+/* ====== 終點道 ====== */
 .cell-homepath-red { background-color: #ffb3b3; }
 .cell-homepath-blue { background-color: #b3d9ff; }
 .cell-homepath-green { background-color: #b3ffb3; }
