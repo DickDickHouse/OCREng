@@ -122,6 +122,32 @@ h1 { margin-bottom: 12px; }
   background: linear-gradient(135deg, #ffe6b8 0 50%, #ffcccc 50% 100%);
 }
 
+/* ====== 梯形通道粗框（2px 深灰） ====== */
+.cell-split-55::before,
+.cell-split-55::after,
+.cell-split-115::before,
+.cell-split-115::after,
+.cell-split-1111::before,
+.cell-split-1111::after,
+.cell-split-511::before,
+.cell-split-511::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #333;
+  box-sizing: border-box;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  pointer-events: none;
+}
+
+/* 右下半（另一個梯形） */
+.cell-split-55::after,
+.cell-split-115::after,
+.cell-split-1111::after,
+.cell-split-511::after {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
 /* 終點道 */
 .cell-homepath-red { background-color: #ffb3b3; }
 .cell-homepath-blue { background-color: #b3d9ff; }
