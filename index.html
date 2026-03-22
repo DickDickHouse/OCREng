@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <title>簡易版飛行棋 Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- ✅ 防快取：加版本號 -->
-  <link rel="stylesheet" href="style.css?v=32" />
+  <!-- ✅ 強制重新載入 CSS -->
+  <link rel="stylesheet" href="style.css?v=33" />
 </head>
 <body>
   <h1>簡易版飛行棋 Demo</h1>
@@ -25,15 +25,14 @@
     </div>
   </div>
 
-  <!-- ✅ 版本顯示 -->
   <p id="version">版本：載入中…</p>
-
   <p id="status"></p>
 
   <div id="board-wrapper">
     <div id="board"></div>
   </div>
 
-  <script src="main.js"></script>
+  <!-- ✅ 強制重新載入 JS -->
+  <script src="main.js?v=33"></script>
 </body>
 </html>
