@@ -425,4 +425,13 @@ function initGame() {
 
 rollButton.addEventListener("click", handleTurn);
 resetButton.addEventListener("click", initGame);
-window.addEventListener("load", initGame);
+window.addEventListener("load", () => {
+  try {
+    initGame();
+  } catch (error) {
+    if (statusEl) {
+      statusEl.textContent = `JS error: ${error.message}`;
+    }
+    console.error(error);
+  }
+});
