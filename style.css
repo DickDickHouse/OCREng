@@ -107,62 +107,6 @@ h1 { margin-bottom: 12px; }
 .cell-split-1111 { background: linear-gradient(45deg, #ffcccc 0 50%, #cce3ff 50% 100%); }
 .cell-split-511 { background: linear-gradient(135deg, #ffe6b8 0 50%, #ffcccc 50% 100%); }
 
-/* 斜虛線（加 z-index） */
-.cell-split-55::after,
-.cell-split-115::after,
-.cell-split-1111::after,
-.cell-split-511::after {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-top: 2px dashed #333;
-  transform-origin: center;
-  z-index: 2;
-  pointer-events: none;
-}
-.cell-split-55::after,
-.cell-split-1111::after { transform: rotate(45deg); }
-.cell-split-115::after,
-.cell-split-511::after { transform: rotate(-45deg); }
-
-/* 梯形虛線框 */
-.cell-extend-45::before,
-.cell-extend-54::before,
-.cell-extend-114::before,
-.cell-extend-125::before,
-.cell-extend-1211::before,
-.cell-extend-1112::before,
-.cell-extend-411::before,
-.cell-extend-512::before {
-  content: "";
-  position: absolute;
-  box-sizing: border-box;
-  border: 2px dashed #333;
-  pointer-events: none;
-}
-.cell-extend-45::before { left: 0; top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%); }
-.cell-extend-54::before { left: 0; top: 0; width: 100%; height: calc(200% + 2px); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%); }
-.cell-extend-114::before { left: 0; top: 0; width: 100%; height: calc(200% + 2px); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%); }
-.cell-extend-125::before { left: calc(-100% - 2px); top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
-.cell-extend-1211::before { left: calc(-100% - 2px); top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
-.cell-extend-1112::before { left: 0; top: calc(-100% - 2px); width: 100%; height: calc(200% + 2px); clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
-.cell-extend-411::before { left: 0; top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%); }
-.cell-extend-512::before { left: 0; top: calc(-100% - 2px); width: 100%; height: calc(200% + 2px); clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
-
-/* 單邊虛線 */
-.edge-dash-right::after,
-.edge-dash-left::after,
-.edge-dash-top::after,
-.edge-dash-bottom::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-.edge-dash-right::after { top: 2px; bottom: 2px; right: -1px; width: 0; border-right: 2px dashed #333; }
-.edge-dash-left::after { top: 2px; bottom: 2px; left: -1px; width: 0; border-left: 2px dashed #333; }
-.edge-dash-top::after { left: 2px; right: 2px; top: -1px; height: 0; border-top: 2px dashed #333; }
-.edge-dash-bottom::after { left: 2px; right: 2px; bottom: -1px; height: 0; border-bottom: 2px dashed #333; }
-
 /* 終點道 */
 .cell-homepath-red { background-color: #ffb3b3; }
 .cell-homepath-blue { background-color: #b3d9ff; }
