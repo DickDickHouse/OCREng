@@ -367,13 +367,13 @@ function getMoveInfo(player, dice) {
   const trackPiece = player.pieces.find(p => p.status !== "home");
 
   if (dice === 6 && homePiece) {
-    return { type: "home", piece: homePiece };
+    return { type: "home", piece: homePiece, steps: dice };
   }
 
   if (trackPiece) {
     const target = trackPiece.progress + dice;
     if (target > maxProgress) return null;
-    return { type: "track", piece: trackPiece, target };
+    return { type: "track", piece: trackPiece, target, steps: dice };
   }
 
   return null;
@@ -385,9 +385,12 @@ function performMove(player, moveInfo, done) {
     return;
   }
 
+  const startProgress = moveInfo.piece.progress;
+
   if (moveInfo.type === "home") {
     moveInfo.piece.status = "track";
     moveInfo.piece.progress = 0;
+    statusEl.textContent = "棋子起飛了!";
     renderPieces();
     done(true, moveInfo.piece);
     return;
@@ -395,11 +398,20 @@ function performMove(player, moveInfo, done) {
 
   animateMovePiece(player, moveInfo.piece, moveInfo.target, () => {
     applyFlyAndCapture(player, moveInfo.piece);
-    if (moveInfo.piece.progress === playerPaths[player.color].length) {
+    const endProgress = moveInfo.piece.progress;
+    const inHomePath = endProgress > PATH_LENGTH;
+    const enteredHomePath = startProgress <= PATH_LENGTH && endProgress > PATH_LENGTH;
+
+    if (endProgress === playerPaths[player.color].length) {
       gameEnded = true;
-      statusEl.textContent = `${player.name} 抵達終點，獲勝！`;
+      statusEl.textContent = "棋子到終點站了!";
       rollButton.disabled = true;
+    } else if (inHomePath || enteredHomePath) {
+      statusEl.textContent = "棋子快到終點了!";
+    } else {
+      statusEl.textContent = `棋子向前 ${moveInfo.steps} 格`;
     }
+
     done(true, moveInfo.piece);
   });
 }
