@@ -5,7 +5,7 @@
   <title>簡易版飛行棋 Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- ✅ 絕對路徑 + 新版本號 -->
-  <link rel="stylesheet" href="/OCREng/style.css?v=104" />
+  <link rel="stylesheet" href="/OCREng/style.css?v=105" />
 </head>
 <body>
   <h1>簡易版飛行棋 Demo</h1>
@@ -17,7 +17,10 @@
     </div>
     <div class="info-block">
       <div>骰子點數：</div>
-      <div><span id="dice-result">-</span></div>
+      <div class="dice-display">
+        <img id="dice-image" class="dice-image" src="/OCREng/images/dice-1.svg" alt="Dice 1" />
+        <span id="dice-result" aria-hidden="true">1</span>
+      </div>
     </div>
     <div class="button-block">
       <button id="roll-button" type="button">擲骰子</button>
@@ -33,6 +36,6 @@
   </div>
 
   <!-- ✅ 絕對路徑 + 新版本號 -->
-  <script src="/OCREng/main.js?v=104"></script>
+  <script src="/OCREng/main.js?v=105"></script>
 </body>
 </html>
