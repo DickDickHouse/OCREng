@@ -48,7 +48,7 @@ h1 { margin-bottom: 12px; }
 
 #reset-button { background-color: #52c41a; color: #fff; }
 
-#status { margin: 4px 0; min-height: 20px; color: #333; font-size: 14px; }
+#status { margin: 4px 0; min-height: 20px; color: #333; font-size: 18px; }
 
 .dice-display {
   display: flex;
