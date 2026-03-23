@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <title>簡易版飛行棋 Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/OCREng/style.css?v=101" />
+  <!-- ✅ 絕對路徑 + 新版本號 -->
+  <link rel="stylesheet" href="/OCREng/style.css?v=102" />
 </head>
 <body>
   <h1>簡易版飛行棋 Demo</h1>
@@ -31,15 +32,7 @@
     <div id="board"></div>
   </div>
 
-  <!-- ✅ 這行會先把版本改成 inline OK -->
-  <script>
-    const v = document.getElementById("version");
-    if (v) v.textContent = "版本：inline OK";
-  </script>
-
-  <!-- ✅ 如果 main.js 載入失敗，會顯示錯誤 -->
-  <script src="/OCREng/main.js?v=101"
-          onerror="document.getElementById('status').textContent='JS 載入失敗（main.js 沒有執行）';">
-  </script>
+  <!-- ✅ 絕對路徑 + 新版本號 -->
+  <script src="/OCREng/main.js?v=102"></script>
 </body>
 </html>
