@@ -453,18 +453,21 @@ function handleTurn() {
         return;
       }
 
-      performMove(player, moveInfo, (moved, movedPiece) => {
-        if (!moved) {
-          setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
-          return;
-        }
-        if (!gameEnded) {
-          setBlinkingPiece(movedPiece);
-          setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
-        } else {
-          setDiceRolling(false);
-        }
-      });
+      setBlinkingPiece(moveInfo.piece);
+      setTimeout(() => {
+        performMove(player, moveInfo, (moved, movedPiece) => {
+          if (!moved) {
+            setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
+            return;
+          }
+          if (!gameEnded) {
+            setBlinkingPiece(movedPiece);
+            setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
+          } else {
+            setDiceRolling(false);
+          }
+        });
+      }, POST_TURN_DELAY_MS);
     }
   }, 80);
 }
