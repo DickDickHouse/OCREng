@@ -261,6 +261,8 @@ function initBoard() {
 
 function renderPieces() {
   const cells = boardEl.getElementsByClassName("cell");
+  if (cells.length === 0) return;
+
   for (let cell of cells) {
     const old = cell.querySelector(".pieces-container");
     if (old) cell.removeChild(old);
@@ -277,6 +279,7 @@ function renderPieces() {
 
   cellPiecesMap.forEach((list, cellIndex) => {
     const cell = cells[cellIndex];
+    if (!cell) return;
     const container = document.createElement("div");
     container.className = "pieces-container";
 
@@ -445,7 +448,7 @@ function handleTurn() {
 
       const moveInfo = getMoveInfo(player, dice);
       if (!moveInfo) {
-        statusEl.textContent = `${player.name} 無棋可走`; 
+        statusEl.textContent = `${player.name} 無棋可走`;
         setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
         return;
       }
@@ -478,7 +481,8 @@ function initGame() {
   currentPlayerIndex = 0;
   gameEnded = false;
   isAnimating = false;
-  setBlinkingPiece(null);
+  blinkingPiece = null;
+  isBlinkingPiece = false;
 
   initBoard();
   renderPieces();
