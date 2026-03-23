@@ -128,12 +128,12 @@ h1 { margin-bottom: 12px; }
 /* 梯形虛線框 */
 .cell-extend-45::before,
 .cell-extend-54::before,
-cell-extend-114::before,
-cell-extend-125::before,
-cell-extend-1211::before,
-cell-extend-1112::before,
-cell-extend-411::before,
-cell-extend-512::before {
+.cell-extend-114::before,
+.cell-extend-125::before,
+.cell-extend-1211::before,
+.cell-extend-1112::before,
+.cell-extend-411::before,
+.cell-extend-512::before {
   content: "";
   position: absolute;
   box-sizing: border-box;
@@ -147,7 +147,7 @@ cell-extend-512::before {
 .cell-extend-1211::before { left: calc(-100% - 2px); top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
 .cell-extend-1112::before { left: 0; top: calc(-100% - 2px); width: 100%; height: calc(200% + 2px); clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
 .cell-extend-411::before { left: 0; top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%); }
-.cell-extend-512::before { left: 0; top: calc(-100% - 2px); width: 100%; height: calc(200% + 2px); height: calc(200% + 2px); clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
+.cell-extend-512::before { left: 0; top: calc(-100% - 2px); width: 100%; height: calc(200% + 2px); clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
 
 /* 單邊虛線 */
 .edge-dash-right::after,
