@@ -71,7 +71,7 @@ const startCellsXY = {
   blue: [1,4],
   red: [12,1],
   green: [4,15],
-  yellow: [12,15],
+  yellow: [15,12],
 };
 const startCells = {
   blue: xyToIndex(...startCellsXY.blue),
