@@ -49,7 +49,31 @@ h1 { margin-bottom: 12px; }
 #reset-button { background-color: #52c41a; color: #fff; }
 
 #status { margin: 4px 0; min-height: 20px; color: #333; font-size: 14px; }
-#dice-result { font-weight: bold; font-size: 18px; }
+
+.dice-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  position: relative;
+}
+
+dice-image {
+  width: 40px;
+  height: 40px;
+}
+
+#dice-result {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 #version {
   color: #d00;
@@ -121,7 +145,7 @@ h1 { margin-bottom: 12px; }
 
 /* 中央 3x3 */
 .center-blue { background-color: #b3d9ff; }
-.center-green { background-color: #b3ffb3; }
+center-green { background-color: #b3ffb3; }
 .center-red { background-color: #ffb3b3; }
 .center-yellow { background-color: #ffe0a3; }
 .center-core { background-color: #ffffff; }
@@ -160,7 +184,7 @@ h1 { margin-bottom: 12px; }
 .fly-up::after { content: "↑"; }
 .fly-down::after { content: "↓"; }
 .fly-left::after { content: "←"; }
-.fly-right::after { content: "→"; }
+fly-right::after { content: "→"; }
 
 .pieces-container {
   position: absolute;
