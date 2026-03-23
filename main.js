@@ -212,6 +212,7 @@ const rollButton = document.getElementById("roll-button");
 const resetButton = document.getElementById("reset-button");
 
 const POST_TURN_DELAY_MS = 3000;
+const DICE_IDLE_IMAGE = "/OCREng/images/dice-blank.svg";
 
 function setDiceImage(value) {
   if (diceImageEl) {
@@ -223,6 +224,11 @@ function setDiceImage(value) {
 
 function setDiceIdle() {
   if (diceDisplayEl) diceDisplayEl.classList.add("is-idle");
+  if (diceImageEl) {
+    diceImageEl.src = DICE_IDLE_IMAGE;
+    diceImageEl.alt = "Dice idle";
+  }
+  if (diceResultEl) diceResultEl.textContent = "";
 }
 
 function setDiceActive() {
@@ -490,7 +496,6 @@ function initGame() {
   initBoard();
   renderPieces();
   updateCurrentPlayerDisplay();
-  setDiceImage(1);
   setDiceIdle();
   statusEl.textContent = "";
 }
