@@ -5,6 +5,7 @@ if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 const BOARD_ROWS = 15;
 const BOARD_COLS = 15;
 
+// (x,y) -> index, x,y are 1-based with (1,1) at top-left
 function xyToIndex(x, y) {
   const col = x - 1;
   const row = y - 1;
@@ -18,6 +19,7 @@ for (let r = 0; r < BOARD_ROWS; r++) {
   }
 }
 
+// ====== 家區 (3x3) ======
 function paintHomeArea(x1, y1, x2, y2, className) {
   for (let y = y1; y <= y2; y++) {
     for (let x = x1; x <= x2; x++) {
@@ -30,6 +32,7 @@ paintHomeArea(13, 1, 15, 3, "cell-home-red");
 paintHomeArea(1, 13, 3, 15, "cell-home-green");
 paintHomeArea(13, 13, 15, 15, "cell-home-yellow");
 
+// ====== 中央 3x3 ======
 const centerCells = [
   [7,7],[8,7],[9,7],
   [7,8],[8,8],[9,8],
@@ -44,6 +47,7 @@ centerCells.forEach(([x,y]) => {
   boardCells[xyToIndex(x,y)].classes.push(cls);
 });
 
+// ====== 外圈路徑 ======
 const basePathWithColor = [
   [5,1,"yellow"], [6,1,"green"], [7,1,"blue"], [8,1,"red"], [9,1,"yellow"], [10,1,"green"],
   [11,1,"blue"], [11,2,"red"], [11,3,"yellow"], [11,4,"green"], [12,5,"blue"], [13,5,"red"],
@@ -58,18 +62,16 @@ const basePathWithColor = [
 
 const basePath = [];
 const baseIndexByCell = new Map();
-
 basePathWithColor.forEach(([x,y,color]) => {
   const idx = xyToIndex(x,y);
   baseIndexByCell.set(idx, basePath.length);
   basePath.push(idx);
-
   boardCells[idx].isPath = true;
   boardCells[idx].classes.push("cell-path", `cell-path-${color}`);
 });
-
 const PATH_LENGTH = basePath.length;
 
+// ====== 起飛點 ======
 const startCellsXY = {
   blue: [1,4],
   red: [12,1],
@@ -87,6 +89,7 @@ boardCells[startCells.red].classes.push("start-red");
 boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.yellow].classes.push("start-yellow");
 
+// ====== 起步點 ======
 const startStepXY = {
   blue: [1,5],
   red: [11,1],
@@ -100,6 +103,7 @@ const playerStartIndex = {
   yellow: baseIndexByCell.get(xyToIndex(...startStepXY.yellow)),
 };
 
+// ====== 終點通道 ======
 function lineCoords(x1,y1,x2,y2) {
   const coords = [];
   if (x1 === x2) {
@@ -123,7 +127,7 @@ homePaths.green.forEach(i => boardCells[i].classes.push("cell-homepath-green"));
 homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));
 homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
 
-// 飛行隧道 → 黃色箭頭移到 (4,11) 且向上
+// ====== 飛行隧道 ======
 const flySquares = {
   yellow: { from: xyToIndex(4,11), to: xyToIndex(4,10), dir: "fly-up" },
   green:  { from: xyToIndex(5,4),  to: xyToIndex(11,4), dir: "fly-right" },
@@ -132,6 +136,7 @@ const flySquares = {
 };
 Object.values(flySquares).forEach(f => boardCells[f.from].classes.push(f.dir));
 
+// ====== 跳棋 ======
 const jumpPairs = [
   [4,5,5,4],
   [11,4,12,5],
@@ -143,6 +148,7 @@ jumpPairs.forEach(([x1,y1,x2,y2]) => {
   boardCells[xyToIndex(x2,y2)].classes.push("cell-jump");
 });
 
+// ====== 斜切 & 梯形 ======
 boardCells[xyToIndex(5,5)].classes.push("cell-split-55");
 boardCells[xyToIndex(11,5)].classes.push("cell-split-115");
 boardCells[xyToIndex(11,11)].classes.push("cell-split-1111");
@@ -157,7 +163,7 @@ boardCells[xyToIndex(11,12)].classes.push("cell-extend-1112");
 boardCells[xyToIndex(4,11)].classes.push("cell-extend-411");
 boardCells[xyToIndex(5,12)].classes.push("cell-extend-512");
 
-// 單邊虛線
+// ====== 單邊虛線 ======
 boardCells[xyToIndex(4,4)].classes.push("edge-dash-right");
 boardCells[xyToIndex(5,4)].classes.push("edge-dash-left");
 
@@ -188,7 +194,7 @@ boardCells[xyToIndex(5,10)].classes.push("edge-dash-bottom");
 boardCells[xyToIndex(5,12)].classes.push("edge-dash-left");
 boardCells[xyToIndex(4,12)].classes.push("edge-dash-right");
 
-// ====== 其餘邏輯 ======
+// ====== 玩家邏輯 ======
 const safeCells = new Set([
   startCells.blue, startCells.green, startCells.red, startCells.yellow,
   flySquares.blue.from, flySquares.green.from, flySquares.red.from, flySquares.yellow.from,
@@ -205,7 +211,6 @@ function baseIndexToProgress(color, baseIndex) {
   return (baseIndex - playerStartIndex[color] + basePath.length) % basePath.length;
 }
 
-// 玩家資料與遊戲邏輯（與你原本一致）
 function homeList(x1,y1,x2,y2) {
   const list = [];
   for (let y = y1; y <= y2; y++) {
@@ -440,243 +445,3 @@ function initGame() {
 rollButton.addEventListener("click", handleTurn);
 resetButton.addEventListener("click", initGame);
 window.addEventListener("load", initGame);
-```
-
----
-
-# ✅ style.css（完整）
-````css name=style.css
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  margin: 16px;
-  text-align: center;
-  background-color: #f0f2f5;
-}
-
-h1 { margin-bottom: 12px; }
-
-#controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.info-block {
-  background-color: #ffffff;
-  padding: 6px 10px;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  font-size: 14px;
-}
-
-#current-player-name { font-weight: bold; }
-
-.player-red { color: #ff4d4f; }
-.player-blue { color: #1890ff; }
-.player-green { color: #52c41a; }
-.player-yellow { color: #faad14; }
-
-.button-block {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.button-block button {
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: none;
-}
-
-#roll-button { background-color: #1890ff; color: #fff; }
-#roll-button:disabled { background-color: #d9d9d9; color: #888; }
-
-#reset-button { background-color: #52c41a; color: #fff; }
-
-#status { margin: 4px 0; min-height: 20px; color: #333; font-size: 14px; }
-#dice-result { font-weight: bold; font-size: 18px; }
-
-#version {
-  color: #d00;
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-
-#board-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-}
-
-#board {
-  display: grid;
-  grid-template-columns: repeat(15, 26px);
-  grid-template-rows: repeat(15, 26px);
-  gap: 2px;
-  margin: 0 auto;
-  padding: 10px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
-}
-
-.cell {
-  width: 26px;
-  height: 26px;
-  border: 1px solid #d9d9d9;
-  position: relative;
-  background-color: #fafafa;
-}
-
-/* 主路 */
-.cell-path { background-color: #e0e0e0; }
-.cell-path-red { background-color: #ffcccc; }
-.cell-path-blue { background-color: #cce3ff; }
-.cell-path-green { background-color: #ccffd7; }
-.cell-path-yellow { background-color: #ffe6b8; }
-
-/* 跳棋顯示 */
-.cell-jump {
-  outline: none;
-  outline-offset: 0;
-}
-.cell-jump::after {
-  content: "跳";
-  position: absolute;
-  top: 1px;
-  left: 2px;
-  font-size: 10px;
-  color: #555;
-}
-
-/* 斜切格 */
-.cell-split-55 { background: linear-gradient(45deg, #ffe6b8 0 50%, #ccffd7 50% 100%); }
-.cell-split-115 { background: linear-gradient(135deg, #ccffd7 0 50%, #cce3ff 50% 100%); }
-.cell-split-1111 { background: linear-gradient(45deg, #ffcccc 0 50%, #cce3ff 50% 100%); }
-.cell-split-511 { background: linear-gradient(135deg, #ffe6b8 0 50%, #ffcccc 50% 100%); }
-
-/* 虛線分割線 */
-.cell-split-55::after,
-.cell-split-115::after,
-.cell-split-1111::after,
-.cell-split-511::after {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-top: 2px dashed #333;
-  transform-origin: center;
-}
-.cell-split-55::after, .cell-split-1111::after { transform: rotate(45deg); }
-.cell-split-115::after, .cell-split-511::after { transform: rotate(-45deg); }
-
-/* 梯形虛線框 */
-.cell-extend-45::before,
-.cell-extend-54::before,
-.cell-extend-114::before,
-.cell-extend-125::before,
-.cell-extend-1211::before,
-.cell-extend-1112::before,
-.cell-extend-411::before,
-.cell-extend-512::before {
-  content: "";
-  position: absolute;
-  box-sizing: border-box;
-  border: 2px dashed #333;
-  pointer-events: none;
-}
-.cell-extend-45::before { left: 0; top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%); }
-.cell-extend-54::before { left: 0; top: 0; width: 100%; height: calc(200% + 2px); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%); }
-.cell-extend-114::before { left: 0; top: 0; width: 100%; height: calc(200% + 2px); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%); }
-.cell-extend-125::before { left: calc(-100% - 2px); top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
-.cell-extend-1211::before { left: calc(-100% - 2px); top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
-.cell-extend-1112::before { left: 0; top: calc(-100% - 2px); width: 100%; height: calc(200% + 2px); clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
-.cell-extend-411::before { left: 0; top: 0; width: calc(200% + 2px); height: 100%; clip-path: polygon(0 0, 50% 0, 100% 100%, 0 100%); }
-.cell-extend-512::before { left: 0; top: calc(-100% - 2px); width: 100%; height: calc(200% + 2px); clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%); }
-
-/* 單邊虛線 */
-.edge-dash-right::after,
-.edge-dash-left::after,
-.edge-dash-top::after,
-.edge-dash-bottom::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-.edge-dash-right::after { top: 2px; bottom: 2px; right: -1px; width: 0; border-right: 2px dashed #333; }
-.edge-dash-left::after { top: 2px; bottom: 2px; left: -1px; width: 0; border-left: 2px dashed #333; }
-.edge-dash-top::after { left: 2px; right: 2px; top: -1px; height: 0; border-top: 2px dashed #333; }
-.edge-dash-bottom::after { left: 2px; right: 2px; bottom: -1px; height: 0; border-bottom: 2px dashed #333; }
-
-/* 其他樣式 */
-.cell-homepath-red { background-color: #ffb3b3; }
-.cell-homepath-blue { background-color: #b3d9ff; }
-.cell-homepath-green { background-color: #b3ffb3; }
-.cell-homepath-yellow { background-color: #ffe0a3; }
-
-.cell-home-red { background-color: #ffd6d6; }
-.cell-home-blue { background-color: #d6e8ff; }
-.cell-home-green { background-color: #d7ffd6; }
-.cell-home-yellow { background-color: #ffe7ba; }
-
-.center-blue { background-color: #b3d9ff; }
-.center-green { background-color: #b3ffb3; }
-.center-red { background-color: #ffb3b3; }
-.center-yellow { background-color: #ffe0a3; }
-.center-core { background-color: #ffffff; }
-
-.start-red::after,
-.start-blue::after,
-.start-green::after,
-.start-yellow::after {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 50%;
-  border: 2px solid #555;
-  background-color: #fff;
-}
-.start-red::after { border-color: #ff4d4f; }
-.start-blue::after { border-color: #1890ff; }
-.start-green::after { border-color: #52c41a; }
-.start-yellow::after { border-color: #faad14; }
-
-.fly-up::after,
-.fly-down::after,
-.fly-left::after,
-.fly-right::after {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
-}
-.fly-up::after { content: "↑"; }
-.fly-down::after { content: "↓"; }
-.fly-left::after { content: "←"; }
-.fly-right::after { content: "→"; }
-
-.pieces-container {
-  position: absolute;
-  inset: 2px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-}
-
-.piece {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  margin: auto;
-  box-shadow: 0 0 2px rgba(0,0,0,0.4);
-}
-.piece.red { background-color: #ff4d4f; }
-.piece.blue { background-color: #1890ff; }
-.piece.green { background-color: #52c41a; }
-.piece.yellow { background-color: #faad14; }
