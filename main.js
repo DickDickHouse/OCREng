@@ -153,19 +153,6 @@ boardCells[xyToIndex(11,12)].classes.push("cell-extend-1112");
 boardCells[xyToIndex(4,11)].classes.push("cell-extend-411");
 boardCells[xyToIndex(5,12)].classes.push("cell-extend-512");
 
-// ====== 單邊虛線（只留一邊，避免重疊） ======
-boardCells[xyToIndex(4,4)].classes.push("edge-dash-right"); // (4,4)-(5,4)
-boardCells[xyToIndex(5,5)].classes.push("edge-dash-bottom"); // (5,5)-(5,6)
-boardCells[xyToIndex(5,5)].classes.push("edge-dash-right"); // (5,5)-(6,5)
-boardCells[xyToIndex(11,11)].classes.push("edge-dash-top"); // (11,11)-(11,10)
-boardCells[xyToIndex(11,11)].classes.push("edge-dash-left"); // (11,11)-(10,11)
-boardCells[xyToIndex(11,12)].classes.push("edge-dash-left"); // (11,12)-(10,12)
-boardCells[xyToIndex(11,4)].classes.push("edge-dash-left"); // (11,4)-(10,4)
-boardCells[xyToIndex(11,5)].classes.push("edge-dash-left"); // (11,5)-(10,5)
-boardCells[xyToIndex(5,11)].classes.push("edge-dash-top"); // (5,11)-(5,10)
-boardCells[xyToIndex(5,12)].classes.push("edge-dash-left"); // (5,12)-(4,12)
-
-// ====== 玩家邏輯 ======
 const safeCells = new Set([
   startCells.blue, startCells.green, startCells.red, startCells.yellow,
   flySquares.blue.from, flySquares.green.from, flySquares.red.from, flySquares.yellow.from,
@@ -216,9 +203,18 @@ let isAnimating = false;
 const boardEl = document.getElementById("board");
 const currentPlayerNameEl = document.getElementById("current-player-name");
 const diceResultEl = document.getElementById("dice-result");
+const diceImageEl = document.getElementById("dice-image");
 const statusEl = document.getElementById("status");
 const rollButton = document.getElementById("roll-button");
 const resetButton = document.getElementById("reset-button");
+
+function setDiceImage(value) {
+  if (diceImageEl) {
+    diceImageEl.src = `/OCREng/images/dice-${value}.svg`;
+    diceImageEl.alt = `Dice ${value}`;
+  }
+  if (diceResultEl) diceResultEl.textContent = value.toString();
+}
 
 function getPieceCellIndex(player, piece) {
   if (piece.status === "home") return homePositions[player.color][piece.homeIndex];
@@ -381,17 +377,27 @@ function handleTurn() {
   isAnimating = true;
   rollButton.disabled = true;
 
-  const dice = randomDice();
-  diceResultEl.textContent = dice.toString();
+  let rollTicks = 0;
+  const maxTicks = 10;
+  const rollInterval = setInterval(() => {
+    const temp = randomDice();
+    setDiceImage(temp);
+    rollTicks += 1;
 
-  performMoveWithRules(player, dice, () => {
-    isAnimating = false;
-    if (!gameEnded) {
-      currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-      updateCurrentPlayerDisplay();
-      rollButton.disabled = false;
+    if (rollTicks >= maxTicks) {
+      clearInterval(rollInterval);
+      const dice = randomDice();
+      setDiceImage(dice);
+      performMoveWithRules(player, dice, () => {
+        isAnimating = false;
+        if (!gameEnded) {
+          currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+          updateCurrentPlayerDisplay();
+          rollButton.disabled = false;
+        }
+      });
     }
-  });
+  }, 80);
 }
 
 function initGame() {
@@ -410,6 +416,7 @@ function initGame() {
   initBoard();
   renderPieces();
   updateCurrentPlayerDisplay();
+  setDiceImage(1);
   statusEl.textContent = "";
 }
 
