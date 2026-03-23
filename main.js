@@ -5,7 +5,6 @@ if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 const BOARD_ROWS = 15;
 const BOARD_COLS = 15;
 
-// (x,y) -> index, x,y are 1-based with (1,1) at top-left
 function xyToIndex(x, y) {
   const col = x - 1;
   const row = y - 1;
@@ -19,7 +18,6 @@ for (let r = 0; r < BOARD_ROWS; r++) {
   }
 }
 
-// ====== 家區 (3x3) ======
 function paintHomeArea(x1, y1, x2, y2, className) {
   for (let y = y1; y <= y2; y++) {
     for (let x = x1; x <= x2; x++) {
@@ -32,7 +30,6 @@ paintHomeArea(13, 1, 15, 3, "cell-home-red");
 paintHomeArea(1, 13, 3, 15, "cell-home-green");
 paintHomeArea(13, 13, 15, 15, "cell-home-yellow");
 
-// ====== 中央 3x3 ======
 const centerCells = [
   [7,7],[8,7],[9,7],
   [7,8],[8,8],[9,8],
@@ -47,7 +44,6 @@ centerCells.forEach(([x,y]) => {
   boardCells[xyToIndex(x,y)].classes.push(cls);
 });
 
-// ====== 外圈路徑 ======
 const basePathWithColor = [
   [5,1,"yellow"], [6,1,"green"], [7,1,"blue"], [8,1,"red"], [9,1,"yellow"], [10,1,"green"],
   [11,1,"blue"], [11,2,"red"], [11,3,"yellow"], [11,4,"green"], [12,5,"blue"], [13,5,"red"],
@@ -71,7 +67,6 @@ basePathWithColor.forEach(([x,y,color]) => {
 });
 const PATH_LENGTH = basePath.length;
 
-// ====== 起飛點 ======
 const startCellsXY = {
   blue: [1,4],
   red: [12,1],
@@ -89,7 +84,6 @@ boardCells[startCells.red].classes.push("start-red");
 boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.yellow].classes.push("start-yellow");
 
-// ====== 起步點 ======
 const startStepXY = {
   blue: [1,5],
   red: [11,1],
@@ -103,7 +97,6 @@ const playerStartIndex = {
   yellow: baseIndexByCell.get(xyToIndex(...startStepXY.yellow)),
 };
 
-// ====== 終點通道 ======
 function lineCoords(x1,y1,x2,y2) {
   const coords = [];
   if (x1 === x2) {
@@ -127,7 +120,6 @@ homePaths.green.forEach(i => boardCells[i].classes.push("cell-homepath-green"));
 homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));
 homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
 
-// ====== 飛行隧道 ======
 const flySquares = {
   yellow: { from: xyToIndex(4,11), to: xyToIndex(4,10), dir: "fly-up" },
   green:  { from: xyToIndex(5,4),  to: xyToIndex(11,4), dir: "fly-right" },
@@ -136,7 +128,6 @@ const flySquares = {
 };
 Object.values(flySquares).forEach(f => boardCells[f.from].classes.push(f.dir));
 
-// ====== 跳棋 ======
 const jumpPairs = [
   [4,5,5,4],
   [11,4,12,5],
@@ -148,7 +139,6 @@ jumpPairs.forEach(([x1,y1,x2,y2]) => {
   boardCells[xyToIndex(x2,y2)].classes.push("cell-jump");
 });
 
-// ====== 斜切 & 梯形 ======
 boardCells[xyToIndex(5,5)].classes.push("cell-split-55");
 boardCells[xyToIndex(11,5)].classes.push("cell-split-115");
 boardCells[xyToIndex(11,11)].classes.push("cell-split-1111");
@@ -163,36 +153,17 @@ boardCells[xyToIndex(11,12)].classes.push("cell-extend-1112");
 boardCells[xyToIndex(4,11)].classes.push("cell-extend-411");
 boardCells[xyToIndex(5,12)].classes.push("cell-extend-512");
 
-// ====== 單邊虛線 ======
-boardCells[xyToIndex(4,4)].classes.push("edge-dash-right");
-boardCells[xyToIndex(5,4)].classes.push("edge-dash-left");
-
-boardCells[xyToIndex(5,5)].classes.push("edge-dash-bottom");
-boardCells[xyToIndex(5,6)].classes.push("edge-dash-top");
-
-boardCells[xyToIndex(5,5)].classes.push("edge-dash-right");
-boardCells[xyToIndex(6,5)].classes.push("edge-dash-left");
-
-boardCells[xyToIndex(11,11)].classes.push("edge-dash-top");
-boardCells[xyToIndex(11,10)].classes.push("edge-dash-bottom");
-
-boardCells[xyToIndex(11,11)].classes.push("edge-dash-left");
-boardCells[xyToIndex(10,11)].classes.push("edge-dash-right");
-
-boardCells[xyToIndex(11,12)].classes.push("edge-dash-left");
-boardCells[xyToIndex(10,12)].classes.push("edge-dash-right");
-
-boardCells[xyToIndex(11,4)].classes.push("edge-dash-left");
-boardCells[xyToIndex(10,4)].classes.push("edge-dash-right");
-
-boardCells[xyToIndex(11,5)].classes.push("edge-dash-left");
-boardCells[xyToIndex(10,5)].classes.push("edge-dash-right");
-
-boardCells[xyToIndex(5,11)].classes.push("edge-dash-top");
-boardCells[xyToIndex(5,10)].classes.push("edge-dash-bottom");
-
-boardCells[xyToIndex(5,12)].classes.push("edge-dash-left");
-boardCells[xyToIndex(4,12)].classes.push("edge-dash-right");
+// ====== 單邊虛線（只留一邊，避免重疊） ======
+boardCells[xyToIndex(4,4)].classes.push("edge-dash-right"); // (4,4)-(5,4)
+boardCells[xyToIndex(5,5)].classes.push("edge-dash-bottom"); // (5,5)-(5,6)
+boardCells[xyToIndex(5,5)].classes.push("edge-dash-right"); // (5,5)-(6,5)
+boardCells[xyToIndex(11,11)].classes.push("edge-dash-top"); // (11,11)-(11,10)
+boardCells[xyToIndex(11,11)].classes.push("edge-dash-left"); // (11,11)-(10,11)
+boardCells[xyToIndex(11,12)].classes.push("edge-dash-left"); // (11,12)-(10,12)
+boardCells[xyToIndex(11,4)].classes.push("edge-dash-left"); // (11,4)-(10,4)
+boardCells[xyToIndex(11,5)].classes.push("edge-dash-left"); // (11,5)-(10,5)
+boardCells[xyToIndex(5,11)].classes.push("edge-dash-top"); // (5,11)-(5,10)
+boardCells[xyToIndex(5,12)].classes.push("edge-dash-left"); // (5,12)-(4,12)
 
 // ====== 玩家邏輯 ======
 const safeCells = new Set([
