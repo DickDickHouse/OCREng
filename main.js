@@ -85,10 +85,10 @@ boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.yellow].classes.push("start-yellow");
 
 const startStepXY = {
-  blue: [1,5],
-  red: [11,1],
-  green: [5,15],
-  yellow: [11,15],
+  blue: [2,5],
+  red: [11,2],
+  green: [5,14],
+  yellow: [14,11],
 };
 const playerStartIndex = {
   blue: baseIndexByCell.get(xyToIndex(...startStepXY.blue)),
