@@ -199,14 +199,19 @@ const players = [
 let currentPlayerIndex = 0;
 let gameEnded = false;
 let isAnimating = false;
+let blinkingPiece = null;
+let isBlinkingPiece = false;
 
 const boardEl = document.getElementById("board");
 const currentPlayerNameEl = document.getElementById("current-player-name");
 const diceResultEl = document.getElementById("dice-result");
 const diceImageEl = document.getElementById("dice-image");
+const diceDisplayEl = document.querySelector(".dice-display");
 const statusEl = document.getElementById("status");
 const rollButton = document.getElementById("roll-button");
 const resetButton = document.getElementById("reset-button");
+
+const POST_TURN_DELAY_MS = 3000;
 
 function setDiceImage(value) {
   if (diceImageEl) {
@@ -214,6 +219,25 @@ function setDiceImage(value) {
     diceImageEl.alt = `Dice ${value}`;
   }
   if (diceResultEl) diceResultEl.textContent = value.toString();
+}
+
+function setDiceIdle() {
+  if (diceDisplayEl) diceDisplayEl.classList.add("is-idle");
+}
+
+function setDiceActive() {
+  if (diceDisplayEl) diceDisplayEl.classList.remove("is-idle");
+}
+
+function setDiceRolling(isRolling) {
+  if (!diceImageEl) return;
+  diceImageEl.classList.toggle("is-rolling", isRolling);
+}
+
+function setBlinkingPiece(piece) {
+  blinkingPiece = piece;
+  isBlinkingPiece = Boolean(piece);
+  renderPieces();
 }
 
 function getPieceCellIndex(player, piece) {
@@ -247,7 +271,7 @@ function renderPieces() {
     player.pieces.forEach((piece) => {
       const cellIndex = getPieceCellIndex(player, piece);
       if (!cellPiecesMap.has(cellIndex)) cellPiecesMap.set(cellIndex, []);
-      cellPiecesMap.get(cellIndex).push(player);
+      cellPiecesMap.get(cellIndex).push({ player, piece });
     });
   });
 
@@ -256,9 +280,12 @@ function renderPieces() {
     const container = document.createElement("div");
     container.className = "pieces-container";
 
-    list.forEach((player) => {
+    list.forEach(({ player, piece }) => {
       const pieceEl = document.createElement("div");
       pieceEl.className = `piece ${player.colorClass}`;
+      if (isBlinkingPiece && piece === blinkingPiece) {
+        pieceEl.classList.add("piece-blink");
+      }
       container.appendChild(pieceEl);
     });
 
@@ -325,36 +352,47 @@ function applyFlyAndCapture(player, piece) {
   renderPieces();
 }
 
-function performMoveWithRules(player, dice, done) {
+function getMoveInfo(player, dice) {
   const maxProgress = playerPaths[player.color].length;
-
   const homePiece = player.pieces.find(p => p.status === "home");
   const trackPiece = player.pieces.find(p => p.status !== "home");
 
   if (dice === 6 && homePiece) {
-    homePiece.status = "track";
-    homePiece.progress = 0;
-    renderPieces();
-    done();
-    return;
+    return { type: "home", piece: homePiece };
   }
 
   if (trackPiece) {
     const target = trackPiece.progress + dice;
-    if (target > maxProgress) { done(); return; }
-    animateMovePiece(player, trackPiece, target, () => {
-      applyFlyAndCapture(player, trackPiece);
-      if (trackPiece.progress === maxProgress) {
-        gameEnded = true;
-        statusEl.textContent = `${player.name} 抵達終點，獲勝！`;
-        rollButton.disabled = true;
-      }
-      done();
-    });
+    if (target > maxProgress) return null;
+    return { type: "track", piece: trackPiece, target };
+  }
+
+  return null;
+}
+
+function performMove(player, moveInfo, done) {
+  if (!moveInfo) {
+    done(false);
     return;
   }
 
-  done();
+  if (moveInfo.type === "home") {
+    moveInfo.piece.status = "track";
+    moveInfo.piece.progress = 0;
+    renderPieces();
+    done(true, moveInfo.piece);
+    return;
+  }
+
+  animateMovePiece(player, moveInfo.piece, moveInfo.target, () => {
+    applyFlyAndCapture(player, moveInfo.piece);
+    if (moveInfo.piece.progress === playerPaths[player.color].length) {
+      gameEnded = true;
+      statusEl.textContent = `${player.name} 抵達終點，獲勝！`;
+      rollButton.disabled = true;
+    }
+    done(true, moveInfo.piece);
+  });
 }
 
 function updateCurrentPlayerDisplay() {
@@ -370,15 +408,31 @@ function updateCurrentPlayerDisplay() {
   if (p.color === "yellow") currentPlayerNameEl.classList.add("player-yellow");
 }
 
+function finalizeTurn() {
+  setDiceRolling(false);
+  setDiceIdle();
+  setBlinkingPiece(null);
+
+  if (!gameEnded) {
+    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    updateCurrentPlayerDisplay();
+    rollButton.disabled = false;
+  }
+  isAnimating = false;
+}
+
 function handleTurn() {
   if (gameEnded || isAnimating) return;
 
   const player = players[currentPlayerIndex];
   isAnimating = true;
   rollButton.disabled = true;
+  setDiceActive();
 
   let rollTicks = 0;
   const maxTicks = 10;
+  setDiceRolling(true);
+
   const rollInterval = setInterval(() => {
     const temp = randomDice();
     setDiceImage(temp);
@@ -388,12 +442,24 @@ function handleTurn() {
       clearInterval(rollInterval);
       const dice = randomDice();
       setDiceImage(dice);
-      performMoveWithRules(player, dice, () => {
-        isAnimating = false;
+
+      const moveInfo = getMoveInfo(player, dice);
+      if (!moveInfo) {
+        statusEl.textContent = `${player.name} 無棋可走`; 
+        setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
+        return;
+      }
+
+      performMove(player, moveInfo, (moved, movedPiece) => {
+        if (!moved) {
+          setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
+          return;
+        }
         if (!gameEnded) {
-          currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-          updateCurrentPlayerDisplay();
-          rollButton.disabled = false;
+          setBlinkingPiece(movedPiece);
+          setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
+        } else {
+          setDiceRolling(false);
         }
       });
     }
@@ -412,11 +478,13 @@ function initGame() {
   currentPlayerIndex = 0;
   gameEnded = false;
   isAnimating = false;
+  setBlinkingPiece(null);
 
   initBoard();
   renderPieces();
   updateCurrentPlayerDisplay();
   setDiceImage(1);
+  setDiceIdle();
   statusEl.textContent = "";
 }
 
