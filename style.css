@@ -58,9 +58,18 @@ h1 { margin-bottom: 12px; }
   position: relative;
 }
 
-dice-image {
+.dice-display.is-idle {
+  opacity: 0.6;
+}
+
+.dice-image {
   width: 40px;
   height: 40px;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.dice-image.is-rolling {
+  animation: dice-shake 0.25s linear infinite;
 }
 
 #dice-result {
@@ -73,6 +82,23 @@ dice-image {
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
+}
+
+@keyframes dice-shake {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(5deg) scale(1.05); }
+  50% { transform: rotate(0deg) scale(1); }
+  75% { transform: rotate(-5deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.piece.piece-blink {
+  animation: piece-blink 0.5s ease-in-out infinite;
+}
+
+@keyframes piece-blink {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 2px rgba(0,0,0,0.4); }
+  50% { transform: scale(1.15); box-shadow: 0 0 6px rgba(0,0,0,0.6); }
 }
 
 #version {
@@ -145,7 +171,7 @@ dice-image {
 
 /* 中央 3x3 */
 .center-blue { background-color: #b3d9ff; }
-center-green { background-color: #b3ffb3; }
+.center-green { background-color: #b3ffb3; }
 .center-red { background-color: #ffb3b3; }
 .center-yellow { background-color: #ffe0a3; }
 .center-core { background-color: #ffffff; }
@@ -184,7 +210,7 @@ center-green { background-color: #b3ffb3; }
 .fly-up::after { content: "↑"; }
 .fly-down::after { content: "↓"; }
 .fly-left::after { content: "←"; }
-fly-right::after { content: "→"; }
+.fly-right::after { content: "→"; }
 
 .pieces-container {
   position: absolute;
