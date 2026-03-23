@@ -379,6 +379,10 @@ function getMoveInfo(player, dice) {
   return null;
 }
 
+function formatStatus(player, message) {
+  return `${player.name}：${message}`;
+}
+
 function performMove(player, moveInfo, done) {
   if (!moveInfo) {
     done(false);
@@ -390,7 +394,7 @@ function performMove(player, moveInfo, done) {
   if (moveInfo.type === "home") {
     moveInfo.piece.status = "track";
     moveInfo.piece.progress = 0;
-    statusEl.textContent = "棋子起飛了!";
+    statusEl.textContent = formatStatus(player, "棋子起飛了!");
     renderPieces();
     done(true, moveInfo.piece);
     return;
@@ -404,12 +408,12 @@ function performMove(player, moveInfo, done) {
 
     if (endProgress === playerPaths[player.color].length) {
       gameEnded = true;
-      statusEl.textContent = "棋子到終點站了!";
+      statusEl.textContent = formatStatus(player, "棋子到終點站了!");
       rollButton.disabled = true;
     } else if (inHomePath || enteredHomePath) {
-      statusEl.textContent = "棋子快到終點了!";
+      statusEl.textContent = formatStatus(player, "棋子快到終點了!");
     } else {
-      statusEl.textContent = `棋子向前 ${moveInfo.steps} 格`;
+      statusEl.textContent = formatStatus(player, `棋子向前 ${moveInfo.steps} 格`);
     }
 
     done(true, moveInfo.piece);
@@ -466,7 +470,7 @@ function handleTurn() {
 
       const moveInfo = getMoveInfo(player, dice);
       if (!moveInfo) {
-        statusEl.textContent = `${player.name} 無棋可走`;
+        statusEl.textContent = formatStatus(player, "無棋可走");
         setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
         return;
       }
