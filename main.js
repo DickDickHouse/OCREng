@@ -96,7 +96,6 @@ const playerStartIndex = {
   green: baseIndexByCell.get(xyToIndex(...startStepXY.green)),
   yellow: baseIndexByCell.get(xyToIndex(...startStepXY.yellow)),
 };
-
 function lineCoords(x1,y1,x2,y2) {
   const coords = [];
   if (x1 === x2) {
@@ -121,7 +120,7 @@ homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));
 homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
 
 const flySquares = {
-  yellow: { from: xyToIndex(4,11), to: xyToIndex(4,10), dir: "fly-up" },
+  yellow: { from: xyToIndex(4,11), to: xyToIndex(4,15), dir: "fly-up" },
   green:  { from: xyToIndex(5,4),  to: xyToIndex(11,4), dir: "fly-right" },
   blue:   { from: xyToIndex(12,5), to: xyToIndex(12,11), dir: "fly-down" },
   red:    { from: xyToIndex(11,12),to: xyToIndex(5,12), dir: "fly-left" },
