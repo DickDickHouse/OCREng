@@ -313,6 +313,7 @@ function getPieceCellIndex(player, piece) {
 }
 
 function initBoard() {
+  if (!boardEl) return;
   boardEl.innerHTML = "";
   boardEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 26px)`;
   boardEl.style.gridTemplateRows = `repeat(${BOARD_ROWS}, 26px)`;
@@ -326,6 +327,7 @@ function initBoard() {
 }
 
 function renderPieces() {
+  if (!boardEl) return;
   const cells = boardEl.getElementsByClassName("cell");
   if (cells.length === 0) return;
 
@@ -443,7 +445,8 @@ function getMoveInfo(player, dice) {
 }
 
 function formatStatus(player, message) {
-  return `${player.name}：${message}`;
+  return \
+    `${player.name}：${message}`;
 }
 
 function formatCaptureMessage(player, capturedList) {
@@ -489,7 +492,7 @@ function performMove(player, moveInfo, done) {
     if (endProgress === playerPaths[player.color].length) {
       gameEnded = true;
       setStatus(formatStatus(player, "棋子到終點站了!"));
-      rollButton.disabled = true;
+      if (rollButton) rollButton.disabled = true;
     } else if (inHomePath || enteredHomePath) {
       setStatus(formatStatus(player, "棋子快到終點了!"));
     } else {
@@ -502,15 +505,17 @@ function performMove(player, moveInfo, done) {
 
 function updateCurrentPlayerDisplay() {
   const p = players[currentPlayerIndex];
-  currentPlayerNameEl.textContent = p.name;
+  if (currentPlayerNameEl) currentPlayerNameEl.textContent = p.name;
 
-  currentPlayerNameEl.classList.remove(
-    "player-red","player-blue","player-green","player-yellow"
-  );
-  if (p.color === "red") currentPlayerNameEl.classList.add("player-red");
-  if (p.color === "blue") currentPlayerNameEl.classList.add("player-blue");
-  if (p.color === "green") currentPlayerNameEl.classList.add("player-green");
-  if (p.color === "yellow") currentPlayerNameEl.classList.add("player-yellow");
+  if (currentPlayerNameEl) {
+    currentPlayerNameEl.classList.remove(
+      "player-red","player-blue","player-green","player-yellow"
+    );
+    if (p.color === "red") currentPlayerNameEl.classList.add("player-red");
+    if (p.color === "blue") currentPlayerNameEl.classList.add("player-blue");
+    if (p.color === "green") currentPlayerNameEl.classList.add("player-green");
+    if (p.color === "yellow") currentPlayerNameEl.classList.add("player-yellow");
+  }
 }
 
 function finalizeTurn() {
@@ -521,7 +526,7 @@ function finalizeTurn() {
   if (!gameEnded) {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
     updateCurrentPlayerDisplay();
-    rollButton.disabled = false;
+    if (rollButton) rollButton.disabled = false;
   }
   isAnimating = false;
 }
@@ -531,7 +536,7 @@ function handleTurn() {
 
   const player = players[currentPlayerIndex];
   isAnimating = true;
-  rollButton.disabled = true;
+  if (rollButton) rollButton.disabled = true;
   setDiceActive();
 
   let rollTicks = 0;
@@ -574,6 +579,15 @@ function handleTurn() {
   }, 80);
 }
 
+function safeInitGame() {
+  try {
+    initGame();
+  } catch (error) {
+    console.error("Init game failed", error);
+    setStatus("初始化失敗，請開啟主控台檢查錯誤", true);
+  }
+}
+
 function initGame() {
   players.forEach((player) => {
     player.pieces.forEach((p, i) => {
@@ -596,6 +610,7 @@ function initGame() {
   setStatus("");
 }
 
-rollButton.addEventListener("click", handleTurn);
-resetButton.addEventListener("click", initGame);
-window.addEventListener("load", initGame);
+if (rollButton) rollButton.addEventListener("click", handleTurn);
+if (resetButton) resetButton.addEventListener("click", safeInitGame);
+window.addEventListener("DOMContentLoaded", safeInitGame);
+window.addEventListener("load", safeInitGame);
