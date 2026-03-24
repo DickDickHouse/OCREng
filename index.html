@@ -5,7 +5,7 @@
   <title>簡易版飛行棋 Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- ✅ 絕對路徑 + 新版本號 -->
-  <link rel="stylesheet" href="/OCREng/style.css?v=107" />
+  <link rel="stylesheet" href="/OCREng/style.css?v=108" />
 </head>
 <body>
   <h1>簡易版飛行棋 Demo</h1>
@@ -29,6 +29,16 @@
   </div>
 
   <p id="version">版本：載入中…</p>
+  <div id="rule-controls" class="info-block rule-controls">
+    <label for="launch-rule">起飛規則：</label>
+    <select id="launch-rule">
+      <option value="6">擲到 6 起飛</option>
+      <option value="even">雙數起飛</option>
+      <option value="odd">單數起飛</option>
+    </select>
+    <button id="confirm-rule" type="button">確定</button>
+  </div>
+  <p id="rule-status">起飛規則：6點</p>
   <p id="status"></p>
 
   <div id="board-wrapper">
@@ -36,6 +46,6 @@
   </div>
 
   <!-- ✅ 絕對路徑 + 新版本號 -->
-  <script src="/OCREng/main.js?v=107"></script>
+  <script src="/OCREng/main.js?v=108"></script>
 </body>
 </html>
