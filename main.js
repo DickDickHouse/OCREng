@@ -216,23 +216,16 @@ const ruleStatusEl = document.getElementById("rule-status");
 
 const POST_TURN_DELAY_MS = 3000;
 const DICE_IDLE_IMAGE = "/OCREng/images/dice-blank.svg";
-
 let launchRule = "6";
 
 function getLaunchRuleLabel(rule) {
-  switch (rule) {
-    case "even":
-      return "雙數";
-    case "odd":
-      return "單數";
-    default:
-      return "6點";
-  }
+  if (rule === "even") return "雙數";
+  if (rule === "odd") return "單數";
+  return "6點";
 }
 
 function updateLaunchRuleDisplay() {
-  if (!ruleStatusEl) return;
-  ruleStatusEl.textContent = `起飛規則：${getLaunchRuleLabel(launchRule)}`;
+  if (ruleStatusEl) ruleStatusEl.textContent = `起飛規則：${getLaunchRuleLabel(launchRule)}`;
 }
 
 function setLaunchRule(rule) {
@@ -240,19 +233,18 @@ function setLaunchRule(rule) {
   updateLaunchRuleDisplay();
 }
 
-if (confirmRuleButton) {
-  confirmRuleButton.addEventListener("click", () => {
-    const selected = launchRuleSelect ? launchRuleSelect.value : "6";
-    setLaunchRule(selected);
-  });
-}
-
-updateLaunchRuleDisplay();
-
 function canLaunchWithDice(dice) {
   if (launchRule === "even") return dice % 2 === 0;
   if (launchRule === "odd") return dice % 2 === 1;
   return dice === 6;
+}
+
+if (launchRuleSelect) setLaunchRule(launchRuleSelect.value);
+if (confirmRuleButton) {
+  confirmRuleButton.addEventListener("click", () => {
+    if (!launchRuleSelect) return;
+    setLaunchRule(launchRuleSelect.value);
+  });
 }
 
 function setDiceImage(value) {
@@ -407,7 +399,7 @@ function getMoveInfo(player, dice) {
   const homePiece = player.pieces.find(p => p.status === "home");
   const trackPiece = player.pieces.find(p => p.status !== "home");
 
-  if (homePiece && canLaunchWithDice(dice)) {
+  if (canLaunchWithDice(dice) && homePiece) {
     return { type: "home", piece: homePiece, steps: dice };
   }
 
@@ -554,6 +546,7 @@ function initGame() {
   renderPieces();
   updateCurrentPlayerDisplay();
   setDiceIdle();
+  updateLaunchRuleDisplay();
   statusEl.textContent = "";
 }
 
