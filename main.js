@@ -199,8 +199,7 @@ const players = [
 let currentPlayerIndex = 0;
 let gameEnded = false;
 let isAnimating = false;
-let blinkingPiece = null;
-let isBlinkingPiece = false;
+const blinkingPieces = new Set();
 
 const boardEl = document.getElementById("board");
 const currentPlayerNameEl = document.getElementById("current-player-name");
@@ -215,7 +214,15 @@ const confirmRuleButton = document.getElementById("confirm-rule");
 const ruleStatusEl = document.getElementById("rule-status");
 
 const POST_TURN_DELAY_MS = 3000;
+const CAPTURE_BLINK_MS = 2000;
 const DICE_IDLE_IMAGE = "/OCREng/images/dice-blank.svg";
+const STATUS_ALERT_CLASS = "status-alert";
+const COLOR_NAMES = {
+  red: "紅棋",
+  blue: "藍棋",
+  green: "綠棋",
+  yellow: "黃棋",
+};
 let launchRule = "6";
 
 function getLaunchRuleLabel(rule) {
@@ -253,6 +260,12 @@ function getPreMoveStatus(player, moveInfo) {
   return formatStatus(player, `棋子向前 ${moveInfo.steps} 格`);
 }
 
+function setStatus(message, alert = false) {
+  if (!statusEl) return;
+  statusEl.textContent = message;
+  statusEl.classList.toggle(STATUS_ALERT_CLASS, Boolean(alert));
+}
+
 function setDiceImage(value) {
   if (diceImageEl) {
     diceImageEl.src = `/OCREng/images/dice-${value}.svg`;
@@ -279,9 +292,17 @@ function setDiceRolling(isRolling) {
   diceImageEl.classList.toggle("is-rolling", isRolling);
 }
 
-function setBlinkingPiece(piece) {
-  blinkingPiece = piece;
-  isBlinkingPiece = Boolean(piece);
+function setBlinkingPiece(pieces) {
+  blinkingPieces.clear();
+  if (!pieces) {
+    renderPieces();
+    return;
+  }
+  if (Array.isArray(pieces)) {
+    pieces.forEach((piece) => blinkingPieces.add(piece));
+  } else {
+    blinkingPieces.add(pieces);
+  }
   renderPieces();
 }
 
@@ -331,7 +352,7 @@ function renderPieces() {
     list.forEach(({ player, piece }) => {
       const pieceEl = document.createElement("div");
       pieceEl.className = `piece ${player.colorClass}`;
-      if (isBlinkingPiece && piece === blinkingPiece) {
+      if (blinkingPieces.has(piece)) {
         pieceEl.classList.add("piece-blink");
       }
       container.appendChild(pieceEl);
@@ -367,6 +388,7 @@ function animateMovePiece(player, piece, targetProgress, onComplete) {
 
 function applyFlyAndCapture(player, piece) {
   const color = player.color;
+  const captured = [];
 
   if (piece.progress > 0 && piece.progress <= PATH_LENGTH) {
     const cellIndex = playerPaths[color][piece.progress - 1];
@@ -391,6 +413,7 @@ function applyFlyAndCapture(player, piece) {
           if (opCell === cellIndex) {
             opPiece.status = "home";
             opPiece.progress = 0;
+            captured.push({ attacker: player, victim: op, piece: opPiece });
           }
         });
       });
@@ -398,6 +421,7 @@ function applyFlyAndCapture(player, piece) {
   }
 
   renderPieces();
+  return captured;
 }
 
 function getMoveInfo(player, dice) {
@@ -422,6 +446,13 @@ function formatStatus(player, message) {
   return `${player.name}：${message}`;
 }
 
+function formatCaptureMessage(player, capturedList) {
+  const attackerName = COLOR_NAMES[player.color] || player.name;
+  const victimNames = capturedList.map((entry) => COLOR_NAMES[entry.victim.color] || entry.victim.name);
+  const victimText = victimNames.join("、");
+  return `${victimText}被${attackerName}打飛了! ${victimText}回基地!`;
+}
+
 function performMove(player, moveInfo, done) {
   if (!moveInfo) {
     done(false);
@@ -433,26 +464,36 @@ function performMove(player, moveInfo, done) {
   if (moveInfo.type === "home") {
     moveInfo.piece.status = "track";
     moveInfo.piece.progress = 0;
-    statusEl.textContent = formatStatus(player, "棋子起飛了!");
+    setStatus(formatStatus(player, "棋子起飛了!"));
     renderPieces();
     done(true, moveInfo.piece);
     return;
   }
 
   animateMovePiece(player, moveInfo.piece, moveInfo.target, () => {
-    applyFlyAndCapture(player, moveInfo.piece);
+    const captured = applyFlyAndCapture(player, moveInfo.piece);
+    if (captured.length > 0) {
+      setStatus(formatCaptureMessage(player, captured), true);
+      setBlinkingPiece(captured.map((entry) => entry.piece));
+      setTimeout(() => {
+        setBlinkingPiece(null);
+        done(true, moveInfo.piece);
+      }, CAPTURE_BLINK_MS);
+      return;
+    }
+
     const endProgress = moveInfo.piece.progress;
     const inHomePath = endProgress > PATH_LENGTH;
     const enteredHomePath = startProgress <= PATH_LENGTH && endProgress > PATH_LENGTH;
 
     if (endProgress === playerPaths[player.color].length) {
       gameEnded = true;
-      statusEl.textContent = formatStatus(player, "棋子到終點站了!");
+      setStatus(formatStatus(player, "棋子到終點站了!"));
       rollButton.disabled = true;
     } else if (inHomePath || enteredHomePath) {
-      statusEl.textContent = formatStatus(player, "棋子快到終點了!");
+      setStatus(formatStatus(player, "棋子快到終點了!"));
     } else {
-      statusEl.textContent = formatStatus(player, `棋子向前 ${moveInfo.steps} 格`);
+      setStatus(formatStatus(player, `棋子向前 ${moveInfo.steps} 格`));
     }
 
     done(true, moveInfo.piece);
@@ -508,7 +549,7 @@ function handleTurn() {
       setDiceImage(dice);
 
       const moveInfo = getMoveInfo(player, dice);
-      statusEl.textContent = getPreMoveStatus(player, moveInfo);
+      setStatus(getPreMoveStatus(player, moveInfo));
       if (!moveInfo) {
         setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
         return;
@@ -545,15 +586,14 @@ function initGame() {
   currentPlayerIndex = 0;
   gameEnded = false;
   isAnimating = false;
-  blinkingPiece = null;
-  isBlinkingPiece = false;
+  setBlinkingPiece(null);
 
   initBoard();
   renderPieces();
   updateCurrentPlayerDisplay();
   setDiceIdle();
   updateLaunchRuleDisplay();
-  statusEl.textContent = "";
+  setStatus("");
 }
 
 rollButton.addEventListener("click", handleTurn);
