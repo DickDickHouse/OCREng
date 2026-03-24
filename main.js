@@ -247,6 +247,12 @@ if (confirmRuleButton) {
   });
 }
 
+function getPreMoveStatus(player, moveInfo) {
+  if (!moveInfo) return formatStatus(player, "無棋可走");
+  if (moveInfo.type === "home") return formatStatus(player, "棋子準備起飛");
+  return formatStatus(player, `棋子向前 ${moveInfo.steps} 格`);
+}
+
 function setDiceImage(value) {
   if (diceImageEl) {
     diceImageEl.src = `/OCREng/images/dice-${value}.svg`;
@@ -502,8 +508,8 @@ function handleTurn() {
       setDiceImage(dice);
 
       const moveInfo = getMoveInfo(player, dice);
+      statusEl.textContent = getPreMoveStatus(player, moveInfo);
       if (!moveInfo) {
-        statusEl.textContent = formatStatus(player, "無棋可走");
         setTimeout(finalizeTurn, POST_TURN_DELAY_MS);
         return;
       }
