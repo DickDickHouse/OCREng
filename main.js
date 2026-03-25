@@ -53,7 +53,7 @@ const basePathWithColor = [
   [7,15,"blue"], [6,15,"red"], [5,15,"yellow"], [5,14,"green"], [5,13,"blue"], [5,12,"red"],
   [4,11,"yellow"], [3,11,"green"], [2,11,"blue"], [1,11,"red"], [1,10,"yellow"], [1,9,"green"],
   [1,8,"blue"], [1,7,"red"], [1,6,"yellow"], [1,5,"green"], [2,5,"blue"], [3,5,"red"],
-  [4,5,"yellow"], [5,4,"green"], [5,3,"blue"], [5,2,"red"
+  [4,5,"yellow"], [5,4,"green"], [5,3,"blue"], [5,2,"red"]
 ];
 
 const basePath = [];
