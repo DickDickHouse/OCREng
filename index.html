@@ -24,35 +24,3 @@
     <div id="controls">
         <div class="button-block">
             <button id="roll-button">擲骰子</button>
-            <button id="reset-button">重新開始</button>
-        </div>
-        <div class="rule-controls">
-            <select id="launch-rule">
-                <option value="6">6 點起飛</option>
-                <option value="even">雙數起飛</option>
-                <option value="odd">單數起飛</option>
-            </select>
-            <button id="confirm-rule">確定規則</button>
-        </div>
-        <div id="rule-status"></div>
-    </div>
-
-    <div id="board-wrapper">
-        <div id="board"></div>
-    </div>
-
-    <script src="main.js"></script>
-</body>
-    <script>
-// 確保頁面完全載入後初始化
-window.addEventListener('load', function() {
-    console.log("頁面載入完成");
-    setTimeout(function() {
-        if (typeof initGame === 'function') {
-            console.log("手動觸發初始化");
-            initGame();
-        }
-    }, 1000);
-});
-</script>
-</html>
