@@ -1,4 +1,4 @@
-const VERSION = "v35-bug-fix";
+const VERSION = "v36-move-fix";
 const versionEl = document.getElementById("version");
 if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 
@@ -334,7 +334,7 @@ function setBlinkingPiece(pieces) {
 
 function getPieceCellIndex(player, piece) {
     if (piece.status === "home") return homePositions[player.color][piece.homeIndex];
-    if (piece.progress === 0) return startCells[player.color];
+    if (piece.progress === 0 && piece.status === "track") return startCells[player.color];
     return playerPaths[player.color][piece.progress - 1];
 }
 
@@ -497,30 +497,36 @@ function applyFlyAndCapture(player, piece) {
     return captured;
 }
 
-// 獲取所有可行步數
+// ✅ 修復：獲取所有可行步數
 function getValidMoves(player, dice) {
     const moves = [];
     const maxProgress = playerPaths[player.color].length;
     
-    // 檢查起飛
+    console.log(`getValidMoves - 玩家：${player.name}, 骰子：${dice}`);
+    
+    // 1. 檢查起飛 (家在基地的棋子)
     if (canLaunchWithDice(dice)) {
         player.pieces.forEach((piece, index) => {
             if (piece.status === "home") {
                 moves.push({ type: "home", pieceIndex: index, piece: piece, steps: dice });
+                console.log(`  - 可起飛棋子 ${index}`);
             }
         });
     }
     
-    // 檢查軌道上的棋子
+    // 2. 檢查軌道上的棋子 (包括剛起飛的)
     player.pieces.forEach((piece, index) => {
         if (piece.status === "track") {
             const target = piece.progress + dice;
+            console.log(`  - 軌道棋子 ${index}, progress: ${piece.progress}, target: ${target}, max: ${maxProgress}`);
             if (target <= maxProgress) {
                 moves.push({ type: "track", pieceIndex: index, piece: piece, target: target, steps: dice });
+                console.log(`    ✓ 可移動`);
             }
         }
     });
     
+    console.log(`getValidMoves - 總共 ${moves.length} 個可行移動`);
     return moves;
 }
 
@@ -531,13 +537,13 @@ function formatStatus(player, message) {
 function formatCaptureMessage(player, capturedList) {
     const attackerName = COLOR_NAMES[player.color] || player.name;
     const victimNames = capturedList.map((entry) => COLOR_NAMES[entry.victim.color] || entry.victim.name);
-    const victimText = victimNames.join("、");
-    return `${victimText} 被${attackerName} 打飛了！${victimText} 回基地！`;
+    const victimText = victimNames.join("、");    return `${victimText} 被${attackerName} 打飛了！${victimText} 回基地！`;
 }
 
 // 勝利條件：任一玩家獲勝
 function checkWin(player) {
-    const allFinished = player.pieces.every(p => p.status === "finished");    if (allFinished) {
+    const allFinished = player.pieces.every(p => p.status === "finished");
+    if (allFinished) {
         gameEnded = true;
         setStatus(`🎉 遊戲結束！${player.name} 獲勝！`, true);
         if (rollButton) rollButton.disabled = true;
@@ -580,13 +586,13 @@ function performMove(player, moveInfo, done) {
         
         const endProgress = moveInfo.piece.progress;
         
-        if (endProgress === playerPaths[player.color].length) {
-            moveInfo.piece.status = "finished";
+        if (endProgress === playerPaths[player.color].length) {            moveInfo.piece.status = "finished";
             setStatus(formatStatus(player, "棋子到終點站了!"));
             if (checkWin(player)) {
                 done(true, moveInfo.piece);
                 return;
-            }        } else if (endProgress > PATH_LENGTH) {
+            }
+        } else if (endProgress > PATH_LENGTH) {
             setStatus(formatStatus(player, "棋子快到終點了!"));
         } else {
             setStatus(formatStatus(player, `棋子向前 ${moveInfo.steps} 格`));
@@ -618,24 +624,24 @@ function finalizeTurn() {
     setBlinkingPiece(null);
     isWaitingForPieceSelection = false;
     validMovePieces = [];
-    isAnimating = false;  // ✅ 關鍵：確保重置
+    isAnimating = false;
     
     if (!gameEnded) {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
         updateCurrentPlayerDisplay();
         if (rollButton) {
-            rollButton.disabled = false;  // ✅ 關鍵：啟用按鈕
+            rollButton.disabled = false;
             console.log("按鈕已啟用");
         }
     }
 }
-
 // ✅ 修復：回合結束邏輯
 function handleTurnEnd(player, moved, dice) {
     console.log("handleTurnEnd 被呼叫，dice:", dice, "moved:", moved);
     
     if (gameEnded) {
-        console.log("遊戲已結束");        return;
+        console.log("遊戲已結束");
+        return;
     }
 
     // 擲到 6 點獲得額外回合
@@ -678,13 +684,13 @@ function handlePieceClick(player, piece) {
         if (moved) {
             handleTurnEnd(player, moved, currentDiceValue);
         } else {
-            finalizeTurn();
-        }
+            finalizeTurn();        }
     });
 }
 
 // ✅ 修復：擲骰子邏輯
-function handleTurn() {    console.log("handleTurn 被呼叫");
+function handleTurn() {
+    console.log("handleTurn 被呼叫");
     
     if (gameEnded) {
         console.log("遊戲已結束");
@@ -702,6 +708,8 @@ function handleTurn() {    console.log("handleTurn 被呼叫");
     }
     
     const player = players[currentPlayerIndex];
+    console.log("當前玩家:", player.name);
+    
     isAnimating = true;
     if (rollButton) rollButton.disabled = true;
     
@@ -725,15 +733,15 @@ function handleTurn() {    console.log("handleTurn 被呼叫");
             const moves = getValidMoves(player, dice);
             validMovePieces = moves;
             
-            console.log("可行步數:", moves.length);
-            
+            console.log("可行步數:", moves.length);            
             if (moves.length === 0) {
                 setStatus(formatStatus(player, "無棋可走"));
                 setTimeout(() => {
                     console.log("無棋可走，呼叫 handleTurnEnd");
                     handleTurnEnd(player, false, dice);
                 }, 1000);
-            } else if (moves.length === 1) {                setStatus(formatStatus(player, "只有一步可走"));
+            } else if (moves.length === 1) {
+                setStatus(formatStatus(player, "只有一步可走"));
                 setBlinkingPiece(moves[0].piece);
                 setTimeout(() => {
                     console.log("自動移動");
@@ -743,7 +751,7 @@ function handleTurn() {    console.log("handleTurn 被呼叫");
                 setStatus(formatStatus(player, "請選擇要移動的棋子"));
                 isWaitingForPieceSelection = true;
                 setBlinkingPiece(moves.map(m => m.piece));
-                isAnimating = false;  // ✅ 允許點擊
+                isAnimating = false;
                 if (rollButton) rollButton.disabled = true;
                 console.log("等待玩家選擇棋子");
             }
@@ -774,15 +782,15 @@ function initGame() {
     currentPlayerIndex = 0;
     gameEnded = false;
     isAnimating = false;
-    isWaitingForPieceSelection = false;
-    validMovePieces = [];
+    isWaitingForPieceSelection = false;    validMovePieces = [];
     setBlinkingPiece(null);
     initBoard();
     renderPieces();
     updateCurrentPlayerDisplay();
     setDiceIdle();
     updateLaunchRuleDisplay();
-    setStatus("");    if (rollButton) {
+    setStatus("");
+    if (rollButton) {
         rollButton.disabled = false;
         console.log("初始化完成，按鈕已啟用");
     }
