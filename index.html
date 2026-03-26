@@ -43,4 +43,16 @@
 
     <script src="main.js"></script>
 </body>
+    <script>
+// 確保頁面完全載入後初始化
+window.addEventListener('load', function() {
+    console.log("頁面載入完成");
+    setTimeout(function() {
+        if (typeof initGame === 'function') {
+            console.log("手動觸發初始化");
+            initGame();
+        }
+    }, 1000);
+});
+</script>
 </html>
