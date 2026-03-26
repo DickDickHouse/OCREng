@@ -1,54 +1,46 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <title>簡易版飛行棋 Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- ✅ 相對路徑 + 新版本號 -->
-  <link rel="stylesheet" href="style.css?v=109" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網頁版飛行棋</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>簡易版飛行棋 Demo</h1>
+    <h1>簡易版飛行棋 Demo</h1>
+    
+    <div id="version"></div>
 
-  <div id="controls">
-    <div class="info-block">
-      <div>目前玩家：</div>
-      <div><span id="current-player-name">紅方</span></div>
+    <div id="controls">
+        <div class="info-block">
+            目前玩家：<span id="current-player-name">載入中...</span>
+        </div>
+        <div class="dice-display" id="dice-display">
+            <img id="dice-image" class="dice-image" src="/OCREng/images/dice-blank.svg" alt="Dice">
+            <span id="dice-result"></span>
+        </div>
+        <div class="button-block">
+            <button id="roll-button">擲骰子</button>
+            <button id="reset-button">重新開始</button>
+        </div>
     </div>
-    <div class="info-block">
-      <div>骰子點數：</div>
-      <div class="dice-display">
-        <img id="dice-image" class="dice-image" src="images/dice-1.svg" alt="Dice 1" />
-        <span id="dice-result" aria-hidden="true">1</span>
-      </div>
+
+    <div id="rule-controls" class="rule-controls">
+        <select id="launch-rule">
+            <option value="6">擲到 6 起飛</option>
+            <option value="even">雙數起飛</option>
+            <option value="odd">單數起飛</option>
+        </select>
+        <button id="confirm-rule">確定規則</button>
     </div>
-    <div class="button-block">
-      <button id="roll-button" type="button">擲骰子</button>
+    <div id="rule-status"></div>
+
+    <div id="status"></div>
+
+    <div id="board-wrapper">
+        <div id="board"></div>
     </div>
-  </div>
 
-  <p id="version">版本：載入中…</p>
-  <div id="rule-controls" class="info-block rule-controls">
-    <label for="launch-rule">起飛規則：</label>
-    <select id="launch-rule">
-      <option value="6">擲到 6 起飛</option>
-      <option value="even">雙數起飛</option>
-      <option value="odd">單數起飛</option>
-    </select>
-    <button id="confirm-rule" type="button">確定</button>
-  </div>
-  <p id="rule-status">起飛規則：6點</p>
-  <p id="status"></p>
-
-  <div id="board-wrapper">
-    <div id="board"></div>
-  </div>
-
-  <div class="button-block" id="reset-block">
-    <button id="reset-button" type="button">重新開始</button>
-  </div>
-
-  <!-- ✅ 相對路徑 + 新版本號 -->
-  <script src="main.js?v=109"></script>
+    <script src="main.js"></script>
 </body>
 </html>
