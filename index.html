@@ -8,34 +8,34 @@
 </head>
 <body>
     <h1>簡易版飛行棋 Demo</h1>
-    
     <div id="version"></div>
-
+    
     <div id="controls">
         <div class="info-block">
-            目前玩家：<span id="current-player-name">載入中...</span>
+            目前玩家：<span id="current-player-name">-</span>
         </div>
-        <div class="dice-display" id="dice-display">
+        <div class="dice-display">
             <img id="dice-image" class="dice-image" src="/OCREng/images/dice-blank.svg" alt="Dice">
             <span id="dice-result"></span>
         </div>
+        <div id="status"></div>
+    </div>
+
+    <div id="controls">
         <div class="button-block">
             <button id="roll-button">擲骰子</button>
             <button id="reset-button">重新開始</button>
         </div>
+        <div class="rule-controls">
+            <select id="launch-rule">
+                <option value="6">6 點起飛</option>
+                <option value="even">雙數起飛</option>
+                <option value="odd">單數起飛</option>
+            </select>
+            <button id="confirm-rule">確定規則</button>
+        </div>
+        <div id="rule-status"></div>
     </div>
-
-    <div id="rule-controls" class="rule-controls">
-        <select id="launch-rule">
-            <option value="6">擲到 6 起飛</option>
-            <option value="even">雙數起飛</option>
-            <option value="odd">單數起飛</option>
-        </select>
-        <button id="confirm-rule">確定規則</button>
-    </div>
-    <div id="rule-status"></div>
-
-    <div id="status"></div>
 
     <div id="board-wrapper">
         <div id="board"></div>
