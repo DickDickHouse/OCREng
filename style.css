@@ -107,7 +107,6 @@ h1 { margin-bottom: 12px; }
     0%, 100% { transform: scale(1); box-shadow: 0 0 2px rgba(0,0,0,0.4); }
     50% { transform: scale(1.15); box-shadow: 0 0 6px rgba(0,0,0,0.6); }
 }
-/* 可選擇棋子樣式 */
 .piece.selectable {
     cursor: pointer;
     border: 2px solid #fff;
@@ -143,12 +142,10 @@ h1 { margin-bottom: 12px; }
     position: relative;
     background-color: #fafafa;
 }
-/* 主路 */
 .cell-path { background-color: #e0e0e0; }
-.cell-path-red { background-color: #ffcccc; }.cell-path-blue { background-color: #cce3ff; }
-.cell-path-green { background-color: #ccffd7; }
-.cell-path-yellow { background-color: #ffe6b8; }
-/* 跳棋顯示 */
+.cell-path-red { background-color: #ffcccc; }
+.cell-path-blue { background-color: #cce3ff; }
+.cell-path-green { background-color: #ccffd7; }.cell-path-yellow { background-color: #ffe6b8; }
 .cell-jump { outline: none; outline-offset: 0; }
 .cell-jump::after {
     content: "跳";
@@ -158,28 +155,23 @@ h1 { margin-bottom: 12px; }
     font-size: 10px;
     color: #555;
 }
-/* 斜切格 */
 .cell-split-55 { background: linear-gradient(45deg, #ffe6b8 0 50%, #ccffd7 50% 100%); }
 .cell-split-115 { background: linear-gradient(135deg, #ccffd7 0 50%, #cce3ff 50% 100%); }
 .cell-split-1111 { background: linear-gradient(45deg, #ffcccc 0 50%, #cce3ff 50% 100%); }
 .cell-split-511 { background: linear-gradient(135deg, #ffe6b8 0 50%, #ffcccc 50% 100%); }
-/* 終點道 */
 .cell-homepath-red { background-color: #ffb3b3; }
 .cell-homepath-blue { background-color: #b3d9ff; }
 .cell-homepath-green { background-color: #b3ffb3; }
 .cell-homepath-yellow { background-color: #ffe0a3; }
-/* 四角家區 */
 .cell-home-red { background-color: #ffd6d6; }
 .cell-home-blue { background-color: #d6e8ff; }
 .cell-home-green { background-color: #d7ffd6; }
 .cell-home-yellow { background-color: #ffe7ba; }
-/* 中央 3x3 */
 .center-blue { background-color: #b3d9ff; }
 .center-green { background-color: #b3ffb3; }
 .center-red { background-color: #ffb3b3; }
 .center-yellow { background-color: #ffe0a3; }
 .center-core { background-color: #ffffff; }
-/* 起步點 */
 .start-red::after,
 .start-blue::after,
 .start-green::after,
@@ -194,7 +186,7 @@ h1 { margin-bottom: 12px; }
 .start-red::after { border-color: #ff4d4f; }
 .start-blue::after { border-color: #1890ff; }
 .start-green::after { border-color: #52c41a; }
-.start-yellow::after { border-color: #faad14; }/* 飛行格箭頭 */
+.start-yellow::after { border-color: #faad14; }
 .fly-up::after,
 .fly-down::after,
 .fly-left::after,
@@ -202,8 +194,7 @@ h1 { margin-bottom: 12px; }
     position: absolute;
     inset: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: center;    justify-content: center;
     font-weight: bold;
     font-size: 16px;
     color: #333;
@@ -231,7 +222,6 @@ h1 { margin-bottom: 12px; }
 .piece.blue { background-color: #1890ff; }
 .piece.green { background-color: #52c41a; }
 .piece.yellow { background-color: #faad14; }
-/* 棋盤下方控制區 */
 #bottom-controls {
     display: flex;
     justify-content: center;
