@@ -1,259 +1,233 @@
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  margin: 16px;
-  text-align: center;
-  background-color: #f0f2f5;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 16px;
+    text-align: center;
+    background-color: #f0f2f5;
 }
-
 h1 { margin-bottom: 12px; }
-
 #controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 8px;
 }
-
 .info-block {
-  background-color: #ffffff;
-  padding: 6px 10px;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  font-size: 14px;
+    background-color: #ffffff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    font-size: 14px;
 }
-
 #current-player-name { font-weight: bold; }
-
 .player-red { color: #ff4d4f; }
 .player-blue { color: #1890ff; }
 .player-green { color: #52c41a; }
 .player-yellow { color: #faad14; }
-
 .button-block {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 .button-block button {
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: none;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
 }
-
 #roll-button { background-color: #1890ff; color: #fff; }
-#roll-button:disabled { background-color: #d9d9d9; color: #888; }
-
+#roll-button:disabled { background-color: #d9d9d9; color: #888; cursor: not-allowed; }
 #reset-button { background-color: #52c41a; color: #fff; }
-
-#status { margin: 4px 0; min-height: 20px; color: #333; font-size: 14px; }
-
+#status { margin: 4px 0; min-height: 20px; color: #333; font-size: 14px; font-weight: bold; }
 .rule-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}.rule-controls select {
+    padding: 4px 8px;
+    font-size: 14px;
 }
-
-.rule-controls select {
-  padding: 4px 8px;
-  font-size: 14px;
-}
-
 .rule-controls button {
-  padding: 4px 10px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: none;
-  background-color: #1890ff;
-  color: #fff;
+    padding: 4px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    background-color: #1890ff;
+    color: #fff;
+    cursor: pointer;
 }
-
 #rule-status {
-  margin: 4px 0;
-  font-size: 14px;
-  color: #555;
+    margin: 4px 0;
+    font-size: 14px;
+    color: #555;
 }
-
 .dice-display {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    position: relative;
 }
-
 dice-display.is-idle {
-  opacity: 0.6;
+    opacity: 0.6;
 }
-
 .dice-image {
-  width: 40px;
-  height: 40px;
-  transition: transform 0.2s ease, filter 0.2s ease;
+    width: 40px;
+    height: 40px;
+    transition: transform 0.2s ease, filter 0.2s ease;
 }
-
 .dice-image.is-rolling {
-  animation: dice-shake 0.25s linear infinite;
+    animation: dice-shake 0.25s linear infinite;
 }
-
 #dice-result {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
 }
-
 @keyframes dice-shake {
-  0% { transform: rotate(0deg) scale(1); }
-  25% { transform: rotate(5deg) scale(1.05); }
-  50% { transform: rotate(0deg) scale(1); }
-  75% { transform: rotate(-5deg) scale(1.05); }
-  100% { transform: rotate(0deg) scale(1); }
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(5deg) scale(1.05); }    50% { transform: rotate(0deg) scale(1); }
+    75% { transform: rotate(-5deg) scale(1.05); }
+    100% { transform: rotate(0deg) scale(1); }
 }
-
 .piece.piece-blink {
-  animation: piece-blink 0.5s ease-in-out infinite;
+    animation: piece-blink 0.5s ease-in-out infinite;
 }
-
+/* 新增：可選擇的棋子樣式 */
+.piece.piece-selectable {
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 8px rgba(0,0,0,0.8);
+    transform: scale(1.2);
+    z-index: 10;
+}
 @keyframes piece-blink {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 2px rgba(0,0,0,0.4); }
-  50% { transform: scale(1.15); box-shadow: 0 0 6px rgba(0,0,0,0.6); }
+    0%, 100% { transform: scale(1); box-shadow: 0 0 2px rgba(0,0,0,0.4); }
+    50% { transform: scale(1.15); box-shadow: 0 0 6px rgba(0,0,0,0.6); }
 }
-
 #version {
-  color: #d00;
-  font-weight: bold;
-  margin-bottom: 6px;
+    color: #d00;
+    font-weight: bold;
+    margin-bottom: 6px;
 }
-
 #board-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+    overflow: auto;
 }
-
 #board {
-  display: grid;
-  grid-template-columns: repeat(15, 26px);
-  grid-template-rows: repeat(15, 26px);
-  gap: 2px;
-  margin: 0 auto;
-  padding: 10px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+    display: grid;
+    grid-template-columns: repeat(15, 26px);
+    grid-template-rows: repeat(15, 26px);
+    gap: 2px;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.18);
 }
-
 .cell {
-  width: 26px;
-  height: 26px;
-  border: 1px solid #d9d9d9;
-  position: relative;
-  background-color: #fafafa;
+    width: 26px;
+    height: 26px;
+    border: 1px solid #d9d9d9;
+    position: relative;
+    background-color: #fafafa;
 }
-
 /* 主路 */
-.cell-path { background-color: #e0e0e0; }
-.cell-path-red { background-color: #ffcccc; }
+.cell-path { background-color: #e0e0e0; }.cell-path-red { background-color: #ffcccc; }
 .cell-path-blue { background-color: #cce3ff; }
 .cell-path-green { background-color: #ccffd7; }
 .cell-path-yellow { background-color: #ffe6b8; }
-
 /* 跳棋顯示 */
 .cell-jump { outline: none; outline-offset: 0; }
 .cell-jump::after {
-  content: "跳";
-  position: absolute;
-  top: 1px;
-  left: 2px;
-  font-size: 10px;
-  color: #555;
+    content: "跳";
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    font-size: 10px;
+    color: #555;
 }
-
 /* 斜切格 */
 .cell-split-55 { background: linear-gradient(45deg, #ffe6b8 0 50%, #ccffd7 50% 100%); }
 .cell-split-115 { background: linear-gradient(135deg, #ccffd7 0 50%, #cce3ff 50% 100%); }
 .cell-split-1111 { background: linear-gradient(45deg, #ffcccc 0 50%, #cce3ff 50% 100%); }
 .cell-split-511 { background: linear-gradient(135deg, #ffe6b8 0 50%, #ffcccc 50% 100%); }
-
 /* 終點道 */
 .cell-homepath-red { background-color: #ffb3b3; }
 .cell-homepath-blue { background-color: #b3d9ff; }
 .cell-homepath-green { background-color: #b3ffb3; }
 .cell-homepath-yellow { background-color: #ffe0a3; }
-
 /* 四角家區 */
 .cell-home-red { background-color: #ffd6d6; }
 .cell-home-blue { background-color: #d6e8ff; }
 .cell-home-green { background-color: #d7ffd6; }
 .cell-home-yellow { background-color: #ffe7ba; }
-
 /* 中央 3x3 */
 .center-blue { background-color: #b3d9ff; }
 .center-green { background-color: #b3ffb3; }
 .center-red { background-color: #ffb3b3; }
 .center-yellow { background-color: #ffe0a3; }
 .center-core { background-color: #ffffff; }
-
 /* 起步點 */
 .start-red::after,
 .start-blue::after,
 .start-green::after,
 .start-yellow::after {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 50%;
-  border: 2px solid #555;
-  background-color: #fff;
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 2px solid #555;
+    background-color: #fff;
 }
 .start-red::after { border-color: #ff4d4f; }
 .start-blue::after { border-color: #1890ff; }
-.start-green::after { border-color: #52c41a; }
-.start-yellow::after { border-color: #faad14; }
-
+.start-green::after { border-color: #52c41a; }.start-yellow::after { border-color: #faad14; }
 /* 飛行格箭頭 */
 .fly-up::after,
 .fly-down::after,
 .fly-left::after,
 .fly-right::after {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
 }
 .fly-up::after { content: "↑"; }
 .fly-down::after { content: "↓"; }
 .fly-left::after { content: "←"; }
 .fly-right::after { content: "→"; }
-
 .pieces-container {
-  position: absolute;
-  inset: 2px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+    position: absolute;
+    inset: 2px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    pointer-events: none; /* 讓點擊事件穿透到 piece */
 }
-
 .piece {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  margin: auto;
-  box-shadow: 0 0 2px rgba(0,0,0,0.4);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin: auto;
+    box-shadow: 0 0 2px rgba(0,0,0,0.4);
+    pointer-events: auto; /* 恢復 piece 的點擊 */
 }
 .piece.red { background-color: #ff4d4f; }
 .piece.blue { background-color: #1890ff; }
