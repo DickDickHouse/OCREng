@@ -39,8 +39,8 @@ h1 { margin-bottom: 12px; }
 }
 #roll-button { background-color: #1890ff; color: #fff; }
 #roll-button:disabled { background-color: #d9d9d9; color: #888; cursor: not-allowed; }
-#reset-button { background-color: #52c41a; color: #fff; }
-#status { margin: 4px 0; min-height: 20px; color: #333; font-size: 14px; }
+#reset-button { background-color: #52c41a; color: #fff; padding: 8px 16px; font-size: 14px; border-radius: 4px; border: none; cursor: pointer; }
+#status { margin: 4px 0; min-height: 20px; color: #333; font-size: 14px; font-weight: bold; }
 .rule-controls {
     display: flex;
     flex-wrap: wrap;
@@ -107,6 +107,14 @@ h1 { margin-bottom: 12px; }
     0%, 100% { transform: scale(1); box-shadow: 0 0 2px rgba(0,0,0,0.4); }
     50% { transform: scale(1.15); box-shadow: 0 0 6px rgba(0,0,0,0.6); }
 }
+/* 可選擇棋子樣式 */
+.piece.selectable {
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 8px rgba(0,0,0,0.8);
+    transform: scale(1.2);
+    z-index: 10;
+}
 #version {
     color: #d00;
     font-weight: bold;
@@ -137,15 +145,15 @@ h1 { margin-bottom: 12px; }
 }
 /* 主路 */
 .cell-path { background-color: #e0e0e0; }
-.cell-path-red { background-color: #ffcccc; }
-.cell-path-blue { background-color: #cce3ff; }
+.cell-path-red { background-color: #ffcccc; }.cell-path-blue { background-color: #cce3ff; }
 .cell-path-green { background-color: #ccffd7; }
 .cell-path-yellow { background-color: #ffe6b8; }
 /* 跳棋顯示 */
 .cell-jump { outline: none; outline-offset: 0; }
 .cell-jump::after {
     content: "跳";
-    position: absolute;    top: 1px;
+    position: absolute;
+    top: 1px;
     left: 2px;
     font-size: 10px;
     color: #555;
@@ -186,15 +194,15 @@ h1 { margin-bottom: 12px; }
 .start-red::after { border-color: #ff4d4f; }
 .start-blue::after { border-color: #1890ff; }
 .start-green::after { border-color: #52c41a; }
-.start-yellow::after { border-color: #faad14; }
-/* 飛行格箭頭 */
+.start-yellow::after { border-color: #faad14; }/* 飛行格箭頭 */
 .fly-up::after,
 .fly-down::after,
 .fly-left::after,
 .fly-right::after {
     position: absolute;
     inset: 0;
-    display: flex;    align-items: center;
+    display: flex;
+    align-items: center;
     justify-content: center;
     font-weight: bold;
     font-size: 16px;
@@ -217,8 +225,16 @@ h1 { margin-bottom: 12px; }
     border-radius: 50%;
     margin: auto;
     box-shadow: 0 0 2px rgba(0,0,0,0.4);
+    transition: transform 0.2s;
 }
 .piece.red { background-color: #ff4d4f; }
 .piece.blue { background-color: #1890ff; }
 .piece.green { background-color: #52c41a; }
 .piece.yellow { background-color: #faad14; }
+/* 棋盤下方控制區 */
+#bottom-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+    margin-bottom: 20px;
+}
