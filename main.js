@@ -1,4 +1,4 @@
-const VERSION = "v34-fixed-complete";
+const VERSION = "v35-bug-fix";
 const versionEl = document.getElementById("version");
 if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 
@@ -37,7 +37,6 @@ const centerCells = [
     [7,9],[8,9],[9,9],
 ];
 
-// ✅ 修復：箭頭函數 => 和邏輯運算符 &&
 centerCells.forEach(([x,y]) => {
     let cls = "center-core";
     if (x === 8 && y === 7) cls = "center-red";
@@ -47,8 +46,8 @@ centerCells.forEach(([x,y]) => {
     boardCells[xyToIndex(x,y)].classes.push(cls);
 });
 
-const basePathWithColor = [    [5,1, "yellow"], [6,1, "green"], [7,1, "blue"], [8,1, "red"], [9,1, "yellow"], [10,1, "green"],
-    [11,1, "blue"], [11,2, "red"], [11,3, "yellow"], [11,4, "green"], [12,5, "blue"], [13,5, "red"],
+const basePathWithColor = [
+    [5,1, "yellow"], [6,1, "green"], [7,1, "blue"], [8,1, "red"], [9,1, "yellow"], [10,1, "green"],    [11,1, "blue"], [11,2, "red"], [11,3, "yellow"], [11,4, "green"], [12,5, "blue"], [13,5, "red"],
     [14,5, "yellow"], [15,5, "green"], [15,6, "blue"], [15,7, "red"], [15,8, "yellow"], [15,9, "green"],
     [15,10, "blue"], [15,11, "red"], [14,11, "yellow"], [13,11, "green"], [12,11, "blue"], [11,12, "red"],
     [11,13, "yellow"], [11,14, "green"], [11,15, "blue"], [10,15, "red"], [9,15, "yellow"], [8,15, "green"],
@@ -96,8 +95,8 @@ const startStepXY = {
     green: [5,14],
     yellow: [14,11],
 };
-const playerStartIndex = {
-    blue: baseIndexByCell.get(xyToIndex(...startStepXY.blue)),
+
+const playerStartIndex = {    blue: baseIndexByCell.get(xyToIndex(...startStepXY.blue)),
     red: baseIndexByCell.get(xyToIndex(...startStepXY.red)),
     green: baseIndexByCell.get(xyToIndex(...startStepXY.green)),
     yellow: baseIndexByCell.get(xyToIndex(...startStepXY.yellow)),
@@ -145,8 +144,8 @@ const flySquares = {
     yellow: { from: xyToIndex(4,11), to: xyToIndex(4,15), dir: "fly-up" },
     green:  { from: xyToIndex(5,4),  to: xyToIndex(11,4), dir: "fly-right" },
     blue:   { from: xyToIndex(12,5), to: xyToIndex(12,11), dir: "fly-down" },
-    red:    { from: xyToIndex(11,12),to: xyToIndex(5,12), dir: "fly-left" },};
-
+    red:    { from: xyToIndex(11,12),to: xyToIndex(5,12), dir: "fly-left" },
+};
 Object.values(flySquares).forEach(f => boardCells[f.from].classes.push(f.dir));
 
 const jumpPairs = [
@@ -217,7 +216,6 @@ const homePositions = {
     yellow:homePositionsFull.yellow.slice(0,4),
 };
 
-// ✅ 修復：字串無多餘空格
 const players = [
     { id:0, name: "紅方", color: "red", colorClass: "red", pieces: Array.from({length:4}, (_,i) => ({status: "home", homeIndex:i, progress:0})) },
     { id:1, name: "藍方", color: "blue", colorClass: "blue", pieces: Array.from({length:4}, (_,i) => ({status: "home", homeIndex:i, progress:0})) },
@@ -236,21 +234,18 @@ let currentDiceValue = 0;
 
 const blinkingPieces = new Set();
 
-// ✅ 修復：getElementById 參數無空格
 const boardEl = document.getElementById("board");
 const currentPlayerNameEl = document.getElementById("current-player-name");
 const diceResultEl = document.getElementById("dice-result");
 const diceImageEl = document.getElementById("dice-image");
 const diceDisplayEl = document.querySelector(".dice-display");
 const statusEl = document.getElementById("status");
-const rollButton = document.getElementById("roll-button");const resetButton = document.getElementById("reset-button");
+const rollButton = document.getElementById("roll-button");
+const resetButton = document.getElementById("reset-button");
 const launchRuleSelect = document.getElementById("launch-rule");
-const confirmRuleButton = document.getElementById("confirm-rule");
-const ruleStatusEl = document.getElementById("rule-status");
+const confirmRuleButton = document.getElementById("confirm-rule");const ruleStatusEl = document.getElementById("rule-status");
 
-const POST_TURN_DELAY_MS = 1000;
 const CAPTURE_BLINK_MS = 2000;
-// ✅ 修復：改為相對路徑
 const DICE_IDLE_IMAGE = "images/dice-blank.svg";
 const STATUS_ALERT_CLASS = "status-alert";
 
@@ -292,14 +287,13 @@ if (confirmRuleButton) {
     });
 }
 
-function setStatus(message, alert = false) {    if (!statusEl) return;
+function setStatus(message, alert = false) {
+    if (!statusEl) return;
     statusEl.textContent = message;
     statusEl.classList.toggle(STATUS_ALERT_CLASS, Boolean(alert));
 }
-
 function setDiceImage(value) {
     if (diceImageEl) {
-        // ✅ 修復：改為相對路徑
         diceImageEl.src = `images/dice-${value}.svg`;
         diceImageEl.alt = `Dice ${value}`;
     }
@@ -341,13 +335,13 @@ function setBlinkingPiece(pieces) {
 function getPieceCellIndex(player, piece) {
     if (piece.status === "home") return homePositions[player.color][piece.homeIndex];
     if (piece.progress === 0) return startCells[player.color];
-    return playerPaths[player.color][piece.progress - 1];}
+    return playerPaths[player.color][piece.progress - 1];
+}
 
 function initBoard() {
     if (!boardEl) {
         console.error("棋盤元素不存在！");
-        return;
-    }
+        return;    }
     boardEl.innerHTML = "";
     boardEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 26px)`;
     boardEl.style.gridTemplateRows = `repeat(${BOARD_ROWS}, 26px)`;
@@ -390,13 +384,13 @@ function renderPieces() {
             pieceEl.className = `piece ${player.colorClass}`;
             
             // 檢查是否為可選擇棋子
-            if (isWaitingForPieceSelection) {                const isValid = validMovePieces.some(m => m.piece === piece);
+            if (isWaitingForPieceSelection) {
+                const isValid = validMovePieces.some(m => m.piece === piece);
                 if (isValid) {
                     pieceEl.classList.add("selectable");
                     pieceEl.onclick = () => handlePieceClick(player, piece);
                 }
-            }
-            
+            }            
             if (blinkingPieces.has(piece)) {
                 pieceEl.classList.add("piece-blink");
             }
@@ -414,7 +408,10 @@ function randomDice() {
 function animateMovePiece(player, piece, targetProgress, onComplete) {
     const start = piece.progress;
     const end = targetProgress;
-    if (end <= start) { onComplete && onComplete(); return; }
+    if (end <= start) { 
+        onComplete && onComplete(); 
+        return; 
+    }
     let current = start;
     const stepTime = 200;
     function moveOne() {
@@ -439,10 +436,10 @@ function checkJump(player, piece) {
             if (currentBaseIdx !== undefined) {
                 for (let i = 1; i < PATH_LENGTH; i++) {
                     const nextIdx = (currentBaseIdx + i) % PATH_LENGTH;
-                    const nextCellIdx = basePath[nextIdx];                    const nextCellData = boardCells[nextCellIdx];
+                    const nextCellIdx = basePath[nextIdx];
+                    const nextCellData = boardCells[nextCellIdx];
                     
-                    if (nextCellData.classes.includes(playerColorClass)) {
-                        const jumpProgress = baseIndexToProgress(player.color, nextCellIdx) + 1;
+                    if (nextCellData.classes.includes(playerColorClass)) {                        const jumpProgress = baseIndexToProgress(player.color, nextCellIdx) + 1;
                         if (jumpProgress > piece.progress) {
                             piece.progress = jumpProgress;
                             renderPieces();
@@ -488,10 +485,10 @@ function applyFlyAndCapture(player, piece) {
                     if (opCell === cellIndex) {
                         opPiece.status = "home";
                         opPiece.progress = 0;
-                        captured.push({ attacker: player, victim: op, piece: opPiece });                    }
+                        captured.push({ attacker: player, victim: op, piece: opPiece });
+                    }
                 });
-            });
-        }
+            });        }
     }
     
     if (captured.length > 0) {
@@ -537,10 +534,10 @@ function formatCaptureMessage(player, capturedList) {
     const victimText = victimNames.join("、");
     return `${victimText} 被${attackerName} 打飛了！${victimText} 回基地！`;
 }
+
 // 勝利條件：任一玩家獲勝
 function checkWin(player) {
-    const allFinished = player.pieces.every(p => p.status === "finished");
-    if (allFinished) {
+    const allFinished = player.pieces.every(p => p.status === "finished");    if (allFinished) {
         gameEnded = true;
         setStatus(`🎉 遊戲結束！${player.name} 獲勝！`, true);
         if (rollButton) rollButton.disabled = true;
@@ -586,10 +583,10 @@ function performMove(player, moveInfo, done) {
         if (endProgress === playerPaths[player.color].length) {
             moveInfo.piece.status = "finished";
             setStatus(formatStatus(player, "棋子到終點站了!"));
-            if (checkWin(player)) {                done(true, moveInfo.piece);
+            if (checkWin(player)) {
+                done(true, moveInfo.piece);
                 return;
-            }
-        } else if (endProgress > PATH_LENGTH) {
+            }        } else if (endProgress > PATH_LENGTH) {
             setStatus(formatStatus(player, "棋子快到終點了!"));
         } else {
             setStatus(formatStatus(player, `棋子向前 ${moveInfo.steps} 格`));
@@ -613,48 +610,71 @@ function updateCurrentPlayerDisplay() {
     }
 }
 
+// ✅ 修復：確保 always 重置狀態
 function finalizeTurn() {
+    console.log("finalizeTurn 被呼叫");
     setDiceRolling(false);
     setDiceIdle();
     setBlinkingPiece(null);
     isWaitingForPieceSelection = false;
     validMovePieces = [];
+    isAnimating = false;  // ✅ 關鍵：確保重置
     
     if (!gameEnded) {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
         updateCurrentPlayerDisplay();
-        if (rollButton) rollButton.disabled = false;
+        if (rollButton) {
+            rollButton.disabled = false;  // ✅ 關鍵：啟用按鈕
+            console.log("按鈕已啟用");
+        }
     }
-    isAnimating = false;
 }
 
-// 回合結束邏輯（處理連續回合）
+// ✅ 修復：回合結束邏輯
 function handleTurnEnd(player, moved, dice) {
-    if (gameEnded) return;
+    console.log("handleTurnEnd 被呼叫，dice:", dice, "moved:", moved);
+    
+    if (gameEnded) {
+        console.log("遊戲已結束");        return;
+    }
 
     // 擲到 6 點獲得額外回合
     const extraTurn = (dice === 6);
 
-    if (extraTurn) {        setStatus(`${player.name} 擲到 6 點，獲得額外回合！`);
+    if (extraTurn) {
+        setStatus(`${player.name} 擲到 6 點，獲得額外回合！`);
         isAnimating = false;
-        if (rollButton) rollButton.disabled = false;
+        if (rollButton) {
+            rollButton.disabled = false;
+            console.log("額外回合，按鈕已啟用");
+        }
     } else {
+        console.log("切換玩家");
         finalizeTurn();
     }
 }
 
-// 處理棋子點擊
+// ✅ 修復：處理棋子點擊
 function handlePieceClick(player, piece) {
-    if (!isWaitingForPieceSelection) return;
+    console.log("handlePieceClick 被呼叫");
+    
+    if (!isWaitingForPieceSelection) {
+        console.log("不在選擇狀態，返回");
+        return;
+    }
     
     const moveInfo = validMovePieces.find(m => m.piece === piece);
-    if (!moveInfo) return;
+    if (!moveInfo) {
+        console.log("找不到移動資訊，返回");
+        return;
+    }
     
     isWaitingForPieceSelection = false;
     validMovePieces = [];
     if (rollButton) rollButton.disabled = true;
     
     performMove(player, moveInfo, (moved, movedPiece) => {
+        console.log("performMove 完成，moved:", moved);
         if (moved) {
             handleTurnEnd(player, moved, currentDiceValue);
         } else {
@@ -663,8 +683,23 @@ function handlePieceClick(player, piece) {
     });
 }
 
-function handleTurn() {
-    if (gameEnded || isAnimating || isWaitingForPieceSelection) return;
+// ✅ 修復：擲骰子邏輯
+function handleTurn() {    console.log("handleTurn 被呼叫");
+    
+    if (gameEnded) {
+        console.log("遊戲已結束");
+        return;
+    }
+    
+    if (isAnimating) {
+        console.log("正在動畫中");
+        return;
+    }
+    
+    if (isWaitingForPieceSelection) {
+        console.log("正在等待選擇棋子");
+        return;
+    }
     
     const player = players[currentPlayerIndex];
     isAnimating = true;
@@ -683,26 +718,34 @@ function handleTurn() {
             clearInterval(rollInterval);
             const dice = randomDice();
             currentDiceValue = dice;
+            console.log("骰子結果:", dice);
             setDiceImage(dice);
-            setDiceRolling(false);            
+            setDiceRolling(false);
+            
             const moves = getValidMoves(player, dice);
             validMovePieces = moves;
             
+            console.log("可行步數:", moves.length);
+            
             if (moves.length === 0) {
                 setStatus(formatStatus(player, "無棋可走"));
-                setTimeout(() => handleTurnEnd(player, false, dice), 1000);
-            } else if (moves.length === 1) {
-                setStatus(formatStatus(player, "只有一步可走"));
+                setTimeout(() => {
+                    console.log("無棋可走，呼叫 handleTurnEnd");
+                    handleTurnEnd(player, false, dice);
+                }, 1000);
+            } else if (moves.length === 1) {                setStatus(formatStatus(player, "只有一步可走"));
                 setBlinkingPiece(moves[0].piece);
                 setTimeout(() => {
+                    console.log("自動移動");
                     handlePieceClick(player, moves[0].piece);
                 }, 500);
             } else {
                 setStatus(formatStatus(player, "請選擇要移動的棋子"));
                 isWaitingForPieceSelection = true;
                 setBlinkingPiece(moves.map(m => m.piece));
-                isAnimating = false;
-                if (rollButton) rollButton.disabled = true; 
+                isAnimating = false;  // ✅ 允許點擊
+                if (rollButton) rollButton.disabled = true;
+                console.log("等待玩家選擇棋子");
             }
         }
     }, 80);
@@ -733,13 +776,16 @@ function initGame() {
     isAnimating = false;
     isWaitingForPieceSelection = false;
     validMovePieces = [];
-    setBlinkingPiece(null);    initBoard();
+    setBlinkingPiece(null);
+    initBoard();
     renderPieces();
     updateCurrentPlayerDisplay();
     setDiceIdle();
     updateLaunchRuleDisplay();
-    setStatus("");
-    if (rollButton) rollButton.disabled = false;
+    setStatus("");    if (rollButton) {
+        rollButton.disabled = false;
+        console.log("初始化完成，按鈕已啟用");
+    }
 }
 
 if (rollButton) rollButton.addEventListener("click", handleTurn);
