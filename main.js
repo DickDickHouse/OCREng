@@ -1,4 +1,4 @@
-const VERSION = "v42-path-corrected";
+const VERSION = "v43-final-working";
 const versionEl = document.getElementById("version");
 if (versionEl) versionEl.textContent = `版本：${VERSION}`;
 
@@ -37,7 +37,6 @@ const centerCells = [
     [7,9],[8,9],[9,9],
 ];
 
-// ✅ 修復：箭頭函數和邏輯運算符
 centerCells.forEach(([x,y]) => {
     let cls = "center-core";
     if (x === 8 && y === 7) cls = "center-red";
@@ -47,9 +46,8 @@ centerCells.forEach(([x,y]) => {
     boardCells[xyToIndex(x,y)].classes.push(cls);
 });
 
-// ✅ 根據您提供的路徑重新定義 basePathWithColorconst basePathWithColor = [
-    // 藍隊起飛後的第一步開始
-    [2,5, "blue"], [3,5, "blue"], [4,5, "blue"],
+// 根據您提供的路徑定義
+const basePathWithColor = [    [2,5, "blue"], [3,5, "blue"], [4,5, "blue"],
     [5,4, "green"], [5,3, "blue"], [5,2, "blue"], [5,1, "blue"],
     [6,1, "green"], [7,1, "blue"], [8,1, "red"], [9,1, "yellow"], [10,1, "green"],
     [11,1, "blue"], [11,2, "red"], [11,3, "yellow"], [11,4, "green"],
@@ -63,8 +61,7 @@ centerCells.forEach(([x,y]) => {
     [5,14, "green"], [5,13, "blue"], [5,12, "red"],
     [4,11, "yellow"], [3,11, "green"], [2,11, "blue"],
     [1,11, "red"], [1,10, "yellow"], [1,9, "green"], [1,8, "blue"],
-    [1,7, "red"], [1,6, "yellow"], [1,5, "green"],
-    [2,5, "blue"]
+    [1,7, "red"], [1,6, "yellow"], [1,5, "green"]
 ];
 
 const basePath = [];
@@ -75,7 +72,7 @@ basePathWithColor.forEach(([x,y,color]) => {
     baseIndexByCell.set(idx, basePath.length);
     basePath.push(idx);
     boardCells[idx].isPath = true;
-    boardCells[idx].classes.push("cell-path", `cell-path-${color.trim()}`);
+    boardCells[idx].classes.push("cell-path", `cell-path-${color}`);
 });
 
 const PATH_LENGTH = basePath.length;
@@ -96,14 +93,13 @@ const startCells = {
 
 boardCells[startCells.blue].classes.push("start-blue");
 boardCells[startCells.red].classes.push("start-red");
-boardCells[startCells.green].classes.push("start-green");boardCells[startCells.yellow].classes.push("start-yellow");
+boardCells[startCells.green].classes.push("start-green");
+boardCells[startCells.yellow].classes.push("start-yellow");
 
-// ✅ 修正起飛點（第一步的位置）
-const startStepXY = {
-    blue: [2,5],   // 藍隊起飛後第一步
-    red: [11,2],   // 紅隊起飛後第一步
-    green: [5,14], // 綠隊起飛後第一步
-    yellow: [14,11], // 黃隊起飛後第一步
+const startStepXY = {    blue: [2,5],
+    red: [11,2],
+    green: [5,14],
+    yellow: [14,11],
 };
 
 const playerStartIndex = {
@@ -113,12 +109,11 @@ const playerStartIndex = {
     yellow: baseIndexByCell.get(xyToIndex(...startStepXY.yellow)),
 };
 
-// ✅ 修正終點隧道入口
 const homeEntryCellsXY = {
-    red: [8,1],    // 紅隊終點隧道入口
-    yellow: [15,8], // 黃隊終點隧道入口
-    green: [8,15],  // 綠隊終點隧道入口
-    blue: [1,8],   // 藍隊終點隧道入口
+    red: [8,1],
+    yellow: [15,8],
+    green: [8,15],
+    blue: [1,8],
 };
 
 const homeEntryIndex = {
@@ -140,18 +135,17 @@ function lineCoords(x1,y1,x2,y2) {
     return coords;
 }
 
-// ✅ 修正終點隧道（homePaths）
 const homePaths = {
-    red:   lineCoords(8,2,8,7).map(([x,y]) => xyToIndex(x,y)),    // 紅隊終點隧道：(8,2)>(8,7)
-    yellow:lineCoords(14,8,9,8).map(([x,y]) => xyToIndex(x,y)),   // 黃隊終點隧道：(14,8)>(9,8)
-    green: lineCoords(8,14,8,9).map(([x,y]) => xyToIndex(x,y)),   // 綠隊終點隧道：(8,14)>(8,9)
-    blue:  lineCoords(2,8,7,8).map(([x,y]) => xyToIndex(x,y)),    // 藍隊終點隧道：(2,8)>(7,8)};
+    red:   lineCoords(8,2,8,7).map(([x,y]) => xyToIndex(x,y)),
+    yellow:lineCoords(14,8,9,8).map(([x,y]) => xyToIndex(x,y)),
+    green: lineCoords(8,14,8,9).map(([x,y]) => xyToIndex(x,y)),
+    blue:  lineCoords(2,8,7,8).map(([x,y]) => xyToIndex(x,y)),
+};
 
 homePaths.blue.forEach(i => boardCells[i].classes.push("cell-homepath-blue"));
 homePaths.green.forEach(i => boardCells[i].classes.push("cell-homepath-green"));
 homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));
 homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
-
 const flySquares = {
     yellow: { from: xyToIndex(4,11), to: xyToIndex(4,15), dir: "fly-up" },
     green:  { from: xyToIndex(5,4),  to: xyToIndex(11,4), dir: "fly-right" },
@@ -194,13 +188,12 @@ Object.keys(startCells).forEach((color) => {
     while (count < maxIterations) {
         path.push(basePath[idx]);
         if (idx === entryIndex) break;
-        idx = (idx + 1) % PATH_LENGTH;        count++;
+        idx = (idx + 1) % PATH_LENGTH;
+        count++;
     }
     
-    // 添加終點隧道
     playerPaths[color] = path.concat(homePaths[color]);
 });
-
 function baseIndexToProgress(color, baseIndex) {
     return (baseIndex - playerStartIndex[color] + PATH_LENGTH) % PATH_LENGTH;
 }
@@ -227,7 +220,6 @@ const homePositions = {
     yellow:homePositionsFull.yellow.slice(0,4),
 };
 
-// ✅ 修復：字串無多餘空格，箭頭函數正確
 const players = [
     { id:0, name: "紅方", color: "red", colorClass: "red", pieces: Array.from({length:4}, (_,i) => ({status: "home", homeIndex:i, progress:0})) },
     { id:1, name: "藍方", color: "blue", colorClass: "blue", pieces: Array.from({length:4}, (_,i) => ({status: "home", homeIndex:i, progress:0})) },
@@ -243,7 +235,7 @@ let validMovePieces = [];
 let currentDiceValue = 0;
 
 const blinkingPieces = new Set();
-// ✅ 修復：getElementById 參數無空格
+
 const boardEl = document.getElementById("board");
 const currentPlayerNameEl = document.getElementById("current-player-name");
 const diceResultEl = document.getElementById("dice-result");
@@ -251,8 +243,7 @@ const diceImageEl = document.getElementById("dice-image");
 const diceDisplayEl = document.querySelector(".dice-display");
 const statusEl = document.getElementById("status");
 const rollButton = document.getElementById("roll-button");
-const resetButton = document.getElementById("reset-button");
-const launchRuleSelect = document.getElementById("launch-rule");
+const resetButton = document.getElementById("reset-button");const launchRuleSelect = document.getElementById("launch-rule");
 const confirmRuleButton = document.getElementById("confirm-rule");
 const ruleStatusEl = document.getElementById("rule-status");
 
@@ -292,7 +283,8 @@ function canLaunchWithDice(dice) {
 
 if (launchRuleSelect) setLaunchRule(launchRuleSelect.value);
 if (confirmRuleButton) {
-    confirmRuleButton.addEventListener("click", () => {        if (!launchRuleSelect) return;
+    confirmRuleButton.addEventListener("click", () => {
+        if (!launchRuleSelect) return;
         setLaunchRule(launchRuleSelect.value);
     });
 }
@@ -300,8 +292,7 @@ if (confirmRuleButton) {
 function setStatus(message, alert = false) {
     if (!statusEl) return;
     statusEl.textContent = message;
-    statusEl.classList.toggle(STATUS_ALERT_CLASS, Boolean(alert));
-}
+    statusEl.classList.toggle(STATUS_ALERT_CLASS, Boolean(alert));}
 
 function setDiceImage(value) {
     if (diceImageEl) {
@@ -342,6 +333,7 @@ function setBlinkingPiece(pieces) {
     }
     renderPieces();
 }
+
 function getPieceCellIndex(player, piece) {
     if (piece.status === "home") return homePositions[player.color][piece.homeIndex];
     if (piece.status === "track" && piece.progress === 0) return startCells[player.color];
@@ -349,8 +341,7 @@ function getPieceCellIndex(player, piece) {
         if (piece.progress - 1 < playerPaths[player.color].length) {
             return playerPaths[player.color][piece.progress - 1];
         }
-    }
-    return homePositions[player.color][0];
+    }    return homePositions[player.color][0];
 }
 
 function initBoard() {
@@ -390,7 +381,8 @@ function renderPieces() {
     
     cellPiecesMap.forEach((list, cellIndex) => {
         const cell = cells[cellIndex];
-        if (!cell) return;        const container = document.createElement("div");
+        if (!cell) return;
+        const container = document.createElement("div");
         container.className = "pieces-container";
         
         list.forEach(({ player, piece }) => {
@@ -398,8 +390,7 @@ function renderPieces() {
             pieceEl.className = `piece ${player.colorClass}`;
             
             if (isWaitingForPieceSelection) {
-                const isValid = validMovePieces.some(m => m.piece === piece);
-                if (isValid) {
+                const isValid = validMovePieces.some(m => m.piece === piece);                if (isValid) {
                     pieceEl.classList.add("selectable");
                     pieceEl.onclick = (e) => {
                         e.stopPropagation();
@@ -440,6 +431,7 @@ function animateMovePiece(player, piece, targetProgress, onComplete) {
     }
     moveOne();
 }
+
 function checkJump(player, piece) {
     if (piece.progress > 0 && piece.progress <= PATH_LENGTH) {
         const cellIndex = playerPaths[player.color][piece.progress - 1];
@@ -447,8 +439,7 @@ function checkJump(player, piece) {
         const playerColorClass = `cell-path-${player.color}`;
         
         if (cellData.classes.includes(playerColorClass)) {
-            const currentBaseIdx = baseIndexByCell.get(cellIndex);
-            if (currentBaseIdx !== undefined) {
+            const currentBaseIdx = baseIndexByCell.get(cellIndex);            if (currentBaseIdx !== undefined) {
                 for (let i = 1; i < PATH_LENGTH; i++) {
                     const nextIdx = (currentBaseIdx + i) % PATH_LENGTH;
                     const nextCellIdx = basePath[nextIdx];
@@ -488,7 +479,8 @@ function applyFlyAndCapture(player, piece) {
         }
     }
     
-    if (piece.progress > 0 && piece.progress <= PATH_LENGTH) {        const cellIndex = playerPaths[color][piece.progress - 1];
+    if (piece.progress > 0 && piece.progress <= PATH_LENGTH) {
+        const cellIndex = playerPaths[color][piece.progress - 1];
         if (!safeCells.has(cellIndex)) {
             players.forEach((op) => {
                 if (op.color === color) return;
@@ -496,8 +488,7 @@ function applyFlyAndCapture(player, piece) {
                     if (opPiece.status !== "track") return;
                     const opCell = getPieceCellIndex(op, opPiece);
                     if (opCell === cellIndex) {
-                        opPiece.status = "home";
-                        opPiece.progress = 0;
+                        opPiece.status = "home";                        opPiece.progress = 0;
                         captured.push({ attacker: player, victim: op, piece: opPiece });
                     }
                 });
@@ -538,6 +529,7 @@ function getValidMoves(player, dice) {
 function formatStatus(player, message) {
     return `${player.name}：${message}`;
 }
+
 function formatCaptureMessage(player, capturedList) {
     const attackerName = COLOR_NAMES[player.color] || player.name;
     const victimNames = capturedList.map((entry) => COLOR_NAMES[entry.victim.color] || entry.victim.name);
@@ -545,8 +537,7 @@ function formatCaptureMessage(player, capturedList) {
     return `${victimText} 被${attackerName} 打飛了！${victimText} 回基地！`;
 }
 
-function checkWin(player) {
-    const allFinished = player.pieces.every(p => p.status === "finished");
+function checkWin(player) {    const allFinished = player.pieces.every(p => p.status === "finished");
     if (allFinished) {
         gameEnded = true;
         setStatus(`🎉 遊戲結束！${player.name} 獲勝！`, true);
@@ -586,7 +577,8 @@ function performMove(player, moveInfo, done) {
         }
         
         const endProgress = moveInfo.piece.progress;
-                if (endProgress === playerPaths[player.color].length) {
+        
+        if (endProgress === playerPaths[player.color].length) {
             moveInfo.piece.status = "finished";
             setStatus(formatStatus(player, "棋子到終點站了!"));
             if (checkWin(player)) {
@@ -594,8 +586,7 @@ function performMove(player, moveInfo, done) {
                 return;
             }
         } else if (endProgress > PATH_LENGTH) {
-            setStatus(formatStatus(player, "棋子快到終點了!"));
-        } else {
+            setStatus(formatStatus(player, "棋子快到終點了!"));        } else {
             setStatus(formatStatus(player, `棋子向前 ${moveInfo.steps} 格`));
         }
 
@@ -635,7 +626,8 @@ function finalizeTurn() {
 }
 
 function handleTurnEnd(player, moved, dice) {
-    if (gameEnded) {        return;
+    if (gameEnded) {
+        return;
     }
 
     const extraTurn = (dice === 6);
@@ -643,8 +635,7 @@ function handleTurnEnd(player, moved, dice) {
     if (extraTurn) {
         setStatus(`${player.name} 擲到 6 點，獲得額外回合！`);
         isAnimating = false;
-        if (rollButton) {
-            rollButton.disabled = false;
+        if (rollButton) {            rollButton.disabled = false;
         }
     } else {
         finalizeTurn();
@@ -684,7 +675,8 @@ function handleTurn() {
         isWaitingForPieceSelection = false;
         if (rollButton) rollButton.disabled = false;
     }
-        if (isWaitingForPieceSelection) {
+    
+    if (isWaitingForPieceSelection) {
         return;
     }
     
@@ -692,8 +684,7 @@ function handleTurn() {
     
     isAnimating = true;
     if (rollButton) rollButton.disabled = true;
-    
-    setDiceActive();
+        setDiceActive();
     let rollTicks = 0;
     const maxTicks = 10;
     setDiceRolling(true);
@@ -733,6 +724,7 @@ function handleTurn() {
         }
     }, 80);
 }
+
 function safeInitGame() {
     try {
         initGame();
@@ -741,8 +733,7 @@ function safeInitGame() {
     }
 }
 
-function initGame() {
-    players.forEach((player) => {
+function initGame() {    players.forEach((player) => {
         player.pieces.forEach((p, i) => {
             p.status = "home";
             p.homeIndex = i;
