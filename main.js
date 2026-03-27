@@ -37,7 +37,6 @@ const centerCells = [
     [7,9],[8,9],[9,9],
 ];
 
-// ✅ 修正：箭頭函數和邏輯運算符
 centerCells.forEach(([x,y]) => {
     let cls = "center-core";
     if (x === 8 && y === 7) cls = "center-red";
@@ -47,8 +46,8 @@ centerCells.forEach(([x,y]) => {
     boardCells[xyToIndex(x,y)].classes.push(cls);
 });
 
-// 根據您提供的路徑定義const basePathWithColor = [
-    [2,5, "blue"], [3,5, "blue"], [4,5, "blue"],
+// 根據您提供的路徑定義
+const basePathWithColor = [    [2,5, "blue"], [3,5, "blue"], [4,5, "blue"],
     [5,4, "green"], [5,3, "blue"], [5,2, "blue"], [5,1, "blue"],
     [6,1, "green"], [7,1, "blue"], [8,1, "red"], [9,1, "yellow"], [10,1, "green"],
     [11,1, "blue"], [11,2, "red"], [11,3, "yellow"], [11,4, "green"],
@@ -96,8 +95,8 @@ boardCells[startCells.blue].classes.push("start-blue");
 boardCells[startCells.red].classes.push("start-red");
 boardCells[startCells.green].classes.push("start-green");
 boardCells[startCells.yellow].classes.push("start-yellow");
-const startStepXY = {
-    blue: [2,5],
+
+const startStepXY = {    blue: [2,5],
     red: [11,2],
     green: [5,14],
     yellow: [14,11],
@@ -145,8 +144,8 @@ const homePaths = {
 
 homePaths.blue.forEach(i => boardCells[i].classes.push("cell-homepath-blue"));
 homePaths.green.forEach(i => boardCells[i].classes.push("cell-homepath-green"));
-homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
-
+homePaths.red.forEach(i => boardCells[i].classes.push("cell-homepath-red"));
+homePaths.yellow.forEach(i => boardCells[i].classes.push("cell-homepath-yellow"));
 const flySquares = {
     yellow: { from: xyToIndex(4,11), to: xyToIndex(4,15), dir: "fly-up" },
     green:  { from: xyToIndex(5,4),  to: xyToIndex(11,4), dir: "fly-right" },
@@ -243,8 +242,8 @@ const diceResultEl = document.getElementById("dice-result");
 const diceImageEl = document.getElementById("dice-image");
 const diceDisplayEl = document.querySelector(".dice-display");
 const statusEl = document.getElementById("status");
-const rollButton = document.getElementById("roll-button");const resetButton = document.getElementById("reset-button");
-const launchRuleSelect = document.getElementById("launch-rule");
+const rollButton = document.getElementById("roll-button");
+const resetButton = document.getElementById("reset-button");const launchRuleSelect = document.getElementById("launch-rule");
 const confirmRuleButton = document.getElementById("confirm-rule");
 const ruleStatusEl = document.getElementById("rule-status");
 
@@ -292,8 +291,8 @@ if (confirmRuleButton) {
 
 function setStatus(message, alert = false) {
     if (!statusEl) return;
-    statusEl.textContent = message;    statusEl.classList.toggle(STATUS_ALERT_CLASS, Boolean(alert));
-}
+    statusEl.textContent = message;
+    statusEl.classList.toggle(STATUS_ALERT_CLASS, Boolean(alert));}
 
 function setDiceImage(value) {
     if (diceImageEl) {
@@ -341,8 +340,8 @@ function getPieceCellIndex(player, piece) {
     if (piece.status === "track" && piece.progress > 0) {
         if (piece.progress - 1 < playerPaths[player.color].length) {
             return playerPaths[player.color][piece.progress - 1];
-        }    }
-    return homePositions[player.color][0];
+        }
+    }    return homePositions[player.color][0];
 }
 
 function initBoard() {
@@ -390,8 +389,8 @@ function renderPieces() {
             const pieceEl = document.createElement("div");
             pieceEl.className = `piece ${player.colorClass}`;
             
-            if (isWaitingForPieceSelection) {                const isValid = validMovePieces.some(m => m.piece === piece);
-                if (isValid) {
+            if (isWaitingForPieceSelection) {
+                const isValid = validMovePieces.some(m => m.piece === piece);                if (isValid) {
                     pieceEl.classList.add("selectable");
                     pieceEl.onclick = (e) => {
                         e.stopPropagation();
@@ -439,8 +438,8 @@ function checkJump(player, piece) {
         const cellData = boardCells[cellIndex];
         const playerColorClass = `cell-path-${player.color}`;
         
-        if (cellData.classes.includes(playerColorClass)) {            const currentBaseIdx = baseIndexByCell.get(cellIndex);
-            if (currentBaseIdx !== undefined) {
+        if (cellData.classes.includes(playerColorClass)) {
+            const currentBaseIdx = baseIndexByCell.get(cellIndex);            if (currentBaseIdx !== undefined) {
                 for (let i = 1; i < PATH_LENGTH; i++) {
                     const nextIdx = (currentBaseIdx + i) % PATH_LENGTH;
                     const nextCellIdx = basePath[nextIdx];
@@ -488,8 +487,8 @@ function applyFlyAndCapture(player, piece) {
                 op.pieces.forEach((opPiece) => {
                     if (opPiece.status !== "track") return;
                     const opCell = getPieceCellIndex(op, opPiece);
-                    if (opCell === cellIndex) {                        opPiece.status = "home";
-                        opPiece.progress = 0;
+                    if (opCell === cellIndex) {
+                        opPiece.status = "home";                        opPiece.progress = 0;
                         captured.push({ attacker: player, victim: op, piece: opPiece });
                     }
                 });
@@ -537,8 +536,8 @@ function formatCaptureMessage(player, capturedList) {
     const victimText = victimNames.join("、");
     return `${victimText} 被${attackerName} 打飛了！${victimText} 回基地！`;
 }
-function checkWin(player) {
-    const allFinished = player.pieces.every(p => p.status === "finished");
+
+function checkWin(player) {    const allFinished = player.pieces.every(p => p.status === "finished");
     if (allFinished) {
         gameEnded = true;
         setStatus(`🎉 遊戲結束！${player.name} 獲勝！`, true);
@@ -586,8 +585,8 @@ function performMove(player, moveInfo, done) {
                 done(true, moveInfo.piece);
                 return;
             }
-        } else if (endProgress > PATH_LENGTH) {            setStatus(formatStatus(player, "棋子快到終點了!"));
-        } else {
+        } else if (endProgress > PATH_LENGTH) {
+            setStatus(formatStatus(player, "棋子快到終點了!"));        } else {
             setStatus(formatStatus(player, `棋子向前 ${moveInfo.steps} 格`));
         }
 
@@ -635,8 +634,8 @@ function handleTurnEnd(player, moved, dice) {
 
     if (extraTurn) {
         setStatus(`${player.name} 擲到 6 點，獲得額外回合！`);
-        isAnimating = false;        if (rollButton) {
-            rollButton.disabled = false;
+        isAnimating = false;
+        if (rollButton) {            rollButton.disabled = false;
         }
     } else {
         finalizeTurn();
@@ -684,8 +683,8 @@ function handleTurn() {
     const player = players[currentPlayerIndex];
     
     isAnimating = true;
-    if (rollButton) rollButton.disabled = true;    
-    setDiceActive();
+    if (rollButton) rollButton.disabled = true;
+        setDiceActive();
     let rollTicks = 0;
     const maxTicks = 10;
     setDiceRolling(true);
@@ -733,8 +732,8 @@ function safeInitGame() {
         setStatus("初始化失敗：" + error.message, true);
     }
 }
-function initGame() {
-    players.forEach((player) => {
+
+function initGame() {    players.forEach((player) => {
         player.pieces.forEach((p, i) => {
             p.status = "home";
             p.homeIndex = i;
