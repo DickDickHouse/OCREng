@@ -17,7 +17,7 @@ h1 { margin-bottom: 12px; }
 
 .info-block {
     background-color: #ffffff;
-    padding: 6px 10px; /* ✅ 修正：加上 'px' 和分號 */
+    padding: 6px 10px; /*  修正：加上 'px' 和分號 */
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     font-size: 14px;
@@ -42,7 +42,7 @@ h1 { margin-bottom: 12px; }
     cursor: pointer;
 }
 #roll-button {
-    background-color: #1890ff; /* ✅ 修正：移除多餘空格 */
+    background-color: #1890ff; /* 修正：移除多餘空格 */
     color: #fff;
 }
 #roll-button:disabled {
