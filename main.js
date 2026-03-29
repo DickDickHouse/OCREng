@@ -197,7 +197,6 @@ function handleRollDice() {
         }    }, 100);
 }
 
-// 初始化棋盤網格
 // 初始化棋盤網格 (修正版 - 確保添加基地和起飛點樣式)
 function initBoard() {
     if (!boardEl) return;
@@ -210,6 +209,8 @@ function initBoard() {
     boardEl.style.background = "#fff";
     boardEl.style.borderRadius = "8px";
     boardEl.style.padding = "8px";
+    // 確保棋盤本身置中
+    boardEl.style.margin = "0 auto";
 
     // 創建 225 個格子
     for (let r = 0; r < BOARD_ROWS; r++) {
@@ -226,15 +227,14 @@ function initBoard() {
             const x = c + 1; // 1-based
             const y = r + 1; // 1-based
             
-            // 檢查是否為家區
+            // 檢查是否為家區 (根據您之前定義的區域)
             if (x >= 1 && x <= 3 && y >= 1 && y <= 3) cell.classList.add("cell-home-blue");
             if (x >= 13 && x <= 15 && y >= 1 && y <= 3) cell.classList.add("cell-home-red");
             if (x >= 1 && x <= 3 && y >= 13 && y <= 15) cell.classList.add("cell-home-green");
             if (x >= 13 && x <= 15 && y >= 13 && y <= 15) cell.classList.add("cell-home-yellow");
             
             // 檢查是否為起飛點
-            if (x === 1 && y === 4) cell.classList.add("start-blue");
-            if (x === 12 && y === 1) cell.classList.add("start-red");
+            if (x === 1 && y === 4) cell.classList.add            if (x === 12 && y === 1) cell.classList.add("start-red");
             if (x === 4 && y === 15) cell.classList.add("start-green");
             if (x === 15 && y === 12) cell.classList.add("start-yellow");
             // --- 結束添加 ---
