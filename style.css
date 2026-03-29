@@ -1,1 +1,22 @@
+/* 家區 */
+.cell-home-red { background-color: #ffd6d6; }
+.cell-home-blue { background-color: #d6e8ff; }
+.cell-home-green { background-color: #d7ffd6; }
+.cell-home-yellow { background-color: #ffe7ba; }
 
+/* 起飛點 */
+.start-red::after,
+.start-blue::after,
+.start-green::after,
+.start-yellow::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 2px solid #555;
+    background-color: #fff;
+}
+.start-red::after { border-color: #ff4d4f; }
+.start-blue::after { border-color: #1890ff; }
+.start-green::after { border-color: #52c41a; }
+.start-yellow::after { border-color: #faad14; }
