@@ -198,6 +198,7 @@ function handleRollDice() {
 }
 
 // 初始化棋盤網格
+// 初始化棋盤網格 (修正版 - 確保添加基地和起飛點樣式)
 function initBoard() {
     if (!boardEl) return;
     
@@ -221,10 +222,11 @@ function initBoard() {
             cell.style.position = "relative";
             cell.style.backgroundColor = "#fafafa";
             
-            // 檢查是否為家區
+            // --- 關鍵：添加基地和起飛點樣式 ---
             const x = c + 1; // 1-based
             const y = r + 1; // 1-based
             
+            // 檢查是否為家區
             if (x >= 1 && x <= 3 && y >= 1 && y <= 3) cell.classList.add("cell-home-blue");
             if (x >= 13 && x <= 15 && y >= 1 && y <= 3) cell.classList.add("cell-home-red");
             if (x >= 1 && x <= 3 && y >= 13 && y <= 15) cell.classList.add("cell-home-green");
@@ -235,11 +237,12 @@ function initBoard() {
             if (x === 12 && y === 1) cell.classList.add("start-red");
             if (x === 4 && y === 15) cell.classList.add("start-green");
             if (x === 15 && y === 12) cell.classList.add("start-yellow");
+            // --- 結束添加 ---
 
             boardEl.appendChild(cell);
         }
     }
-    console.log(`✅ [initBoard] 成功創建 ${boardEl.children.length} 個格子`);
+    console.log(`✅ [initBoard] 成功創建 ${boardEl.children.length} 個格子，包含基地和起飛點樣式`);
 }
 
 // 渲染棋子（基地 + 軌道）
