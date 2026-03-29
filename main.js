@@ -296,10 +296,16 @@ function renderPieces() {    if (!boardEl) return;
             pieceEl.style.boxShadow = "0 0 2px rgba(0,0,0,0.4)";
             
             // 設定顏色            if (player.color === "blue") pieceEl.style.backgroundColor = "#1890ff";
-            if (player.color === "red")  pieceEl.style.backgroundColor = "#ff4d4f";
-            if (player.color === "green")pieceEl.style.backgroundColor = "#52c41a";
-            if (player.color === "yellow")pieceEl.style.backgroundColor = "#faad14";
+            //if (player.color === "red")  pieceEl.style.backgroundColor = "#ff4d4f";
+            //if (player.color === "green")pieceEl.style.backgroundColor = "#52c41a";
+           // if (player.color === "yellow")pieceEl.style.backgroundColor = "#faad14";
 
+            // 設定顏色
+            pieceEl.style.backgroundColor =
+            player.color === "blue" ? "#1890ff" :
+            player.color === "red"  ? "#ff4d4f" :
+            player.color === "green"? "#52c41a" : "#faad14";
+            
             container.appendChild(pieceEl);
             cell.appendChild(container);
         });
