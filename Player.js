@@ -1,5 +1,5 @@
-import Piece from './Piece.js';
-import GameConfig from './GameConfig.js';
+import Piece from 'Piece.js';
+import GameConfig from 'GameConfig.js';
 
 class Player {
     constructor(id, name, color) {
