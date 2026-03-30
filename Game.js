@@ -1,9 +1,9 @@
 // Game.js
-import GameConfig from 'GameConfig.js';
-import Player from 'Player.js';
-import Board from 'Board.js';
-import Dice from 'Dice.js';
-import UI from 'UI.js';
+import GameConfig from './GameConfig.js';
+import Player from './Player.js';
+import Board from './Board.js';
+import Dice from './Dice.js';
+import UI from './UI.js';
 
 class Game {
     constructor() {
