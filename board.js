@@ -1,5 +1,5 @@
 // Board.js - 棋盤類別
-import GameConfig from './GameConfig.js';
+import GameConfig from 'GameConfig.js';
 
 class Board {
     constructor(boardElementId) {
