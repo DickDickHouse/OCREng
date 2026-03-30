@@ -1,6 +1,9 @@
-// Piece.js - 棋子類別
+// Piece.js - 檢查點 #2
+console.log("[CHECKPOINT] Piece.js 已載入");
+
 class Piece {
     constructor(id, status = 'home', homeIndex = 0, progress = 0) {
+        console.log(`[CHECKPOINT] Piece 建構子被呼叫: id=${id}, status=${status}`);
         this.id = id; // 棋子唯一 ID
         this.status = status; // 'home', 'track', 'finished'
         this.homeIndex = homeIndex; // 在家中的索引 (0-3)
