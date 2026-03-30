@@ -1,7 +1,10 @@
-// UI.js
+// UI.js - 檢查點 #6
+console.log("[CHECKPOINT] UI.js 已載入");
+
 class UI {
     constructor(game) {
-        this.game = game;
+        console.log("[CHECKPOINT] UI 建構子被呼叫");
+        this.game = game; // 持有 Game 的引用
         this.currentPlayerNameEl = document.getElementById('current-player-name');
         this.statusEl = document.getElementById('status');
         this.rollButton = document.getElementById('roll-button');
@@ -25,10 +28,13 @@ class UI {
 
     updateCurrentPlayerDisplay() {
         if (this.currentPlayerNameEl) {
-            const player = this.game.getCurrentPlayer();
-            this.currentPlayerNameEl.textContent = player.name;
+            const currentPlayer = this.game.getCurrentPlayer();
+            this.currentPlayerNameEl.textContent = currentPlayer.name;
+
+            // 清除舊的顏色類別
             this.currentPlayerNameEl.classList.remove('player-red', 'player-blue', 'player-green', 'player-yellow');
-            this.currentPlayerNameEl.classList.add(`player-${player.color}`);
+            // 添加新的顏色類別
+            this.currentPlayerNameEl.classList.add(`player-${currentPlayer.color}`);
         }
     }
 
@@ -47,11 +53,12 @@ class UI {
 
     updateLaunchRuleDisplay(rule) {
         if (this.ruleStatusEl) {
-            const labels = { '6': '6 點起飛', 'even': '雙數起飛', 'odd': '單數起飛' };
-            this.ruleStatusEl.textContent = `起飛規則：${labels[rule] || '未知'}`;
+            const ruleLabels = { '6': '6 點起飛', 'even': '雙數起飛', 'odd': '單數起飛' };
+            this.ruleStatusEl.textContent = `起飛規則：${ruleLabels[rule] || '未知'}`;
         }
     }
 
+    // 遊戲結束提示
     showGameOver(winner) {
         this.setStatus(`🎉 遊戲結束！${winner.name} 獲勝！`, true);
         this.setRollButtonEnabled(false);
