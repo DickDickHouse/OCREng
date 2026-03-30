@@ -1,6 +1,6 @@
 // paths.js
-import { BOARD_ROWS, BOARD_COLS, PATH_LENGTH } from './config.js';
-import { xyToIndex, lineCoords } from './utils.js';
+import { BOARD_ROWS, BOARD_COLS, PATH_LENGTH } from 'config.js';
+import { xyToIndex, lineCoords } from 'utils.js';
 
 // 路徑定義
 const basePathWithColor = [
