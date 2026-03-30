@@ -159,7 +159,7 @@ export default Piece;
 
 ```javascript
 // Player.js
-import Piece from 'Piece.js';
+import Piece from './Piece.js';
 import GameConfig from './GameConfig.js';
 
 class Player {
@@ -213,7 +213,7 @@ export default Player;
 
 ### 📁 4. `Board.js```javascript
 // Board.js
-import GameConfig from 'GameConfig.js';
+import GameConfig from './GameConfig.js';
 
 class Board {
     constructor(boardElementId) {
