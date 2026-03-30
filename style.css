@@ -90,16 +90,13 @@ h1 { margin-bottom: 12px; }
 #rule-status {
     margin: 4px 0;
     font-size: 14px;
-    color: #555;
-}
-
-.dice-display {
+    color: #555-display {
     display: flex;
     align-items: center;
-    gap: 6px;    min-height: 40px;
+    gap: 6px;
+    min-height: 40px;
     position: relative;
-}
-.dice-display.is-idle {
+}.dice-display.is-idle {
     opacity: 0.6;
 }
 .dice-image {
@@ -130,7 +127,7 @@ h1 { margin-bottom: 12px; }
 }
 
 #board-wrapper {
-    display:;
+    display: flex;
     justify-content: center;
     margin-top: 8px;
 }
@@ -145,9 +142,12 @@ h1 { margin-bottom: 12px; }
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.18);
 }
-.cell {    width: 26px;
-    height: 26px    border: 1px solid #d9d9d9;
-    position: relative;
+.cell {
+    width: 26px;
+    height: 26px;
+    border: 1px solid #d9d9d9;    position: relative;
+    /* 移除這行，讓 .cell-home-* 的背景色可以生效 */
+    /* background-color: #fafafa; */
 }
 /* 家區 */
 .cell-home-red { background-color: #ffd6d6; }
@@ -169,7 +169,7 @@ h1 { margin-bottom: 12px; }
 .start-red::after { border-color: #ff4d4f; }
 .start-blue::after { border-color: #1890ff; }
 .start-green::after { border-color: #52c41a; }
-.start { border-color: #faad14; }
+.start-yellow::after { border-color: #faad14; }
 .pieces-container {
     position: absolute;
     inset: 2px;
