@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>簡易版飛行棋 Demo</title>
+    <title>OOP 飛行棋 Demo</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>簡易版飛行棋 Demo</h1>
+    <h1>OOP 飛行棋 Demo</h1>
     <div id="version"></div>
 
     <div id="controls">
@@ -41,9 +41,9 @@
     </div>
 
     <div id="bottom-controls">
-        <button id="reset-button">重新開始</button>
+        <button id="reset-button" onclick="window.gameInstance && window.gameInstance.reset()">重新開始</button>
     </div>
 
-    <script src="main.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
