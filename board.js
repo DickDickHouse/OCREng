@@ -1,11 +1,14 @@
-// Board.js - 棋盤類別
+// Board.js - 檢查點 #4
+console.log("[CHECKPOINT] Board.js 已載入");
+
 import GameConfig from './GameConfig.js';
 
 class Board {
     constructor(boardElementId) {
+        console.log(`[CHECKPOINT] Board 建構子被呼叫，目標元素 ID: ${boardElementId}`);
         this.element = document.getElementById(boardElementId);
         if (!this.element) {
-            throw new Error(`找不到棋盤元素: ${boardElementId}`);
+            console.error(`[ERROR] 找不到棋盤元素: ${boardElementId}`);
         }
         this.cells = [];
         this.boardData = []; // 用於存儲格子的額外數據
@@ -45,9 +48,9 @@ class Board {
                         break;
                     }
                 }
-
                 // 標記起飛點
-                for (const color of GameConfig.COLORS) {                    const [sx, sy] = GameConfig.PATHS.startCellsXY[color];
+                for (const color of GameConfig.COLORS) {
+                    const [sx, sy] = GameConfig.PATHS.startCellsXY[color];
                     if (x === sx && y === sy) {
                         this.boardData[r][c].isStart = true;
                         this.boardData[r][c].classes.push(`start-${color}`);
@@ -88,15 +91,15 @@ class Board {
         };
 
         // 標記家區路徑
-        homePaths.blue.forEach(i => this.boardData[ (i / GameConfig.COLS) | 0 ][ i % GameConfig.COLS ].classes.push("cell-homepath-blue"));
-        homePaths.green.forEach(i => this.boardData[ (i / GameConfig.COLS) | 0 ][ i % GameConfig.COLS ].classes.push("cell-homepath-green"));
-        homePaths.red.forEach(i => this.boardData[ (i / GameConfig.COLS) | 0 ][ i % GameConfig.COLS ].classes.push("cell-homepath-red"));
-        homePaths.yellow.forEach(i => this.boardData[ (i / GameConfig.COLS) | 0 ][ i % GameConfig.COLS ].classes.push("cell-homepath-yellow"));
+        homePaths.blue.forEach(i => this.boardData[ Math.floor(i / GameConfig.COLS) ][ i % GameConfig.COLS ].classes.push("cell-homepath-blue"));
+        homePaths.green.forEach(i => this.boardData[ Math.floor(i / GameConfig.COLS) ][ i % GameConfig.COLS ].classes.push("cell-homepath-green"));
+        homePaths.red.forEach(i => this.boardData[ Math.floor(i / GameConfig.COLS) ][ i % GameConfig.COLS ].classes.push("cell-homepath-red"));
+        homePaths.yellow.forEach(i => this.boardData[ Math.floor(i / GameConfig.COLS) ][ i % GameConfig.COLS ].classes.push("cell-homepath-yellow"));
 
-        // 生成玩家完整路徑
-        for (const color of GameConfig.COLORS) {
+        // 生成玩家完整路徑        for (const color of GameConfig.COLORS) {
             const startIndex = playerStartIndex[color];
-            const path = [];            let idx = startIndex;
+            const path = [];
+            let idx = startIndex;
             while (true) {
                 path.push(basePath[idx]);
                 if (idx === playerStartIndex[color] && path.length > 1) break; // 避免無限循環，實際上這裡需要更精確的終點判斷
@@ -130,6 +133,7 @@ class Board {
                 this.cells[data.index] = cell; // 將 DOM 元素存入索引數組
             }
         }
+        console.log(`[CHECKPOINT] Board.initDOM() 完成，創建了 ${this.element.children.length} 個格子`);
     }
 
     // 渲染棋子
@@ -141,11 +145,11 @@ class Board {
             if (oldContainer) cell.removeChild(oldContainer);
         });
 
-        // 按格子收集棋子
-        const cellPiecesMap = new Map();
+        // 按格子收集棋子        const cellPiecesMap = new Map();
         players.forEach(player => {
             player.pieces.forEach(piece => {
-                let cellIndex;                if (piece.status === 'home') {
+                let cellIndex;
+                if (piece.status === 'home') {
                     const [x, y] = GameConfig.PATHS.homePositions[player.color][piece.homeIndex];
                     cellIndex = GameConfig.xyToIndex(x, y);
                 } else if (piece.status === 'track' && piece.progress === 0) {
@@ -190,5 +194,9 @@ class Board {
                 container.appendChild(pieceEl);
             });
 
-            cell.appendChild(container);
-       export default Board;
+            cell.appendChild(container);        });
+        console.log(`[CHECKPOINT] Board.renderPieces() 完成`);
+    }
+}
+
+export default Board;
