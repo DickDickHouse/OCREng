@@ -1,4 +1,3 @@
-// ✅ 飛行棋核心 v57 - 完全修正版
 console.log("[CORE] main.js 加載中...");
 
 const BOARD_ROWS = 15;
@@ -27,7 +26,6 @@ if (!boardEl) {
 }
 
 let currentPlayerIndex = 0;
-let gameEnded = false;
 let isAnimating = false;
 
 const players = [
@@ -36,26 +34,22 @@ const players = [
         name: "紅方",
         color: "red",
         colorClass: "red",
-        homeArea: { x1: 13, y1: 1, x2: 15, y2: 3 },
         homePositions: [[13, 1], [15, 1], [13, 3], [15, 3]],
         pieces: Array.from({length:4}, (_, i) => ({
             status: "home",
             homeIndex: i,
-            progress: 0,
-            homeCoord: [13, 1]
+            progress: 0
         }))
     },
     {
         id: 1,
-        name: "藍方",        color: "blue",
+        name: "藍方",
+        color: "blue",
         colorClass: "blue",
-        homeArea: { x1: 1, y1: 1, x2: 3, y2: 3 },
         homePositions: [[1,1], [3,1], [1,3], [3,3]],
-        pieces: Array.from({length:4}, (_, i) => ({
-            status: "home",
+        pieces: Array.from({length:4}, (_, i) => ({            status: "home",
             homeIndex: i,
-            progress: 0,
-            homeCoord: [1, 1]
+            progress: 0
         }))
     },
     {
@@ -63,13 +57,11 @@ const players = [
         name: "綠方",
         color: "green",
         colorClass: "green",
-        homeArea: { x1: 1, y1: 13, x2: 3, y2: 15 },
         homePositions: [[1,13], [3,13], [1,15], [3,15]],
         pieces: Array.from({length:4}, (_, i) => ({
             status: "home",
             homeIndex: i,
-            progress: 0,
-            homeCoord: [1, 13]
+            progress: 0
         }))
     },
     {
@@ -77,13 +69,11 @@ const players = [
         name: "黃方",
         color: "yellow",
         colorClass: "yellow",
-        homeArea: { x1: 13, y1: 13, x2: 15, y2: 15 },
         homePositions: [[13,13], [15,13], [13,15], [15,15]],
         pieces: Array.from({length:4}, (_, i) => ({
             status: "home",
             homeIndex: i,
-            progress: 0,
-            homeCoord: [13, 13]
+            progress: 0
         }))
     },
 ];
@@ -96,7 +86,8 @@ const startCellsXY = {
 };
 
 const startCells = {
-    blue: xyToIndex(...startCellsXY.blue),    red: xyToIndex(...startCellsXY.red),
+    blue: xyToIndex(...startCellsXY.blue),
+    red: xyToIndex(...startCellsXY.red),
     green: xyToIndex(...startCellsXY.green),
     yellow: xyToIndex(...startCellsXY.yellow),
 };
@@ -105,8 +96,7 @@ function updateCurrentPlayerDisplay() {
     const p = players[currentPlayerIndex];
     if (currentPlayerNameEl) currentPlayerNameEl.textContent = p.name;
     if (currentPlayerNameEl) {
-        currentPlayerNameEl.classList.remove(
-            "player-red", "player-blue", "player-green", "player-yellow"
+        currentPlayerNameEl.classList.remove(            "player-red", "player-blue", "player-green", "player-yellow"
         );
         if (p.color === "red") currentPlayerNameEl.classList.add("player-red");
         if (p.color === "blue") currentPlayerNameEl.classList.add("player-blue");
@@ -128,7 +118,7 @@ function setDiceIdle() {
 }
 
 function handleRollDice() {
-    console.log("🎲 [handleRollDice] 擲骰子按鈕被點擊");
+    console.log("🎲 擲骰子按鈕被點擊");
     
     if (isAnimating) return;
     isAnimating = true;
@@ -145,7 +135,8 @@ function handleRollDice() {
     const rollInterval = setInterval(() => {
         const tempNum = Math.floor(Math.random() * 6) + 1;
         if (diceImageEl) {
-            diceImageEl.src = `images/dice-${tempNum}.svg`;        }
+            diceImageEl.src = `images/dice-${tempNum}.svg`;
+        }
         if (diceResultEl) diceResultEl.textContent = tempNum.toString();
         
         rollCount++;
@@ -154,8 +145,7 @@ function handleRollDice() {
             
             const finalDice = Math.floor(Math.random() * 6) + 1;
             if (diceImageEl) {
-                diceImageEl.classList.remove("is-rolling");
-                diceImageEl.src = `images/dice-${finalDice}.svg`;
+                diceImageEl.classList.remove("is-rolling");                diceImageEl.src = `images/dice-${finalDice}.svg`;
             }
             if (diceResultEl) diceResultEl.textContent = finalDice.toString();
             
@@ -194,7 +184,8 @@ function initBoard() {
             cell.style.position = "relative";
             
             const x = c + 1;
-            const y = r + 1;            
+            const y = r + 1;
+            
             if (x >= 1 && x <= 3 && y >= 1 && y <= 3) cell.classList.add("cell-home-blue");
             if (x >= 13 && x <= 15 && y >= 1 && y <= 3) cell.classList.add("cell-home-red");
             if (x >= 1 && x <= 3 && y >= 13 && y <= 15) cell.classList.add("cell-home-green");
@@ -204,11 +195,10 @@ function initBoard() {
             if (x === 12 && y === 1) cell.classList.add("start-red");
             if (x === 4 && y === 15) cell.classList.add("start-green");
             if (x === 15 && y === 12) cell.classList.add("start-yellow");
-
             boardEl.appendChild(cell);
         }
     }
-    console.log(`✅ [initBoard] 成功創建 ${boardEl.children.length} 個格子`);
+    console.log(`✅ 成功創建 ${boardEl.children.length} 個格子`);
 }
 
 function renderPieces() {
@@ -228,8 +218,6 @@ function renderPieces() {
             if (piece.status === "home") {
                 const [x, y] = player.homePositions[piece.homeIndex];
                 cellIndex = xyToIndex(x, y);
-            } else if (piece.status === "track" && piece.progress === 0) {
-                cellIndex = startCells[player.color];
             } else {
                 return;
             }
@@ -243,7 +231,8 @@ function renderPieces() {
             container.style.inset = "2px";
             container.style.display = "grid";
             container.style.gridTemplateColumns = "1fr 1fr";
-            container.style.gridTemplateRows = "1fr 1fr";            
+            container.style.gridTemplateRows = "1fr 1fr";
+            
             const pieceEl = document.createElement("div");
             pieceEl.className = `piece ${player.colorClass}`;
             pieceEl.style.width = "14px";
@@ -254,14 +243,13 @@ function renderPieces() {
             
             pieceEl.style.backgroundColor =
                 player.color === "blue" ? "#1890ff" :
-                player.color === "red" ? "#ff4d4f" :
-                player.color === "green" ? "#52c41a" : "#faad14";
+                player.color === "red" ? "#ff4d4f" :                player.color === "green" ? "#52c41a" : "#faad14";
             
             container.appendChild(pieceEl);
             cell.appendChild(container);
         });
     });
-    console.log("✅ [renderPieces] 所有棋子已渲染");
+    console.log("✅ 所有棋子已渲染");
 }
 
 function initGame() {
@@ -274,12 +262,10 @@ function initGame() {
             piece.status = "home";
             piece.homeIndex = i;
             piece.progress = 0;
-            piece.homeCoord = player.homePositions[i];
         });
     });
     
     currentPlayerIndex = 0;
-    gameEnded = false;
     isAnimating = false;
     
     renderPieces();
@@ -293,6 +279,7 @@ function initGame() {
     
     console.log("✅ 遊戲初始化完成");
 }
+
 function initEventListeners() {
     if (rollButton) {
         rollButton.addEventListener("click", handleRollDice);
