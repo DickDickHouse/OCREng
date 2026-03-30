@@ -1,5 +1,5 @@
 // utils.js
-import { BOARD_COLS } from './config.js';
+import { BOARD_COLS } from 'config.js';
 
 export function xyToIndex(x, y) {
     const col = x - 1;
