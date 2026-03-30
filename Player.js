@@ -1,8 +1,12 @@
-import Piece from 'Piece.js';
-import GameConfig from 'GameConfig.js';
+// Player.js - 檢查點 #3
+console.log("[CHECKPOINT] Player.js 已載入");
+
+import Piece from './Piece.js';
+import GameConfig from './GameConfig.js';
 
 class Player {
     constructor(id, name, color) {
+        console.log(`[CHECKPOINT] Player 建構子被呼叫: ${name} (${color})`);
         this.id = id;
         this.name = name;
         this.color = color;
