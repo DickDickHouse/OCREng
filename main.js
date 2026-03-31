@@ -61,7 +61,7 @@ const PATHS = {
 function xyToIndex(x, y) {
     const col = x - 1;
     const row = y - 1;
-    return row * COLS + col;
+    return row * BOARD_COLS + col; // ✅ 修正：變量名 BOARD_COLS
 }
 
 function lineCoords(x1, y1, x2, y2) {
@@ -103,7 +103,7 @@ function createPiece(id, status = 'home', homeIndex = 0, progress = 0) {
             return false;
         },
         move(steps, maxProgress) {
-            if (this.status !== false;
+            if (this.status !== 'track') return false; // ✅ 修正：補全 if 語句
             this.progress += steps;
             if (this.progress >= maxProgress) {
                 this.status = 'finished';
@@ -537,8 +537,7 @@ function createGame() {
 
     function performMove(moveInfo) {
         const { piece, type, target, steps } = moveInfo;
-        const player = players[currentPlayerIndex];
-        if (type === 'launch') {
+        const player = players[currentPlayerIndex];        if (type === 'launch') {
             piece.launch();
             ui.setStatus(`${player.name} 的棋子起飛了！`);
         } else if (type === 'move' && target !== undefined) {
@@ -548,7 +547,7 @@ function createGame() {
         board.renderPieces(players);
 
         if (piece.isFinished() && player.hasWon()) {
- true;
+            gameEnded = true; // ✅ 修正：賦值運算符
             ui.showGameOver(player);
             isAnimating = false;
             return;
@@ -586,8 +585,8 @@ function createGame() {
         currentPlayerIndex = 0;
         gameEnded = false;
         isAnimating = false;
-        board.renderPieces(players);        ui.updateCurrentPlayerDisplay();
-        dice.reset();
+        board.renderPieces(players);
+        ui.updateCurrentPlayerDisplay();        dice.reset();
         ui.setRollButtonEnabled(true);
         ui.setStatus('');
     }
